@@ -1,0 +1,136 @@
+<h2 mat-dialog-title>New Ingredient Source</h2>
+
+<mat-dialog-content>
+  <mat-stepper linear (selectionChange)="onStepChange($event)" #stepper>
+
+    <!-- ── Step 1: Source Details ───────────────────────────────────────── -->
+    <mat-step [stepControl]="step1" label="Source details">
+      <form [formGroup]="step1" class="step-form">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g. Ashwood Treant" autocomplete="off" />
+          <mat-hint>Monster, plant, trap, vendor — any ingredient source</mat-hint>
+          @if (step1.get('name')?.hasError('required') && step1.get('name')?.touched) {
+            <mat-error>Name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="row-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Creature type</mat-label>
+            <mat-select formControlName="creatureTypeId">
+              @for (ct of creatureTypes; track ct.id) {
+                <mat-option [value]="ct.id">{{ ct.name }}</mat-option>
+              }
+            </mat-select>
+            @if (step1.get('creatureTypeId')?.hasError('required') && step1.get('creatureTypeId')?.touched) {
+              <mat-error>Required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Rarity</mat-label>
+            <mat-select formControlName="rarity">
+              @for (r of rarities; track r) {
+                <mat-option [value]="r">{{ r }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="checkbox-row">
+          <mat-checkbox formControlName="isBoss">Boss creature</mat-checkbox>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Notes (optional)</mat-label>
+          <textarea matInput formControlName="notes" rows="2"
+                    placeholder="Where it's found, special behaviour, etc."></textarea>
+        </mat-form-field>
+
+        <div class="step-actions">
+          <button mat-button type="button" (click)="cancel()">Cancel</button>
+          <button mat-flat-button matStepperNext [disabled]="step1.invalid">Next</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- ── Step 2: Harvestable Components ───────────────────────────────── -->
+    <mat-step label="Harvestable components">
+      <div class="step-form">
+        <p class="step-hint">Which component types can be harvested from this source?</p>
+
+        <div class="component-grid">
+          @for (ct of componentTypes; track ct.id) {
+            <button mat-stroked-button type="button"
+                    [class.selected]="isSelected(ct.id)"
+                    (click)="toggleComponent(ct.id)">
+              {{ ct.name }}
+            </button>
+          }
+        </div>
+
+        @if (step2Error()) {
+          <p class="field-error">{{ step2Error() }}</p>
+        }
+
+        <div class="step-actions">
+          <button mat-button type="button" matStepperPrevious>Back</button>
+          <button mat-flat-button matStepperNext
+                  [disabled]="selectedComponents().size === 0">
+            Next
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- ── Step 3: Name Ingredients ─────────────────────────────────────── -->
+    <mat-step [stepControl]="step3" label="Name ingredients">
+      <form [formGroup]="step3" class="step-form">
+        <p class="step-hint">Name each ingredient this source yields.</p>
+
+        <div class="ingredient-rows" formArrayName="ingredients">
+          @for (row of ingredientRows.controls; track $index) {
+            <div class="ingredient-row" [formGroupName]="$index">
+              <span class="component-label">{{ ingredientRowMeta[$index]?.name }}</span>
+
+              <mat-form-field appearance="outline" class="ingredient-name-field">
+                <mat-label>Ingredient name</mat-label>
+                <input matInput formControlName="name"
+                       [placeholder]="'e.g. ' + ingredientRowMeta[$index]?.name + ' extract'"
+                       autocomplete="off" />
+                @if (row.get('name')?.hasError('required') && row.get('name')?.touched) {
+                  <mat-error>Required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="ingredient-notes-field">
+                <mat-label>Notes (optional)</mat-label>
+                <input matInput formControlName="notes" autocomplete="off" />
+              </mat-form-field>
+            </div>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <p class="submit-error">{{ errorMessage() }}</p>
+        }
+
+        <div class="step-actions">
+          <button mat-button type="button" matStepperPrevious [disabled]="submitting()">Back</button>
+          <button mat-flat-button type="button"
+                  [disabled]="step3.invalid || submitting()"
+                  (click)="submit()">
+            @if (submitting()) {
+              <mat-spinner diameter="18" />
+            } @else {
+              Create
+            }
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+  </mat-stepper>
+</mat-dialog-content>

@@ -1,0 +1,74 @@
+<h2 mat-dialog-title class="dialog-title">
+  {{ recipe.name }}
+  <div class="title-badges">
+    <span class="tier-badge" [style.background]="tierColor" [style.color]="tierTextColor">{{ recipe.tier }}</span>
+    <span class="dc-badge">DC {{ recipe.dc }}</span>
+    @if (recipe.isCustom) {
+      <span class="custom-badge">Custom</span>
+    }
+    @if (noHeatNote) {
+      <span class="no-heat-badge" [matTooltip]="noHeatNote">
+        <mat-icon>whatshot</mat-icon> No heat required
+      </span>
+    }
+  </div>
+</h2>
+
+<mat-dialog-content>
+
+  @if (recipe.imageUrl) {
+    <div class="recipe-hero">
+      <img [src]="recipe.imageUrl" [alt]="recipe.name" [title]="recipe.name" class="recipe-hero-img" />
+    </div>
+  }
+
+  <section class="section">
+    <h3 class="section-label">Required Ingredients</h3>
+    <div class="chip-row">
+      @for (item of ingredientDetails; track item.name) {
+        <mat-chip>
+          {{ item.name }}
+          @if (item.bossSpecific) {
+            <span class="boss-specific">({{ item.bossSpecific }})</span>
+          }
+        </mat-chip>
+      }
+    </div>
+  </section>
+
+  @if (recipe.bossEffect) {
+    <mat-divider />
+    <section class="section">
+      <h3 class="section-label">Boss Effect</h3>
+      <div class="boss-effect">
+        {{ recipe.bossEffect }}
+      </div>
+    </section>
+  }
+
+  <mat-divider />
+
+  <section class="section">
+    <h3 class="section-label">Ingredient Effects</h3>
+    <div class="ingredient-effects-list">
+      @for (item of ingredientDetails; track item.name) {
+        <div class="ingredient-effect-row">
+          <span class="comp-name">{{ item.name }}</span>
+          <span class="effect-hint">Effect varies by creature type — check the Ingredients tab for the specific combination you're using.</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  @if (recipe.notes) {
+    <mat-divider />
+    <section class="section">
+      <p class="notes">{{ recipe.notes }}</p>
+    </section>
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

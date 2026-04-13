@@ -1,0 +1,98 @@
+<h2 mat-dialog-title class="dialog-title">
+  {{ ingredient.name }}
+  <div class="title-badges">
+    <span class="type-badge">{{ componentTypeName }}</span>
+    <span class="creature-badge">{{ creatureTypeName }}</span>
+    @if (ingredient.isCustom) {
+      <span class="custom-badge">Custom</span>
+    }
+  </div>
+</h2>
+
+<div class="ingredient-context-art">
+  <img [src]="contextImageUrl" [alt]="componentTypeName" [title]="componentTypeName" />
+</div>
+
+<mat-dialog-content>
+
+  <section class="section">
+    <h3 class="section-label">Magical Effect</h3>
+    @if (effect) {
+      <p class="effect-desc">{{ effect.description }}</p>
+      @if (effect.scaling) {
+        <div class="scaling-table">
+          <div class="scale-row">
+            <span class="scale-rarity uncommon">Uncommon</span>
+            <span class="scale-value">{{ effect.scaling.uncommon }}</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-rarity rare">Rare</span>
+            <span class="scale-value">{{ effect.scaling.rare }}</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-rarity very-rare">Very Rare</span>
+            <span class="scale-value">{{ effect.scaling.veryRare }}</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-rarity legendary">Legendary</span>
+            <span class="scale-value">{{ effect.scaling.legendary }}</span>
+          </div>
+        </div>
+      }
+    } @else {
+      <p class="no-effect">No magical effect for this combination.</p>
+    }
+  </section>
+
+  <mat-divider />
+
+  <section class="section">
+    <h3 class="section-label">Inventory</h3>
+    <div class="quantity-row">
+      <span class="qty-label">In stock:</span>
+      <button mat-icon-button [disabled]="quantity === 0" (click)="adjust(-1)">
+        <mat-icon>remove</mat-icon>
+      </button>
+      <span class="qty-value" [class.has-qty]="quantity > 0">{{ quantity }}</span>
+      <button mat-icon-button (click)="adjust(1)">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </section>
+
+  @if (sourceMonsters.length > 0) {
+    <mat-divider />
+    <section class="section">
+      <h3 class="section-label">Source Monsters</h3>
+      <div class="tag-list">
+        @for (m of sourceMonsters; track m!.id) {
+          <button type="button" mat-button class="source-tag link-chip" (click)="openMonster(m!)">{{ m!.name }}</button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (relatedRecipes.length > 0) {
+    <mat-divider />
+    <section class="section">
+      <h3 class="section-label">Used in Recipes</h3>
+      <div class="tag-list">
+        @for (r of relatedRecipes; track r.id) {
+          <button type="button" mat-button class="recipe-tag link-chip" (click)="openRecipe(r)">{{ r.name }}</button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (ingredient.notes) {
+    <mat-divider />
+    <section class="section">
+      <p class="notes">{{ ingredient.notes }}</p>
+    </section>
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

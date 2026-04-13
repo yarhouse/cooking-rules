@@ -1,0 +1,112 @@
+<h2 mat-dialog-title>New Recipe</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g. Treant Bark Stew" autocomplete="off" />
+      @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="row-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Tier</mat-label>
+        <mat-select formControlName="tier">
+          @for (t of tiers; track t) {
+            <mat-option [value]="t">{{ t }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>DC</mat-label>
+        <input matInput type="number" formControlName="dc" min="0" />
+        @if (form.get('dc')?.hasError('min')) {
+          <mat-error>DC must be ≥ 0</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="checkbox-cell">
+        <mat-checkbox formControlName="requiresHeat">Requires heat</mat-checkbox>
+      </div>
+    </div>
+
+    @if (isBoss) {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Boss effect</mat-label>
+        <textarea matInput formControlName="bossEffect" rows="2"
+                  placeholder="Describe the special boss effect…"></textarea>
+        @if (form.get('bossEffect')?.hasError('required') && form.get('bossEffect')?.touched) {
+          <mat-error>Boss effect is required for boss-tier recipes</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notes (optional)</mat-label>
+      <textarea matInput formControlName="notes" rows="2"></textarea>
+    </mat-form-field>
+
+    <mat-divider />
+
+    <div class="ingredients-section">
+      <div class="ingredients-header">
+        <span class="section-label">Ingredients</span>
+        <button mat-stroked-button type="button" (click)="addIngredientRow()">
+          <mat-icon>add</mat-icon> Add slot
+        </button>
+      </div>
+
+      <div formArrayName="ingredients" class="ingredient-rows">
+        @for (row of ingredientRows.controls; track $index) {
+          <div class="ingredient-row" [formGroupName]="$index">
+            <mat-form-field appearance="outline" class="component-field">
+              <mat-label>Component type</mat-label>
+              <mat-select formControlName="componentTypeId">
+                @for (ct of componentTypes; track ct.id) {
+                  <mat-option [value]="ct.id">{{ ct.name }}</mat-option>
+                }
+              </mat-select>
+              @if (row.get('componentTypeId')?.hasError('required') && row.get('componentTypeId')?.touched) {
+                <mat-error>Required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="boss-specific-field">
+              <mat-label>Boss specific (optional)</mat-label>
+              <input matInput formControlName="bossSpecific"
+                     placeholder="e.g. Fiend brain" autocomplete="off" />
+            </mat-form-field>
+
+            <button mat-icon-button type="button" class="remove-btn"
+                    [disabled]="ingredientRows.length === 1"
+                    (click)="removeIngredientRow($index)">
+              <mat-icon>remove_circle_outline</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="submit-error">{{ errorMessage() }}</p>
+    }
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button type="button"
+          [disabled]="form.invalid || submitting()"
+          (click)="submit()">
+    @if (submitting()) {
+      <mat-spinner diameter="18" />
+    } @else {
+      Create
+    }
+  </button>
+</mat-dialog-actions>

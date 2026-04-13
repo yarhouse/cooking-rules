@@ -1,0 +1,80 @@
+<h2 mat-dialog-title class="dialog-title">
+  {{ monster.name }}
+  <div class="title-badges">
+    <span class="type-badge">{{ creatureTypeName }}</span>
+    <span class="rarity-badge" [class]="rarityClass(monster.rarity)">{{ monster.rarity }}</span>
+    @if (monster.isCustom) {
+      <span class="custom-badge">Custom</span>
+    }
+  </div>
+</h2>
+
+<div class="monster-context-art">
+  <img src="images/context/monster-harvesting.png" alt="" role="presentation" />
+</div>
+
+<mat-dialog-content>
+
+  <section class="section">
+    <h3 class="section-label">Harvestable Components</h3>
+    <div class="chip-row">
+      @for (item of ingredients; track item.componentTypeId) {
+        <mat-chip>{{ item.componentTypeName }}</mat-chip>
+      }
+    </div>
+  </section>
+
+  <mat-divider />
+
+  <section class="section">
+    <h3 class="section-label">Component Effects</h3>
+    <div class="effect-list">
+      @for (item of ingredients; track item.componentTypeId) {
+        <div class="effect-block">
+          <span class="comp-name">{{ item.componentTypeName }}</span>
+          @if (item.effect) {
+            <p class="effect-desc">{{ item.effect.description }}</p>
+            @if (item.effect.scaling) {
+              <div class="scaling-grid">
+                <span class="scale-rarity uncommon">Uncommon</span>
+                <span class="scale-value">{{ item.effect.scaling.uncommon }}</span>
+                <span class="scale-rarity rare">Rare</span>
+                <span class="scale-value">{{ item.effect.scaling.rare }}</span>
+                <span class="scale-rarity very-rare">Very Rare</span>
+                <span class="scale-value">{{ item.effect.scaling.veryRare }}</span>
+                <span class="scale-rarity legendary">Legendary</span>
+                <span class="scale-value">{{ item.effect.scaling.legendary }}</span>
+              </div>
+            }
+          } @else {
+            <p class="no-effect">No magical effect data.</p>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  @if (relatedRecipes.length > 0) {
+    <mat-divider />
+    <section class="section">
+      <h3 class="section-label">Used in Recipes</h3>
+      <div class="recipe-list">
+        @for (recipe of relatedRecipes; track recipe.id) {
+          <button type="button" mat-button class="recipe-chip link-chip" (click)="openRecipe(recipe)">{{ recipe.name }}</button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (monster.notes) {
+    <mat-divider />
+    <section class="section">
+      <p class="notes">{{ monster.notes }}</p>
+    </section>
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

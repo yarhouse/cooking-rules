@@ -1,0 +1,488 @@
+:host {
+  display: block;
+}
+
+.rules-page {
+  padding: var(--page-padding);
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+
+  @media (max-width: 768px) { padding: var(--page-padding-mobile); }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0 0 20px;
+    color: var(--mat-sys-on-surface);
+  }
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 20px;
+}
+
+// ── Card shared ────────────────────────────────────────────────────────
+
+mat-card {
+  mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: var(--mat-sys-primary);
+    }
+  }
+
+  mat-card-content {
+    padding-top: 12px;
+
+    mat-divider {
+      margin: 12px 0;
+    }
+  }
+}
+
+// ── Tab 1: How to Cook ─────────────────────────────────────────────────
+
+.fact-grid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fact-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.fact-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--mat-sys-primary);
+}
+
+.rule-note {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+.prereq-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0 0 8px;
+}
+
+.prereq-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.prereq-chip {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.dc-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.tier-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  width: 100px;
+}
+
+.dc-badge {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  width: 56px;
+  text-align: center;
+}
+
+.ing-count {
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.outcome-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.outcome-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.outcome-tag {
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  &.failure {
+    background: #fce4ec;
+    color: #c62828;
+  }
+}
+
+.outcome-text {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.dispel-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dispel-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.rarity-label {
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  min-width: 76px;
+  text-align: center;
+
+  &.rarity-uncommon  { background: #e8f5e9; color: #00695c; }
+  &.rarity-rare      { background: #e3f2fd; color: #1565c0; }
+  &.rarity-very-rare { background: #f3e5f5; color: #6a1b9a; }
+  &.rarity-legendary { background: #fff3e0; color: #e65100; }
+}
+
+.dispel-value {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// ── Tab 2: Component Effects ───────────────────────────────────────────
+
+.effects-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  button {
+    font-size: 0.8rem;
+    height: 32px;
+    line-height: 32px;
+    padding: 0 12px;
+    border-radius: 16px;
+
+    &.active-chip {
+      background: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
+      border-color: var(--mat-sys-primary);
+    }
+  }
+}
+
+.empty-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 0;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    opacity: 0.4;
+  }
+
+  p {
+    font-size: 0.875rem;
+    margin: 0;
+  }
+}
+
+.context-description {
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.5;
+  margin: 0;
+  padding: 4px 0 8px;
+  font-style: italic;
+}
+
+.effect-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.effect-row {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.is-overridden {
+    background: color-mix(in srgb, var(--mat-sys-primary-container) 20%, transparent);
+  }
+}
+
+.effect-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.effect-creature-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mat-sys-primary);
+  flex: 1;
+}
+
+.house-rule-badge {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-primary-container);
+  background: var(--mat-sys-primary-container);
+  padding: 1px 6px;
+  border-radius: 6px;
+
+  mat-icon {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.effect-actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+
+  .edit-btn, .clear-btn {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.effect-row:hover .effect-actions {
+  opacity: 1;
+}
+
+.effect-description {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.scaled-value {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 1px 8px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+
+  &.rarity-uncommon  { background: #e8f5e9; color: #00695c; }
+  &.rarity-rare      { background: #e3f2fd; color: #1565c0; }
+  &.rarity-very-rare { background: #f3e5f5; color: #6a1b9a; }
+  &.rarity-legendary { background: #fff3e0; color: #e65100; }
+}
+
+.inline-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.edit-field {
+  width: 100%;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+// ── Tab 3: Quirks ──────────────────────────────────────────────────────
+
+.quirk-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.quirk-hint {
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+}
+
+.quirk-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.quirk-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.is-flaw {
+    border-left: 3px solid var(--mat-sys-error, #c62828);
+  }
+
+  &.is-boon {
+    border-left: 3px solid var(--mat-sys-primary);
+  }
+}
+
+.quirk-roll {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--mat-sys-on-surface-variant);
+  min-width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.quirk-body {
+  flex: 1;
+}
+
+.quirk-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.quirk-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+}
+
+.quirk-type-badge {
+  padding: 1px 7px;
+  border-radius: 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &.flaw-badge  { background: #fce4ec; color: #c62828; }
+  &.boon-badge  { background: #e8f5e9; color: #2e7d32; }
+}
+
+.quirk-effect {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+  line-height: 1.5;
+}

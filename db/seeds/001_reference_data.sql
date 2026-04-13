@@ -1,0 +1,21 @@
+-- enkiridion: reference data seed
+-- Local file — not committed to the public repo.
+-- Populate this file with your own data to seed the database on first launch.
+-- Applied automatically by server/src/db.ts when PRAGMA user_version = 0.
+-- Must be idempotent — use INSERT OR IGNORE (ON CONFLICT DO NOTHING).
+--
+-- Expected tables (see db/sqlite/schema.sql for full column definitions):
+--   creature_types          (id, name)
+--   component_types         (id, name, description)
+--   creature_type_components(creature_type_id, component_type_id)
+--   component_effects       (component_type_id, creature_type_id, description,
+--                            scaling_uncommon, scaling_rare, scaling_very_rare, scaling_legendary)
+--   monsters                (id, name, creature_type_id, rarity, is_boss, notes)
+--   monster_harvestable_components (monster_id, component_type_id)
+--   ingredients             (id, name, component_type_id, creature_type_id, notes)
+--   ingredient_source_monsters    (ingredient_id, monster_id)
+--   recipes                 (id, name, tier, dc, boss_effect, requires_heat, notes, image_url)
+--   recipe_ingredients      (recipe_id, component_type_id, boss_specific)
+--
+-- Example:
+--   INSERT OR IGNORE INTO creature_types (id, name) VALUES ('aberration', 'Aberration');

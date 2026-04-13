@@ -1,0 +1,307 @@
+<div class="rules-page">
+  <h1>Rules Reference</h1>
+
+  <mat-tab-group>
+
+    <!-- ── Tab 1: How to Cook ───────────────────────────────────────── -->
+    <mat-tab label="How to Cook">
+      <div class="tab-content">
+
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title><mat-icon>timer</mat-icon> Quick Facts</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="fact-grid">
+              <div class="fact">
+                <span class="fact-label">Cook time</span>
+                <span class="fact-value">1 hour</span>
+              </div>
+              <div class="fact">
+                <span class="fact-label">Consume</span>
+                <span class="fact-value">10 minutes</span>
+              </div>
+              <div class="fact">
+                <span class="fact-label">Duration</span>
+                <span class="fact-value">8 hours</span>
+              </div>
+            </div>
+            <mat-divider />
+            <p class="rule-note">
+              Eating a new magical meal replaces the previous meal's effects at the end of the 10-minute consumption period.
+            </p>
+            <p class="rule-note">
+              Portions: 1 Large creature <em>or</em> up to 4 Medium/smaller creatures.
+            </p>
+            <mat-divider />
+            <p class="prereq-title">Prerequisites</p>
+            <div class="prereq-list">
+              <span class="prereq-chip">Recipe</span>
+              <span class="prereq-chip">Monster Components</span>
+              <span class="prereq-chip">Essence</span>
+              <span class="prereq-chip">Cook's Utensils</span>
+              <span class="prereq-chip">Heat Source</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title><mat-icon>casino</mat-icon> The Cook Check</mat-card-title>
+            <mat-card-subtitle>Constitution (cook's utensils) vs. recipe DC</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="dc-table">
+              @for (row of dcTable; track row.tier) {
+                <div class="dc-row">
+                  <span class="tier-name">{{ row.tier }}</span>
+                  <span class="dc-badge">DC {{ row.dc }}</span>
+                  <span class="ing-count">{{ row.ingredients }} ingredient{{ row.ingredients > 1 ? 's' : '' }}</span>
+                </div>
+              }
+            </div>
+            <mat-divider />
+            <div class="outcome-list">
+              <div class="outcome-row">
+                <span class="outcome-tag success">Success</span>
+                <span class="outcome-text">No quirks. Beat DC by 5+: 1 boon (min. uncommon). Beat by 10+: 2 boons (min. rare). Beat by 15+: 3 boons (min. very rare).</span>
+              </div>
+              <div class="outcome-row">
+                <span class="outcome-tag failure">Miss</span>
+                <span class="outcome-text">Miss by 1–4: 1 flaw. Miss by 5–9: 2 flaws. Miss by 10–14: 3 flaws. Miss by 15+: 4 flaws.</span>
+              </div>
+            </div>
+            <mat-divider />
+            <p class="rule-note">
+              <strong>Sous chef:</strong> One helper spends the full hour assisting. Adds their proficiency bonus to your check — or half their proficiency bonus if they lack cook's utensils proficiency.
+            </p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title><mat-icon>auto_fix_off</mat-icon> Dispelling Magical Meals</mat-card-title>
+            <mat-card-subtitle>All meal effects count as a single spell for dispel magic purposes</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="dispel-table">
+              <div class="dispel-row">
+                <span class="rarity-label rarity-uncommon">Uncommon</span>
+                <span class="dispel-value">2nd-level spell</span>
+              </div>
+              <div class="dispel-row">
+                <span class="rarity-label rarity-rare">Rare</span>
+                <span class="dispel-value">4th-level spell</span>
+              </div>
+              <div class="dispel-row">
+                <span class="rarity-label rarity-very-rare">Very Rare</span>
+                <span class="dispel-value">6th-level spell</span>
+              </div>
+              <div class="dispel-row">
+                <span class="rarity-label rarity-legendary">Legendary</span>
+                <span class="dispel-value">8th-level spell</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </mat-tab>
+
+    <!-- ── Tab 2: Component Effects ─────────────────────────────────── -->
+    <mat-tab label="Component Effects">
+      <div class="tab-content">
+
+        <div class="effects-controls">
+          <mat-button-toggle-group
+            [value]="effectMode()"
+            (change)="effectMode.set($event.value); selectedComponent.set(null); selectedCreature.set(null)">
+            <mat-button-toggle value="component">By Component</mat-button-toggle>
+            <mat-button-toggle value="creature">By Creature</mat-button-toggle>
+          </mat-button-toggle-group>
+
+          <mat-button-toggle-group [value]="selectedRarity()" (change)="selectedRarity.set($event.value)">
+            @for (rarity of rarities; track rarity) {
+              <mat-button-toggle [value]="rarity">{{ rarityLabels[rarity] }}</mat-button-toggle>
+            }
+          </mat-button-toggle-group>
+        </div>
+
+        <!-- By Component -->
+        @if (effectMode() === 'component') {
+          <div class="chip-row">
+            @for (comp of componentTypes; track comp.id) {
+              <button mat-stroked-button
+                [class.active-chip]="selectedComponent() === comp.id"
+                (click)="selectedComponent.set(selectedComponent() === comp.id ? null : comp.id)">
+                {{ comp.name }}
+              </button>
+            }
+          </div>
+
+          @if (!selectedComponent()) {
+            <div class="empty-hint">
+              <mat-icon>touch_app</mat-icon>
+              <p>Select a component type above to see its effects by creature.</p>
+            </div>
+          } @else {
+            <p class="context-description">{{ selectedComponentType()?.description }}</p>
+            <div class="effect-list">
+              @for (row of effectsByComponent(); track row.key) {
+                <div class="effect-row" [class.is-overridden]="row.isOverridden">
+                  <div class="effect-header">
+                    <span class="effect-creature-label">{{ row.label }}</span>
+                    @if (row.isOverridden) {
+                      <span class="house-rule-badge" matTooltip="House rule override">
+                        <mat-icon>edit</mat-icon> house rule
+                      </span>
+                    }
+                    <div class="effect-actions">
+                      @if (editingKey() !== row.key) {
+                        <button mat-icon-button class="edit-btn"
+                          [matTooltip]="row.isOverridden ? 'Edit house rule' : 'Override with house rule'"
+                          (click)="startEdit(row.key, row.description)">
+                          <mat-icon>edit_note</mat-icon>
+                        </button>
+                        @if (row.isOverridden) {
+                          <button mat-icon-button class="clear-btn" matTooltip="Restore original"
+                            (click)="clearOverride(row.key)">
+                            <mat-icon>restart_alt</mat-icon>
+                          </button>
+                        }
+                      }
+                    </div>
+                  </div>
+
+                  @if (editingKey() === row.key) {
+                    <div class="inline-edit">
+                      <mat-form-field appearance="outline" class="edit-field">
+                        <mat-label>Effect description</mat-label>
+                        <textarea matInput [(ngModel)]="editText" cdkTextareaAutosize rows="2"></textarea>
+                      </mat-form-field>
+                      <div class="edit-buttons">
+                        <button mat-stroked-button (click)="saveEdit(row.key)">Save</button>
+                        <button mat-button (click)="cancelEdit()">Cancel</button>
+                      </div>
+                    </div>
+                  } @else {
+                    <p class="effect-description">{{ row.description }}</p>
+                    @if (row.scaledValue) {
+                      <span class="scaled-value rarity-{{ selectedRarity() }}">{{ row.scaledValue }}</span>
+                    }
+                  }
+                </div>
+              }
+            </div>
+          }
+        }
+
+        <!-- By Creature -->
+        @if (effectMode() === 'creature') {
+          <div class="chip-row">
+            @for (creature of creatureTypes; track creature.id) {
+              <button mat-stroked-button
+                [class.active-chip]="selectedCreature() === creature.id"
+                (click)="selectedCreature.set(selectedCreature() === creature.id ? null : creature.id)">
+                {{ creature.name }}
+              </button>
+            }
+          </div>
+
+          @if (!selectedCreature()) {
+            <div class="empty-hint">
+              <mat-icon>touch_app</mat-icon>
+              <p>Select a creature type above to see all harvestable component effects.</p>
+            </div>
+          } @else {
+            <p class="context-description">
+              Harvestable components: {{ selectedCreatureType()?.availableComponents?.join(', ') }}
+            </p>
+            <div class="effect-list">
+              @for (row of effectsByCreature(); track row.key) {
+                <div class="effect-row" [class.is-overridden]="row.isOverridden">
+                  <div class="effect-header">
+                    <span class="effect-creature-label">{{ row.label }}</span>
+                    @if (row.isOverridden) {
+                      <span class="house-rule-badge" matTooltip="House rule override">
+                        <mat-icon>edit</mat-icon> house rule
+                      </span>
+                    }
+                    <div class="effect-actions">
+                      @if (editingKey() !== row.key) {
+                        <button mat-icon-button class="edit-btn"
+                          [matTooltip]="row.isOverridden ? 'Edit house rule' : 'Override with house rule'"
+                          (click)="startEdit(row.key, row.description)">
+                          <mat-icon>edit_note</mat-icon>
+                        </button>
+                        @if (row.isOverridden) {
+                          <button mat-icon-button class="clear-btn" matTooltip="Restore original"
+                            (click)="clearOverride(row.key)">
+                            <mat-icon>restart_alt</mat-icon>
+                          </button>
+                        }
+                      }
+                    </div>
+                  </div>
+
+                  @if (editingKey() === row.key) {
+                    <div class="inline-edit">
+                      <mat-form-field appearance="outline" class="edit-field">
+                        <mat-label>Effect description</mat-label>
+                        <textarea matInput [(ngModel)]="editText" cdkTextareaAutosize rows="2"></textarea>
+                      </mat-form-field>
+                      <div class="edit-buttons">
+                        <button mat-stroked-button (click)="saveEdit(row.key)">Save</button>
+                        <button mat-button (click)="cancelEdit()">Cancel</button>
+                      </div>
+                    </div>
+                  } @else {
+                    <p class="effect-description">{{ row.description }}</p>
+                    @if (row.scaledValue) {
+                      <span class="scaled-value rarity-{{ selectedRarity() }}">{{ row.scaledValue }}</span>
+                    }
+                  }
+                </div>
+              }
+            </div>
+          }
+        }
+
+      </div>
+    </mat-tab>
+
+    <!-- ── Tab 3: Quirks ─────────────────────────────────────────────── -->
+    <mat-tab label="Quirks">
+      <div class="tab-content">
+
+        <div class="quirk-controls">
+          <mat-button-toggle-group [value]="quirkFilter()" (change)="quirkFilter.set($event.value)">
+            <mat-button-toggle value="all">All</mat-button-toggle>
+            <mat-button-toggle value="flaw">Flaws</mat-button-toggle>
+            <mat-button-toggle value="boon">Boons</mat-button-toggle>
+          </mat-button-toggle-group>
+          <span class="quirk-hint">Roll d8 to determine which quirk you receive</span>
+        </div>
+
+        <div class="quirk-list">
+          @for (quirk of filteredQuirks(); track quirk.type + quirk.roll) {
+            <div class="quirk-row" [class.is-flaw]="quirk.type === 'flaw'" [class.is-boon]="quirk.type === 'boon'">
+              <span class="quirk-roll">{{ quirk.roll }}</span>
+              <div class="quirk-body">
+                <div class="quirk-header">
+                  <span class="quirk-name">{{ quirk.name }}</span>
+                  <span class="quirk-type-badge" [class.flaw-badge]="quirk.type === 'flaw'" [class.boon-badge]="quirk.type === 'boon'">
+                    {{ quirk.type }}
+                  </span>
+                </div>
+                <p class="quirk-effect">{{ quirk.effect }}</p>
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>

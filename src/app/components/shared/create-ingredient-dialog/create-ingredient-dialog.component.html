@@ -1,0 +1,73 @@
+<h2 mat-dialog-title>New Ingredient</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g. Dragon Bile" autocomplete="off" />
+      @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="row-2">
+      <mat-form-field appearance="outline">
+        <mat-label>Component type</mat-label>
+        <mat-select formControlName="componentTypeId">
+          @for (ct of componentTypes; track ct.id) {
+            <mat-option [value]="ct.id">{{ ct.name }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('componentTypeId')?.hasError('required') && form.get('componentTypeId')?.touched) {
+          <mat-error>Required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Creature type</mat-label>
+        <mat-select formControlName="creatureTypeId">
+          @for (ct of creatureTypes; track ct.id) {
+            <mat-option [value]="ct.id">{{ ct.name }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('creatureTypeId')?.hasError('required') && form.get('creatureTypeId')?.touched) {
+          <mat-error>Required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Source (optional)</mat-label>
+      <mat-select formControlName="sourceMonsterIds" multiple>
+        @for (m of monsters; track m.id) {
+          <mat-option [value]="m.id">{{ m.name }}</mat-option>
+        }
+      </mat-select>
+      <mat-hint>Which monsters or sources drop this ingredient</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notes (optional)</mat-label>
+      <textarea matInput formControlName="notes" rows="2"></textarea>
+    </mat-form-field>
+
+    @if (errorMessage()) {
+      <p class="submit-error">{{ errorMessage() }}</p>
+    }
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button type="button"
+          [disabled]="form.invalid || submitting()"
+          (click)="submit()">
+    @if (submitting()) {
+      <mat-spinner diameter="18" />
+    } @else {
+      Create
+    }
+  </button>
+</mat-dialog-actions>

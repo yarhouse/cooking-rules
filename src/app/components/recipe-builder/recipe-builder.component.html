@@ -1,0 +1,232 @@
+<div class="builder-page">
+  <div class="builder-header">
+    <h1>Recipe Builder</h1>
+    <mat-button-toggle-group [value]="mode()" (change)="mode.set($event.value)">
+      <mat-button-toggle value="ingredient">
+        <mat-icon>kitchen</mat-icon>
+        What can I make?
+      </mat-button-toggle>
+      <mat-button-toggle value="effect">
+        <mat-icon>auto_fix_high</mat-icon>
+        I need an effect
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <div class="builder-layout">
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+
+      @if (mode() === 'ingredient') {
+        <!-- Ingredient-first mode -->
+        <div class="panel-header">
+          <span>Select Ingredients</span>
+          <div class="panel-actions">
+            <button mat-stroked-button (click)="loadFromInventory()" matTooltip="Pre-load all inventory items">
+              <mat-icon>inventory_2</mat-icon> Use Inventory
+            </button>
+            <button mat-stroked-button [class.active]="ingredientOnlyInventory()"
+                    (click)="ingredientOnlyInventory.set(!ingredientOnlyInventory())">
+              <mat-icon>{{ ingredientOnlyInventory() ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+              In stock only
+            </button>
+          </div>
+        </div>
+
+        <mat-form-field appearance="outline" class="search-field">
+          <input matInput [value]="ingredientQuery()"
+                 (input)="ingredientQuery.set($any($event.target).value)"
+                 placeholder="Filter ingredients…" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="ingredient-list">
+          @for (ingredient of filteredIngredientList(); track ingredient.id) {
+            <button class="ingredient-item"
+                    [class.selected]="isSelected(ingredient)"
+                    [class.in-stock]="getQuantity(ingredient.id) > 0"
+                    (click)="toggleIngredient(ingredient)">
+              <div class="item-main">
+                <span class="item-name">{{ ingredient.name }}</span>
+                <span class="item-tags">
+                  <span class="component-tag">{{ getComponentName(ingredient.componentTypeId) }}</span>
+                  <span class="creature-tag">{{ getCreatureName(ingredient.creatureTypeId) }}</span>
+                </span>
+              </div>
+              <div class="item-right">
+                @if (getQuantity(ingredient.id) > 0) {
+                  <span class="stock-badge">×{{ getQuantity(ingredient.id) }}</span>
+                }
+                @if (isSelected(ingredient)) {
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                }
+              </div>
+            </button>
+            <mat-divider></mat-divider>
+          }
+          @empty {
+            <p class="empty">No ingredients match.</p>
+          }
+        </div>
+      }
+
+      @if (mode() === 'effect') {
+        <!-- Effect-first mode -->
+        <div class="panel-header">
+          <span>Search for an Effect</span>
+        </div>
+
+        <mat-form-field appearance="outline" class="search-field">
+          <input matInput [value]="effectQuery()"
+                 (input)="effectQuery.set($any($event.target).value)"
+                 placeholder="e.g. acid, frightened, concentration, fly…" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        @if (effectQuery().length < 2) {
+          <div class="effect-hints">
+            <p>Try:</p>
+            <ul>
+              <li>Damage types: <strong>acid, fire, cold, psychic, necrotic</strong></li>
+              <li>Conditions: <strong>frightened, charmed, stunned, paralysed</strong></li>
+              <li>Spells: <strong>fly, detect, invisibility, feather fall</strong></li>
+              <li>Stats: <strong>charisma, wisdom, perception, intimidation</strong></li>
+              <li>Mechanics: <strong>temp HP, advantage, darkvision</strong></li>
+            </ul>
+          </div>
+        }
+
+        <div class="effect-results">
+          @for (result of effectSearchResults(); track result.ingredient.id) {
+            <div class="effect-result">
+              <div class="result-header">
+                <span class="ingredient-name">{{ result.ingredient.name }}</span>
+                @if (getQuantity(result.ingredient.id) > 0) {
+                  <span class="stock-badge">In stock: ×{{ getQuantity(result.ingredient.id) }}</span>
+                } @else {
+                  <span class="no-stock">Not in stock</span>
+                }
+              </div>
+              <p class="effect-text">{{ result.effect.description }}</p>
+              @if (result.effect.scaling) {
+                <div class="scaling-row">
+                  <span>U: {{ result.effect.scaling.uncommon }}</span>
+                  <span>R: {{ result.effect.scaling.rare }}</span>
+                  <span>VR: {{ result.effect.scaling.veryRare }}</span>
+                  <span>L: {{ result.effect.scaling.legendary }}</span>
+                </div>
+              }
+              <button mat-stroked-button class="add-btn" (click)="addFromEffect(result.ingredient)">
+                <mat-icon>add</mat-icon>
+                Add to selection
+              </button>
+            </div>
+          }
+          @empty {
+            @if (effectQuery().length >= 2) {
+              <p class="empty">No effects match "{{ effectQuery() }}".</p>
+            }
+          }
+        </div>
+      }
+
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+
+      <!-- Selected Ingredients -->
+      <div class="selected-section">
+        <div class="section-header">
+          <span class="section-title">Selected ({{ selectedIngredients().length }})</span>
+          @if (selectedIngredients().length > 0) {
+            <button mat-button (click)="clearSelection()">Clear all</button>
+          }
+        </div>
+
+        @if (selectedIngredients().length === 0) {
+          <p class="empty-selection">Select ingredients from the left panel.</p>
+        }
+
+        <div class="selected-chips">
+          @for (ingredient of selectedIngredients(); track ingredient.id) {
+            <div class="selected-chip">
+              <span class="chip-type">{{ getComponentName(ingredient.componentTypeId) }}</span>
+              <span class="chip-name">{{ ingredient.name }}</span>
+              <button mat-icon-button (click)="removeSelected(ingredient)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <mat-divider />
+
+      <!-- Effects Preview -->
+      @if (selectedEffects().length > 0) {
+        <div class="effects-section">
+          <h3 class="section-title">Effects</h3>
+          @for (item of selectedEffects(); track item.ingredient.id) {
+            <div class="effect-preview">
+              <div class="effect-header">
+                <span class="comp-label">{{ getComponentName(item.ingredient.componentTypeId) }}</span>
+                <span class="creature-label">{{ getCreatureName(item.ingredient.creatureTypeId) }}</span>
+              </div>
+              <p class="effect-desc">{{ item.effect!.description }}</p>
+              @if (item.effect!.scaling) {
+                <div class="scaling-row">
+                  <span class="scale-cell"><span class="scale-label">U</span>{{ item.effect!.scaling!.uncommon }}</span>
+                  <span class="scale-cell"><span class="scale-label">R</span>{{ item.effect!.scaling!.rare }}</span>
+                  <span class="scale-cell"><span class="scale-label">VR</span>{{ item.effect!.scaling!.veryRare }}</span>
+                  <span class="scale-cell"><span class="scale-label">L</span>{{ item.effect!.scaling!.legendary }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+        <mat-divider />
+      }
+
+      <!-- Recipe Matches -->
+      <div class="matches-section">
+        <h3 class="section-title">Recipe Matches</h3>
+
+        @if (selectedIngredients().length === 0) {
+          <p class="empty-selection">Select ingredients to see matching recipes.</p>
+        }
+
+        @for (match of recipeMatches(); track match.recipe.id) {
+          <div class="recipe-match" [class]="matchClass(match.complete, match.covered, match.recipe.ingredients.map(i => i.componentTypeId))">
+            <div class="match-header">
+              <span class="match-name">{{ match.recipe.name }}</span>
+              <span class="match-dc">DC {{ match.recipe.dc }}</span>
+              <span class="match-tier">{{ match.recipe.tier }}</span>
+            </div>
+            <div class="match-ingredients">
+              @for (ri of match.recipe.ingredients; track ri.componentTypeId) {
+                <span class="match-chip"
+                      [class.covered]="selectedComponentTypes().includes(ri.componentTypeId)"
+                      [class.missing]="!selectedComponentTypes().includes(ri.componentTypeId)">
+                  {{ getComponentName(ri.componentTypeId) }}
+                </span>
+              }
+            </div>
+            @if (!match.complete && match.missing.length > 0) {
+              <p class="missing-note">Missing: {{ match.missing.map(id => getComponentName(id)).join(', ') }}</p>
+            }
+            @if (match.recipe.bossEffect) {
+              <p class="boss-effect-note">Boss: {{ match.recipe.bossEffect }}</p>
+            }
+          </div>
+        }
+
+        @if (selectedIngredients().length > 0 && recipeMatches().length === 0) {
+          <p class="empty-selection">No recipes match the selected ingredients.</p>
+        }
+      </div>
+
+    </div>
+  </div>
+</div>

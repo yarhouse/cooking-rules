@@ -1,0 +1,57 @@
+.browse-page {
+  padding: var(--page-padding);
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+
+  @media (max-width: 768px) { padding: var(--page-padding-mobile); }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--mat-sys-primary);
+    margin: 0 0 16px;
+  }
+}
+
+.tab-content {
+  padding-top: 20px;
+}
+
+.filter-field {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 12px;
+}
+
+.chip-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+
+  button {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    height: 30px;
+    min-width: unset;
+    text-transform: capitalize;
+
+    &.active {
+      background: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
+      border-color: var(--mat-sys-primary);
+    }
+  }
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.empty {
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  grid-column: 1 / -1;
+}

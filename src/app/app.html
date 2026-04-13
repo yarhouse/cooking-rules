@@ -1,0 +1,67 @@
+<mat-sidenav-container [class.rail-active]="isRail()" [class.side-open]="isSideOpen()">
+
+  <!-- Sidebar Navigation -->
+  <mat-sidenav [mode]="sidenavMode()" [opened]="sidenavOpened()" [class.rail]="isRail()" (closed)="onSidenavClosed()">
+    <div class="sidebar-content" [class.rail]="isRail()">
+
+      <div class="sidebar-top">
+
+        <!-- Header with inline collapse toggle -->
+        <mat-toolbar class="sidebar-header">
+          <button type="button" mat-icon-button (click)="toggleCollapsed()"
+                  [attr.aria-label]="isRail() ? 'Expand navigation' : 'Collapse navigation'">
+            <mat-icon>menu</mat-icon>
+          </button>
+          <div class="sidebar-titles" [class.collapsed]="isRail()">
+            <div class="sidebar-title">Chef Aratus Cookbook</div>
+            <div class="sidebar-subtitle">Cooking Reference</div>
+          </div>
+        </mat-toolbar>
+
+        <mat-divider [class.collapsed]="isRail()" />
+
+        <mat-nav-list>
+          @for (item of navItems; track item.route) {
+            <a mat-list-item
+               [routerLink]="item.route"
+               routerLinkActive="active-nav-item"
+               [class.rail-item]="isRail()"
+               [matTooltip]="isRail() ? item.label : ''"
+               matTooltipPosition="right"
+               (click)="onNavClick()">
+              <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+              <span class="nav-label">{{ item.label }}</span>
+            </a>
+          }
+        </mat-nav-list>
+      </div>
+
+      <div class="sidebar-bottom">
+        <mat-divider />
+        <div class="theme-toggle">
+          <button type="button" mat-icon-button (click)="toggleTheme()"
+                  [attr.aria-label]="isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'"
+                  [matTooltip]="isRail() ? (isDarkMode() ? 'Light mode' : 'Dark mode') : ''"
+                  matTooltipPosition="right">
+            <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+          </button>
+          <span class="nav-label theme-label">{{ isDarkMode() ? 'Light mode' : 'Dark mode' }}</span>
+        </div>
+      </div>
+
+    </div>
+  </mat-sidenav>
+
+  <!-- Main Content -->
+  <mat-sidenav-content>
+    <mat-toolbar class="mobile-toolbar">
+      <button type="button" mat-icon-button (click)="sidenavOpened.set(!sidenavOpened())" aria-label="Toggle navigation">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>Chef Aratus Cookbook</span>
+    </mat-toolbar>
+
+    <router-outlet />
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

@@ -1,0 +1,70 @@
+<div class="search-page">
+  <div class="search-hero">
+    <h1>Chef Aratus Cookbook</h1>
+    <p class="subtitle">Search monsters, recipes, and ingredients</p>
+
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search…</mat-label>
+      <input matInput
+             [value]="query()"
+             (input)="onSearch($any($event.target).value)"
+             placeholder="e.g. wyvern, blood curd, acid…"
+             autocomplete="off" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  @if (!hasSearched()) {
+    <div class="tips">
+      <p>Try searching for:</p>
+      <ul>
+        <li><strong>A monster name</strong> — see what parts it yields and related recipes</li>
+        <li><strong>A recipe name</strong> — see ingredients and effects</li>
+        <li><strong>An ingredient type</strong> — "blood", "bone", "spice"…</li>
+        <li><strong>An effect keyword</strong> — use the <strong>Recipe Builder</strong> for effect lookups</li>
+      </ul>
+    </div>
+  }
+
+  @if (hasSearched() && !hasResults) {
+    <div class="no-results">
+      <mat-icon>search_off</mat-icon>
+      <p>No results for "{{ query() }}"</p>
+    </div>
+  }
+
+  @if (results().monsters.length > 0) {
+    <section>
+      <h2 class="section-label">Monsters</h2>
+      <div class="card-grid">
+        @for (monster of results().monsters; track monster.id) {
+          <app-monster-card [monster]="monster" />
+        }
+      </div>
+    </section>
+    <mat-divider />
+  }
+
+  @if (results().recipes.length > 0) {
+    <section>
+      <h2 class="section-label">Recipes</h2>
+      <div class="card-grid">
+        @for (recipe of results().recipes; track recipe.id) {
+          <app-recipe-card [recipe]="recipe" />
+        }
+      </div>
+    </section>
+    <mat-divider />
+  }
+
+  @if (results().ingredients.length > 0) {
+    <section>
+      <h2 class="section-label">Ingredients</h2>
+      <div class="card-grid">
+        @for (ingredient of results().ingredients; track ingredient.id) {
+          <app-ingredient-card [ingredient]="ingredient" />
+        }
+      </div>
+    </section>
+  }
+</div>

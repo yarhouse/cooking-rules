@@ -1,0 +1,111 @@
+{
+  "name": "cooking-rules",
+  "version": "1.0.0",
+  "description": "Chef Aratus Cookbook — a monster cooking rules reference and campaign tracker",
+  "author": "Aaron Yarhouse <aaron@yarhouse.dev>",
+  "main": "electron/main.js",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "start:static": "ng serve --configuration=static",
+    "build": "ng build",
+    "build:static": "ng build --configuration=static",
+    "build:electron": "ng build --configuration=electron",
+    "build:server": "cd server && npm run build",
+    "electron:start": "npm run build:electron && npm run build:server && env -u ELECTRON_RUN_AS_NODE ./node_modules/.bin/electron .",
+    "postinstall": "electron-builder install-app-deps --module-dir server",
+    "electron:rebuild": "electron-rebuild -f -w better-sqlite3 --module-dir server",
+    "dist:mac": "npm run build:electron && npm run build:server && npm run electron:rebuild && electron-builder --mac",
+    "dist:win": "npm run build:electron && npm run build:server && npm run electron:rebuild && electron-builder --win",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "packageManager": "npm@10.9.4",
+  "dependencies": {
+    "@angular/animations": "^21.2.8",
+    "@angular/cdk": "^21.2.6",
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.0",
+    "@angular/material": "^21.2.6",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/router": "^21.2.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.2.1",
+    "@angular/cli": "^21.2.1",
+    "@angular/compiler-cli": "^21.2.0",
+    "@electron/rebuild": "^4.0.3",
+    "@types/node": "^25.6.0",
+    "electron": "^32.3.3",
+    "electron-builder": "^26.8.1",
+    "jsdom": "^28.0.0",
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
+  },
+  "build": {
+    "appId": "dev.yarhouse.aratus-cookbook",
+    "productName": "Chef Aratus Cookbook",
+    "copyright": "Copyright © 2025 Aaron Yarhouse",
+    "files": [
+      "electron/**/*",
+      "dist/cooking-rules/browser/**/*",
+      "server/package.json",
+      "server/dist/**/*",
+      "server/node_modules/**/*",
+      "db/sqlite/schema.sql",
+      "db/seeds/001_reference_data.sql"
+    ],
+    "asarUnpack": [
+      "server/package.json",
+      "server/dist/**/*",
+      "server/node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "db/sqlite/schema.sql",
+        "to": "db/sqlite/schema.sql"
+      },
+      {
+        "from": "db/seeds/001_reference_data.sql",
+        "to": "db/seeds/001_reference_data.sql"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.reference",
+      "icon": "build/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "output": "release"
+    }
+  }
+}

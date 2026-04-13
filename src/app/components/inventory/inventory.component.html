@@ -1,0 +1,89 @@
+<div class="inventory-page">
+  <h1>Inventory</h1>
+
+  <!-- Essence Section -->
+  <mat-card class="essence-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>auto_awesome</mat-icon>
+        Essence Stock
+      </mat-card-title>
+      <mat-card-subtitle>Required for cooking magical meals — determines rarity and power</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="essence-rows">
+        @for (rarity of rarities; track rarity) {
+          <div class="essence-row">
+            <span class="rarity-label" [class]="'rarity-' + rarity">{{ rarityLabels[rarity] }}</span>
+            <div class="qty-controls">
+              <button mat-icon-button (click)="adjustEssence(rarity, -1)" [disabled]="getEssence(rarity) === 0">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <span class="qty" [class.has-qty]="getEssence(rarity) > 0">{{ getEssence(rarity) }}</span>
+              <button mat-icon-button (click)="adjustEssence(rarity, 1)">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-divider />
+
+  <!-- Ingredients Section -->
+  <div class="ingredients-header">
+    <h2>Ingredients</h2>
+    <mat-button-toggle-group [value]="groupBy()" (change)="groupBy.set($event.value)">
+      <mat-button-toggle value="component">By Type</mat-button-toggle>
+      <mat-button-toggle value="creature">By Creature</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  @if (inventoryIngredients().length === 0) {
+    <div class="empty-inventory">
+      <mat-icon>kitchen</mat-icon>
+      <p>Your pantry is empty.</p>
+      <p class="hint">Add ingredients using the <strong>+</strong> buttons on ingredient cards in Browse or Search.</p>
+    </div>
+  }
+
+  @for (group of groupedIngredients(); track group.key) {
+    <div class="ingredient-group">
+      <h3 class="group-label">{{ group.label }}</h3>
+      @for (ingredient of group.items; track ingredient.id) {
+        <div class="ingredient-row">
+          <div class="ingredient-info">
+            <span class="ingredient-name">{{ ingredient.name }}</span>
+            @if (groupBy() === 'component') {
+              <span class="creature-tag">{{ getCreatureName(ingredient.creatureTypeId) }}</span>
+            } @else {
+              <span class="component-tag">{{ getComponentName(ingredient.componentTypeId) }}</span>
+            }
+            @if (getEffect(ingredient)) {
+              <span class="effect-hint" [matTooltip]="getEffect(ingredient)">
+                <mat-icon>info_outline</mat-icon>
+              </span>
+            }
+            @if (ingredient.isCustom) {
+              <span class="custom-tag">Custom</span>
+            }
+            @if (ingredient.createdAt) {
+              <span class="date-tag">Added {{ ingredient.createdAt | slice:0:10 }}</span>
+            }
+          </div>
+          <div class="qty-controls">
+            <button mat-icon-button (click)="adjust(ingredient.id, -1)" [disabled]="getQuantity(ingredient.id) === 0">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="qty" [class.has-qty]="getQuantity(ingredient.id) > 0">{{ getQuantity(ingredient.id) }}</span>
+            <button mat-icon-button (click)="adjust(ingredient.id, 1)">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

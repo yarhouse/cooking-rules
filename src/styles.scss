@@ -1,0 +1,77 @@
+@use '@angular/material' as mat;
+
+// Base Material styles — required for elevation, ripple, typography base
+@include mat.core();
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Roboto, sans-serif;
+}
+
+$light-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$orange-palette,
+    tertiary: mat.$red-palette,
+  ),
+));
+
+$dark-theme: mat.define-theme((
+  color: (
+    theme-type: dark,
+    primary: mat.$orange-palette,
+    tertiary: mat.$red-palette,
+  ),
+));
+
+$card-overrides: (
+  outlined-container-color: var(--mat-card-elevated-container-color),
+);
+
+// Emit all component styles with light theme as the default
+html {
+  @include mat.all-component-themes($light-theme);
+  @include mat.card-overrides($card-overrides);
+  color-scheme: light;
+}
+
+// OS-level dark preference — applies before JS loads (no class needed)
+@media (prefers-color-scheme: dark) {
+  html:not(.light-theme) {
+    @include mat.all-component-colors($dark-theme);
+    @include mat.card-overrides($card-overrides);
+    color-scheme: dark;
+  }
+}
+
+// Explicit overrides set by the theme toggle (take priority over OS preference)
+html.dark-theme {
+  @include mat.all-component-colors($dark-theme);
+  @include mat.card-overrides($card-overrides);
+  color-scheme: dark;
+}
+
+html.light-theme {
+  @include mat.all-component-colors($light-theme);
+  @include mat.card-overrides($card-overrides);
+  color-scheme: light;
+}
+
+// Apply Material surface color to body background
+body {
+  background-color: var(--mat-sys-background, #fffbfe);
+  color: var(--mat-sys-on-background, #1c1b1f);
+}
+
+// Shared page layout token — all views use this max-width
+:root {
+  --page-max-width: 1200px;
+  --page-padding: 24px;
+  --page-padding-mobile: 16px;
+}

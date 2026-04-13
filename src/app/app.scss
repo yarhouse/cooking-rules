@@ -1,0 +1,194 @@
+$sidenav-expanded-width: 240px;
+$sidenav-rail-width: 80px;
+$nav-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+app-root {
+  display: block;
+  height: 100%;
+  font-family: Roboto, sans-serif;
+  font-size: 15px;
+
+  mat-sidenav-container {
+    height: 100%;
+
+    // Take full ownership of margin-left in side mode so Angular Material's
+    // inline style (which is stale after CSS width transitions) never wins.
+    mat-sidenav-content {
+      transition: margin-left $nav-transition !important;
+    }
+
+    &.side-open mat-sidenav-content {
+      margin-left: $sidenav-expanded-width !important;
+    }
+
+    // rail-active comes after side-open so it wins when both are present
+    &.rail-active mat-sidenav-content {
+      margin-left: $sidenav-rail-width !important;
+    }
+  }
+
+  // !important needed: AM's .mat-drawer class (specificity 0,1,0) sets
+  // width: var(--mat-sidenav-container-width, 360px) which beats our (0,0,2).
+  // Also preserve AM's transform transition for over-mode open/close animation.
+  mat-sidenav {
+    width: $sidenav-expanded-width !important;
+    transition: width $nav-transition, transform 400ms cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    overflow: hidden !important;
+
+    &.rail {
+      width: $sidenav-rail-width !important;
+    }
+  }
+
+  .sidebar-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+  }
+
+  // ── Sidebar header ────────────────────────────────────────────────────────────
+
+  .sidebar-header {
+    --mat-toolbar-standard-height: auto;
+    padding: 8px;
+    gap: 4px;
+    transition: justify-content $nav-transition;
+  }
+
+  // .rail & inside a nested block compiles to ".rail app-root .xxx" (broken),
+  // so rail-mode overrides are written as direct sibling selectors instead.
+  .rail .sidebar-header {
+    justify-content: center;
+  }
+
+  .sidebar-titles {
+    overflow: hidden;
+    max-width: 180px;
+    opacity: 1;
+    white-space: nowrap;
+    transition:
+      max-width $nav-transition,
+      opacity $nav-transition;
+
+    &.collapsed {
+      max-width: 0;
+      opacity: 0;
+    }
+  }
+
+  .sidebar-title {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--mat-sys-primary);
+  }
+
+  .sidebar-subtitle {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .mat-drawer-inner-container {
+    padding-right: 5px;
+    border-right-style: solid;
+    border-right-color: var(--mat-divider-color, var(--mat-sys-outline-variant));
+    border-right-width: var(--mat-divider-width, 1px);
+  }
+
+  mat-divider {
+    transition: opacity $nav-transition;
+
+    &.collapsed {
+      opacity: 0;
+    }
+  }
+
+  // ── Rail nav item centering ───────────────────────────────────────────────────
+
+  .rail-item {
+    padding-inline: 0 !important;
+    justify-content: center !important;
+
+    .mdc-list-item__start {
+      margin: 0 !important;
+    }
+
+    .mdc-list-item__content {
+      flex-grow: 0 !important;
+      flex-shrink: 1 !important;
+    }
+  }
+
+  // ── Nav items ─────────────────────────────────────────────────────────────────
+
+  .nav-label {
+    display: inline-block;
+    max-width: 160px;
+    opacity: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    transition:
+      max-width $nav-transition,
+      opacity 150ms ease;
+  }
+
+  .rail .nav-label {
+    max-width: 0;
+    opacity: 0;
+  }
+
+  .active-nav-item {
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+
+  .rail .active-nav-item {
+    border-radius: 28px;
+  }
+
+  // ── Bottom theme toggle ───────────────────────────────────────────────────────
+
+  .sidebar-bottom {
+    flex-shrink: 0;
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 4px;
+
+    .theme-label {
+      font-size: 0.875rem;
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+
+  .rail .theme-toggle {
+    justify-content: center;
+    padding: 4px;
+  }
+
+  // ── Mobile toolbar ────────────────────────────────────────────────────────────
+
+  .mobile-toolbar {
+    display: none;
+    gap: 8px;
+    padding: 0 8px 0 4px;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    font-weight: 500;
+    font-size: 0.95rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  @media (max-width: 768px) {
+    .mobile-toolbar {
+      display: flex;
+    }
+  }
+}

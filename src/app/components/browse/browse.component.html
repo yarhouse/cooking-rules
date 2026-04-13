@@ -1,0 +1,97 @@
+<div class="browse-page">
+  <h1>Browse</h1>
+
+  <mat-tab-group animationDuration="150ms">
+
+    <!-- Monsters Tab -->
+    <mat-tab label="Monsters">
+      <div class="tab-content">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filter monsters…</mat-label>
+          <input matInput [value]="monsterQuery()" (input)="monsterQuery.set($any($event.target).value)" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="chip-filters">
+          @for (ct of creatureTypes; track ct.id) {
+            <button mat-stroked-button
+                    [class.active]="selectedCreatureType() === ct.id"
+                    (click)="toggleCreatureType(ct.id)">
+              {{ ct.name }}
+            </button>
+          }
+        </div>
+
+        <div class="card-grid">
+          @for (monster of filteredMonsters(); track monster.id) {
+            <app-monster-card [monster]="monster" />
+          }
+          @empty {
+            <p class="empty">No monsters found.</p>
+          }
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Recipes Tab -->
+    <mat-tab label="Recipes">
+      <div class="tab-content">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filter recipes…</mat-label>
+          <input matInput [value]="recipeQuery()" (input)="recipeQuery.set($any($event.target).value)" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="chip-filters">
+          @for (tier of recipeTiers; track tier) {
+            <button mat-stroked-button
+                    [class.active]="selectedRecipeTier() === tier"
+                    (click)="toggleRecipeTier(tier)">
+              {{ tier }}
+            </button>
+          }
+        </div>
+
+        <div class="card-grid">
+          @for (recipe of filteredRecipes(); track recipe.id) {
+            <app-recipe-card [recipe]="recipe" />
+          }
+          @empty {
+            <p class="empty">No recipes found.</p>
+          }
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Ingredients Tab -->
+    <mat-tab label="Ingredients">
+      <div class="tab-content">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filter ingredients…</mat-label>
+          <input matInput [value]="ingredientQuery()" (input)="ingredientQuery.set($any($event.target).value)" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="chip-filters">
+          @for (ct of componentTypes; track ct.id) {
+            <button mat-stroked-button
+                    [class.active]="selectedComponentType() === ct.id"
+                    (click)="toggleComponentType(ct.id)">
+              {{ ct.name }}
+            </button>
+          }
+        </div>
+
+        <div class="card-grid">
+          @for (ingredient of filteredIngredients(); track ingredient.id) {
+            <app-ingredient-card [ingredient]="ingredient" />
+          }
+          @empty {
+            <p class="empty">No ingredients found.</p>
+          }
+        </div>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>

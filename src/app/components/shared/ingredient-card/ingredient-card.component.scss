@@ -1,0 +1,121 @@
+.ingredient-card {
+  height: 100%;
+  cursor: pointer;
+  transition: box-shadow 150ms ease;
+
+  &:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+}
+
+.type-badge, .creature-badge, .custom-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-right: 4px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.type-badge {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.creature-badge {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.custom-badge {
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+}
+
+.effect-summary {
+  font-size: 0.82rem;
+  margin: 8px 0 0;
+  line-height: 1.4;
+}
+
+.no-effect {
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: 8px 0 0;
+}
+
+.quantity-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+
+  .qty-label {
+    font-size: 0.8rem;
+    color: var(--mat-sys-on-surface-variant);
+    margin-right: 4px;
+  }
+
+  .qty-value {
+    font-size: 1rem;
+    font-weight: 600;
+    min-width: 24px;
+    text-align: center;
+    color: var(--mat-sys-on-surface-variant);
+
+    &.has-qty {
+      color: var(--mat-sys-primary);
+    }
+  }
+}
+
+.details {
+  margin-top: 12px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  padding-top: 10px;
+}
+
+.scaling-table {
+  margin-bottom: 10px;
+}
+
+.scale-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  &:last-child { border-bottom: none; }
+
+  span:first-child {
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant);
+    min-width: 80px;
+  }
+}
+
+.sources, .recipes {
+  font-size: 0.78rem;
+  margin-bottom: 6px;
+
+  .label {
+    font-weight: 600;
+    color: var(--mat-sys-on-surface-variant);
+    margin-right: 6px;
+  }
+
+  .source-name, .recipe-name {
+    margin-right: 8px;
+    &:not(:last-child)::after { content: ','; }
+  }
+
+  .recipe-name { color: var(--mat-sys-primary); }
+}
+
+.notes {
+  font-size: 0.75rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: 8px 0 0;
+}

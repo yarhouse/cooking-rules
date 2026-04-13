@@ -1,0 +1,24 @@
+<mat-card class="monster-card" (click)="openDetails()">
+  <mat-card-header>
+    <mat-card-title>{{ monster.name }}</mat-card-title>
+    <mat-card-subtitle>
+      <span class="type-badge">{{ creatureTypeName }}</span>
+      <span class="rarity-badge" [class]="rarityClass(monster.rarity)">{{ monster.rarity }}</span>
+      @if (monster.isCustom) {
+        <span class="custom-badge">Custom</span>
+      }
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="components">
+      @for (item of ingredients; track item.componentTypeId) {
+        <mat-chip [matTooltip]="item.effect?.description ?? 'No magical effect'" class="component-chip">
+          {{ item.componentTypeName }}
+        </mat-chip>
+      }
+    </div>
+
+  </mat-card-content>
+
+</mat-card>

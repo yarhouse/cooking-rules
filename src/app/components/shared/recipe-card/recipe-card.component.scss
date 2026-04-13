@@ -1,0 +1,117 @@
+.recipe-card {
+  height: 100%;
+  cursor: pointer;
+  transition: box-shadow 150ms ease;
+
+  &:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+}
+
+.tier-badge, .dc-badge, .custom-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-right: 4px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.dc-badge {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font-weight: 700;
+}
+
+.custom-badge {
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+}
+
+.no-heat {
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--mat-sys-on-surface-variant);
+    vertical-align: middle;
+  }
+}
+
+.card-thumb {
+  text-align: center;
+  margin-bottom: 8px;
+
+  img {
+    max-height: 120px;
+    max-width: 100%;
+    object-fit: contain;
+  }
+}
+
+.ingredients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.ingredient-chip {
+  font-size: 0.75rem;
+  height: 24px;
+}
+
+.boss-specific {
+  font-size: 0.65rem;
+  opacity: 0.8;
+  margin-left: 4px;
+}
+
+.details {
+  margin-top: 12px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  padding-top: 10px;
+}
+
+.boss-effect {
+  background: color-mix(in srgb, var(--mat-sys-tertiary-container) 40%, transparent);
+  border-left: 3px solid var(--mat-sys-tertiary);
+  padding: 8px 10px;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 10px;
+  font-size: 0.82rem;
+
+  .label {
+    font-weight: 700;
+    display: block;
+    color: var(--mat-sys-tertiary);
+    margin-bottom: 2px;
+  }
+}
+
+.ingredient-effects {
+  margin-bottom: 6px;
+}
+
+.component-name {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--mat-sys-primary);
+  display: block;
+}
+
+.effect-text {
+  font-size: 0.8rem;
+  display: block;
+}
+
+.effect-hint {
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+}
+
+.notes {
+  font-size: 0.75rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: 8px 0 0;
+}

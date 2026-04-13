@@ -1,0 +1,39 @@
+<mat-card class="recipe-card" (click)="openDetails()">
+  <mat-card-header>
+    <mat-card-title>{{ recipe.name }}</mat-card-title>
+    <mat-card-subtitle>
+      <span class="tier-badge" [style.background]="tierColor" [style.color]="tierTextColor">
+        {{ recipe.tier }}
+      </span>
+      <span class="dc-badge">DC {{ recipe.dc }}</span>
+      @if (recipe.isCustom) {
+        <span class="custom-badge">Custom</span>
+      }
+      @if (noHeatNote) {
+        <span class="no-heat" [matTooltip]="noHeatNote">
+          <mat-icon>whatshot</mat-icon>
+        </span>
+      }
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (recipe.imageUrl) {
+      <div class="card-thumb">
+        <img [src]="recipe.imageUrl" [alt]="recipe.name" [title]="recipe.name" />
+      </div>
+    }
+    <div class="ingredients">
+      @for (item of ingredientDetails; track item.name) {
+        <mat-chip class="ingredient-chip">
+          {{ item.name }}
+          @if (item.bossSpecific) {
+            <span class="boss-specific">({{ item.bossSpecific }})</span>
+          }
+        </mat-chip>
+      }
+    </div>
+
+  </mat-card-content>
+
+</mat-card>

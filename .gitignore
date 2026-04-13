@@ -1,0 +1,75 @@
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+**/node_modules
+npm-debug.log
+yarn-error.log
+
+# Environment — never commit real credentials
+.env
+server/.env
+
+# Server build output
+/server/dist
+
+# Packaged Electron installers (built with npm run dist:mac / dist:win)
+/release
+
+# Local SQLite database (created automatically on first run)
+/data/
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+.vscode/
+.vscode
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/mcp.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Reference source files (downloaded HTML — not source code)
+/ref/
+
+# Copyrighted images sourced from D&D Beyond — not for redistribution
+/public/images/
+
+# Local data files — contain copyrighted rulebook content, not committed to the public repo.
+# The committed versions are empty stubs. Populate them locally and run:
+#   git update-index --skip-worktree src/app/data/monsters.data.ts \
+#     src/app/data/recipes.data.ts src/app/data/ingredients.data.ts \
+#     src/app/data/component-types.data.ts src/app/data/creature-types.data.ts \
+#     db/seeds/001_reference_data.sql
+# to prevent git from tracking your local changes.
+# (This .gitignore entry only protects untracked files; skip-worktree handles tracked ones.)
