@@ -41,10 +41,10 @@
   background: var(--mat-sys-surface-container-high);
   color: var(--mat-sys-on-surface-variant);
 
-  &.rarity-uncommon  { background: #b2dfdb; color: #00695c; }
-  &.rarity-rare      { background: #bbdefb; color: #1565c0; }
-  &.rarity-very-rare { background: #e1bee7; color: #6a1b9a; }
-  &.rarity-legendary { background: #fff9c4; color: #f57f17; }
+  &.rarity-uncommon  { background: #cce5cc; color: #1b4520; }
+  &.rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
+  &.rarity-very-rare { background: #dfd0ea; color: #3e1560; }
+  &.rarity-legendary { background: #f0e0a0; color: #5a3200; }
 }
 
 .custom-badge {
@@ -119,10 +119,10 @@
   border-radius: 6px;
   align-self: center;
 
-  &.uncommon  { background: #e8f5e9; color: #00695c; }
-  &.rare      { background: #e3f2fd; color: #1565c0; }
-  &.very-rare { background: #f3e5f5; color: #6a1b9a; }
-  &.legendary { background: #fff3e0; color: #e65100; }
+  &.uncommon  { background: #cce5cc; color: #1b4520; }
+  &.rare      { background: #c5d8ea; color: #1a2f4a; }
+  &.very-rare { background: #dfd0ea; color: #3e1560; }
+  &.legendary { background: #f0e0a0; color: #5a3200; }
 }
 
 .scale-value {

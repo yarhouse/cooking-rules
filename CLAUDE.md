@@ -62,6 +62,27 @@ The `serverReady` flag prevents the macOS `activate` event (fires on first launc
 
 For dev, the server is spawned with Electron's own binary (`process.execPath`) + `ELECTRON_RUN_AS_NODE=1` so the compiled addon version always matches. The `ELECTRON_RUN_AS_NODE` env var is stripped from the parent env spread so it doesn't affect the main Electron process.
 
+#### Multi-arch packaging and the afterPack hook
+
+**The problem:** `electron-builder`'s built-in native module rebuild only scans root `node_modules/` — it never touches `server/node_modules/`. When `dist:mac` builds both x64 and arm64 DMGs, whatever `better_sqlite3.node` was compiled on the host machine ends up in both bundles. The arm64 DMG then contains an x64 binary, causing a crash on Apple Silicon (`node:electron/js2c/node_init` dumps its own source to stdout before any user code runs).
+
+**The fix:** `electron/after-pack.js` is an `electron-builder` `afterPack` hook. After each platform bundle is assembled it:
+
+1. Backs up the current `better_sqlite3.node` (the system-Node dev binary)
+2. Rebuilds `better_sqlite3.node` for the exact target arch against Electron's Node ABI
+3. Copies the result into the assembled bundle (`app.asar.unpacked/...`)
+4. Attempts to restore the backup so local `npm run dev` still works
+
+**Known issue — restore step is unreliable:** Despite backing up and restoring, `npm run dev` fails after a `dist:mac` run with a NODE_MODULE_VERSION mismatch (binary compiled for Electron NMV 128, system Node 22 needs NMV 127). The root cause is not yet fully diagnosed — likely electron-builder mutates something beyond env vars (possibly a temporary `.npmrc` or node-gyp config) that causes `better-sqlite3` to remain compiled against Electron's ABI even after the file-level restore.
+
+**Workaround:** After any `dist:mac` or `dist:win` run, restore the dev binary manually:
+
+```bash
+cd server && npm rebuild better-sqlite3
+```
+
+**Resuming investigation:** When revisiting, start by logging what `better_sqlite3.node` contains (via `file` command) immediately before and after the restore step to confirm whether the file copy itself is the problem or whether something else rebuilds the binary a second time after the hook returns.
+
 ### Packaging internals
 
 `server/dist/`, `server/node_modules/`, and `server/package.json` are listed in `asarUnpack` — they must be outside `app.asar` because spawned processes cannot read files from inside an asar archive. The server entry path in `main.js` uses `app.getAppPath().replace('app.asar', 'app.asar.unpacked')` when `app.isPackaged` is true.

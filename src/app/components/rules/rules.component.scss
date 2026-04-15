@@ -173,13 +173,13 @@ mat-card {
   flex-shrink: 0;
 
   &.success {
-    background: #e8f5e9;
-    color: #2e7d32;
+    background: #d0e8d0;
+    color: #1b4520;
   }
 
   &.failure {
-    background: #fce4ec;
-    color: #c62828;
+    background: #ead0d0;
+    color: #5a1010;
   }
 }
 
@@ -213,10 +213,10 @@ mat-card {
   min-width: 76px;
   text-align: center;
 
-  &.rarity-uncommon  { background: #e8f5e9; color: #00695c; }
-  &.rarity-rare      { background: #e3f2fd; color: #1565c0; }
-  &.rarity-very-rare { background: #f3e5f5; color: #6a1b9a; }
-  &.rarity-legendary { background: #fff3e0; color: #e65100; }
+  &.rarity-uncommon  { background: #cce5cc; color: #1b4520; }
+  &.rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
+  &.rarity-very-rare { background: #dfd0ea; color: #3e1560; }
+  &.rarity-legendary { background: #f0e0a0; color: #5a3200; }
 }
 
 .dispel-value {
@@ -376,10 +376,10 @@ mat-card {
   font-size: 0.78rem;
   font-weight: 700;
 
-  &.rarity-uncommon  { background: #e8f5e9; color: #00695c; }
-  &.rarity-rare      { background: #e3f2fd; color: #1565c0; }
-  &.rarity-very-rare { background: #f3e5f5; color: #6a1b9a; }
-  &.rarity-legendary { background: #fff3e0; color: #e65100; }
+  &.rarity-uncommon  { background: #cce5cc; color: #1b4520; }
+  &.rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
+  &.rarity-very-rare { background: #dfd0ea; color: #3e1560; }
+  &.rarity-legendary { background: #f0e0a0; color: #5a3200; }
 }
 
 .inline-edit {
@@ -476,8 +476,8 @@ mat-card {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 
-  &.flaw-badge  { background: #fce4ec; color: #c62828; }
-  &.boon-badge  { background: #e8f5e9; color: #2e7d32; }
+  &.flaw-badge  { background: #ead0d0; color: #5a1010; }
+  &.boon-badge  { background: #d0e8d0; color: #1b4520; }
 }
 
 .quirk-effect {

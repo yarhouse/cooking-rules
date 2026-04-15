@@ -25,10 +25,10 @@
   background: var(--mat-sys-surface-container-high);
   color: var(--mat-sys-on-surface-variant);
 
-  &.rarity-uncommon { background: #b2dfdb; color: #00695c; }
-  &.rarity-rare { background: #bbdefb; color: #1565c0; }
-  &.rarity-very-rare { background: #e1bee7; color: #6a1b9a; }
-  &.rarity-legendary { background: #fff9c4; color: #f57f17; }
+  &.rarity-uncommon  { background: #cce5cc; color: #1b4520; }
+  &.rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
+  &.rarity-very-rare { background: #dfd0ea; color: #3e1560; }
+  &.rarity-legendary { background: #f0e0a0; color: #5a3200; }
 }
 
 .custom-badge {

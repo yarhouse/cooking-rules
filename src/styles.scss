@@ -11,14 +11,22 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: Roboto, sans-serif;
 }
+
+// ── Fantasy typography stack ────────────────────────────────────────────────
+$font-display: 'Cinzel', Georgia, 'Times New Roman', serif;
+$font-body: 'Raleway', 'Segoe UI', sans-serif;
 
 $light-theme: mat.define-theme((
   color: (
     theme-type: light,
     primary: mat.$orange-palette,
-    tertiary: mat.$red-palette,
+    tertiary: mat.$green-palette,
+  ),
+  typography: (
+    plain-family: "'Raleway', 'Segoe UI', sans-serif",
+    brand-family: "'Cinzel', Georgia, serif",
+    bold-weight: 700,
   ),
 ));
 
@@ -26,7 +34,12 @@ $dark-theme: mat.define-theme((
   color: (
     theme-type: dark,
     primary: mat.$orange-palette,
-    tertiary: mat.$red-palette,
+    tertiary: mat.$green-palette,
+  ),
+  typography: (
+    plain-family: "'Raleway', 'Segoe UI', sans-serif",
+    brand-family: "'Cinzel', Georgia, serif",
+    bold-weight: 700,
   ),
 ));
 
@@ -63,15 +76,109 @@ html.light-theme {
   color-scheme: light;
 }
 
-// Apply Material surface color to body background
-body {
-  background-color: var(--mat-sys-background, #fffbfe);
-  color: var(--mat-sys-on-background, #1c1b1f);
-}
-
-// Shared page layout token — all views use this max-width
+// ── Cookbook design tokens ──────────────────────────────────────────────────
+// These sit after all Material theme emits so they override --mat-sys-* values.
 :root {
+  --cookbook-font-display: #{$font-display};
+  --cookbook-font-body: #{$font-body};
   --page-max-width: 1200px;
   --page-padding: 24px;
   --page-padding-mobile: 16px;
 }
+
+// ── Parchment — light mode ──────────────────────────────────────────────────
+html,
+html.light-theme {
+  --mat-sys-background:                 #f0e6cf;
+  --mat-sys-surface:                    #f8f1e2;
+  --mat-sys-surface-variant:            #e5d4b2;
+  --mat-sys-surface-container-lowest:   #fdf8ef;
+  --mat-sys-surface-container-low:      #f5ebd8;
+  --mat-sys-surface-container:          #eee0c4;
+  --mat-sys-surface-container-high:     #e6d4ae;
+  --mat-sys-surface-container-highest:  #dcc89c;
+  --mat-sys-outline-variant:            rgba(120, 78, 20, 0.22);
+  --mat-sys-outline:                    rgba(110, 68, 15, 0.45);
+}
+
+// ── Dungeon leather — dark mode ─────────────────────────────────────────────
+@media (prefers-color-scheme: dark) {
+  html:not(.light-theme) {
+    --mat-sys-background:                 #1b1208;
+    --mat-sys-surface:                    #231809;
+    --mat-sys-surface-variant:            #33230e;
+    --mat-sys-surface-container-lowest:   #110b04;
+    --mat-sys-surface-container-low:      #1e1409;
+    --mat-sys-surface-container:          #2a1c0c;
+    --mat-sys-surface-container-high:     #35240f;
+    --mat-sys-surface-container-highest:  #402d12;
+    --mat-sys-outline-variant:            rgba(210, 165, 80, 0.2);
+    --mat-sys-outline:                    rgba(200, 155, 70, 0.38);
+  }
+}
+
+html.dark-theme {
+  --mat-sys-background:                 #1b1208;
+  --mat-sys-surface:                    #231809;
+  --mat-sys-surface-variant:            #33230e;
+  --mat-sys-surface-container-lowest:   #110b04;
+  --mat-sys-surface-container-low:      #1e1409;
+  --mat-sys-surface-container:          #2a1c0c;
+  --mat-sys-surface-container-high:     #35240f;
+  --mat-sys-surface-container-highest:  #402d12;
+  --mat-sys-outline-variant:            rgba(210, 165, 80, 0.2);
+  --mat-sys-outline:                    rgba(200, 155, 70, 0.38);
+}
+
+// ── Body ─────────────────────────────────────────────────────────────────────
+body {
+  background-color: var(--mat-sys-background);
+  color: var(--mat-sys-on-background, #1c1b1f);
+  font-family: var(--cookbook-font-body);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  // Subtle parchment grain — very faint SVG turbulence overlay
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+}
+
+// ── Display headings ──────────────────────────────────────────────────────────
+h1, h2, h3 {
+  font-family: var(--cookbook-font-display);
+  letter-spacing: 0.03em;
+  font-weight: 600;
+}
+
+// ── Warm card shadows (replaces Material's grey elevation) ────────────────────
+.mat-mdc-card {
+  box-shadow:
+    0 1px 4px rgba(70, 42, 8, 0.10),
+    0 2px 10px rgba(70, 42, 8, 0.07) !important;
+  transition: box-shadow 150ms ease !important;
+
+  &:hover {
+    box-shadow:
+      0 3px 12px rgba(70, 42, 8, 0.16),
+      0 1px 4px rgba(70, 42, 8, 0.10) !important;
+  }
+}
+
+// ── Badge pill enforcement ────────────────────────────────────────────────────
+// The global line-height would otherwise make span badges taller than their
+// border-radius, losing the pill shape. Force line-height: 1 so radius wins.
+.type-badge, .rarity-badge, .dc-badge, .tier-badge, .creature-badge,
+.custom-badge, .house-rule-badge, .quirk-type-badge, .outcome-tag,
+.prereq-chip, .recipe-chip, .component-tag, .creature-tag, .custom-tag,
+.scaled-value {
+  line-height: 1 !important;
+  border-radius: 999px !important;
+}
+
+// ── Rarity badge palette — manuscript ink tones ───────────────────────────────
+// Fallback for any future components that don't define rarity variants locally.
+// Individual components own their own rarity colour blocks.
+.rarity-uncommon  { background: #cce5cc; color: #1b4520; }
+.rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
+.rarity-very-rare { background: #dfd0ea; color: #3e1560; }
+.rarity-legendary { background: #f0e0a0; color: #5a3200; }

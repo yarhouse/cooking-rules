@@ -1,11 +1,11 @@
-$sidenav-expanded-width: 240px;
+$sidenav-expanded-width: 260px;
 $sidenav-rail-width: 80px;
 $nav-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 
 app-root {
   display: block;
   height: 100%;
-  font-family: Roboto, sans-serif;
+  font-family: var(--cookbook-font-body, 'Raleway', 'Segoe UI', sans-serif);
   font-size: 15px;
 
   mat-sidenav-container {
@@ -34,6 +34,7 @@ app-root {
     width: $sidenav-expanded-width !important;
     transition: width $nav-transition, transform 400ms cubic-bezier(0.25, 0.8, 0.25, 1) !important;
     overflow: hidden !important;
+    border-radius: 0 !important; // Material 3 adds a rounded drawer by default
 
     &.rail {
       width: $sidenav-rail-width !important;
@@ -64,8 +65,9 @@ app-root {
   }
 
   .sidebar-titles {
-    overflow: hidden;
-    max-width: 180px;
+    // clip-path instead of overflow:hidden so vertical ascenders (Cinzel) aren't clipped
+    clip-path: inset(0 -4px 0 0); // allow a tiny bleed on right to avoid edge clipping
+    max-width: 196px; // 260 sidebar − 48px button − 16px padding
     opacity: 1;
     white-space: nowrap;
     transition:
@@ -79,23 +81,28 @@ app-root {
   }
 
   .sidebar-title {
-    font-size: 1rem;
-    font-weight: 700;
-    line-height: 1.2;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    font-family: var(--cookbook-font-display, 'Cinzel', Georgia, serif);
+    letter-spacing: 0.01em;
     color: var(--mat-sys-primary);
   }
 
   .sidebar-subtitle {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     line-height: 1.2;
+    font-family: var(--cookbook-font-body, 'Raleway', 'Segoe UI', sans-serif);
+    font-style: italic;
     color: var(--mat-sys-on-surface-variant);
   }
 
   .mat-drawer-inner-container {
-    padding-right: 5px;
     border-right-style: solid;
-    border-right-color: var(--mat-divider-color, var(--mat-sys-outline-variant));
-    border-right-width: var(--mat-divider-width, 1px);
+    border-right-color: var(--mat-sys-outline-variant);
+    border-right-width: 1px;
+    // Subtle warmth in the sidebar background vs. page background
+    background: color-mix(in srgb, var(--mat-sys-surface-container-low) 70%, var(--mat-sys-surface));
   }
 
   mat-divider {
@@ -106,33 +113,33 @@ app-root {
     }
   }
 
-  // ── Rail nav item centering ───────────────────────────────────────────────────
-
-  .rail-item {
-    padding-inline: 0 !important;
-    justify-content: center !important;
-
-    .mdc-list-item__start {
-      margin: 0 !important;
-    }
-
-    .mdc-list-item__content {
-      flex-grow: 0 !important;
-      flex-shrink: 1 !important;
-    }
-  }
 
   // ── Nav items ─────────────────────────────────────────────────────────────────
 
+  mat-nav-list a[mat-list-item] {
+    padding-inline: 0 !important;
+    transition: border-radius $nav-transition;
+  }
+
+  mat-nav-list .mdc-list-item__start {
+    width: $sidenav-rail-width;
+    min-width: $sidenav-rail-width;
+    flex-shrink: 0;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 !important;
+  }
+
   .nav-label {
-    display: inline-block;
+    display: inline-flex;
     max-width: 160px;
     opacity: 1;
     overflow: hidden;
     white-space: nowrap;
     transition:
       max-width $nav-transition,
-      opacity 150ms ease;
+      opacity $nav-transition;
   }
 
   .rail .nav-label {

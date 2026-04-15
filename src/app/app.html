@@ -20,7 +20,7 @@
 
         <mat-divider [class.collapsed]="isRail()" />
 
-        <mat-nav-list>
+        <mat-nav-list [class.collapsed]="isRail()" >
           @for (item of navItems; track item.route) {
             <a mat-list-item
                [routerLink]="item.route"
