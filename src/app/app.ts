@@ -76,6 +76,8 @@ export class App {
     { label: 'Browse', route: '/browse', icon: 'menu_book' },
     { label: 'Recipe Builder', route: '/builder', icon: 'restaurant' },
     { label: 'Inventory', route: '/inventory', icon: 'kitchen' },
+    { label: 'Harvesting', route: '/harvesting', icon: 'agriculture' },
+    { label: 'Crafting', route: '/crafting', icon: 'build' },
     { label: 'Rules', route: '/rules', icon: 'book' },
   ];
 

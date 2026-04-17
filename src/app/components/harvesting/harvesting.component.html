@@ -1,0 +1,318 @@
+<div class="harvesting-page">
+
+  <mat-tab-group animationDuration="150ms">
+
+    <!-- ====================================================== -->
+    <!-- TAB 1 — RULES                                          -->
+    <!-- ====================================================== -->
+    <mat-tab label="Rules">
+      <div class="tab-content">
+
+        <section class="rules-section">
+          <h2>How Harvesting Works</h2>
+          <p class="intro-text">
+            Harvesting is the act of extracting magical components from a slain creature before its
+            latent magic fades. You have five steps — and a tight time limit.
+          </p>
+
+          <div class="steps-grid">
+            <mat-card appearance="outlined" class="step-card">
+              <mat-card-header>
+                <div class="step-number">1</div>
+                <mat-card-title>Description</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                The GM consults the creature's type to determine which components are available.
+                Boss monsters have unique harvest tables. CR also determines which
+                <strong>essence</strong> tier can be extracted.
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card appearance="outlined" class="step-card">
+              <mat-card-header>
+                <div class="step-number">2</div>
+                <mat-card-title>Harvest List</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                The party decides what to harvest and <strong>in what order</strong>. Order matters —
+                components later in the list require higher cumulative DCs to reach.
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card appearance="outlined" class="step-card">
+              <mat-card-header>
+                <div class="step-number">3</div>
+                <mat-card-title>Harvest DCs</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                Each component has a <strong>Component DC</strong>. The <strong>Harvest DC</strong> for
+                each item is the cumulative sum of all Component DCs above it in the list.
+                <em>Example: Eyes (DC 5) → Pouch of Teeth (DC 10+5=15) → Hide (DC 20+15=35).</em>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card appearance="outlined" class="step-card">
+              <mat-card-header>
+                <div class="step-number">4</div>
+                <mat-card-title>Harvesting Check</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                Two harvesters make separate checks — an <strong>Assessing Harvester</strong>
+                (Intelligence + skill) and a <strong>Carving Harvester</strong>
+                (Dexterity + skill, or spellcasting ability for ritual carving).
+                One creature can do both but makes both checks at <strong>disadvantage</strong>.
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card appearance="outlined" class="step-card">
+              <mat-card-header>
+                <div class="step-number">5</div>
+                <mat-card-title>Loot</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                Add the two check results together. You successfully harvest every component whose
+                Harvest DC is met or exceeded. Components above your total are lost.
+              </mat-card-content>
+            </mat-card>
+          </div>
+
+          <mat-divider />
+
+          <div class="rules-two-col">
+            <div>
+              <h3>Degradation</h3>
+              <ul>
+                <li>A harvester must begin within <strong>1 minute</strong> of the creature's death.</li>
+                <li>Harvesting must not be interrupted once started.</li>
+                <li>A character can only fully harvest <strong>one creature</strong> per battle.</li>
+                <li><em>Gentle repose</em> does <strong>not</strong> prevent degradation.</li>
+              </ul>
+
+              <h3>Harvest Time by Size</h3>
+              <table class="reference-table">
+                <thead><tr><th>Creature Size</th><th>Time</th><th>Max Helpers</th></tr></thead>
+                <tbody>
+                  @for (row of harvestSizeTable; track row.size) {
+                    <tr>
+                      <td>{{ row.size }}</td>
+                      <td>{{ row.time }}</td>
+                      <td>{{ row.helpers }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div>
+              <h3>Helpers</h3>
+              <p>
+                Additional creatures can assist by adding their proficiency bonus (or half,
+                rounded down, without proficiency) to the check result. Helpers must assist for
+                the <em>entire</em> duration.
+              </p>
+
+              <h3>Ritual Carving</h3>
+              <p>
+                When harvesting <strong>Aberrations, Celestials, Elementals, Fey, or Fiends</strong>,
+                a carving harvester with a spellcasting ability can substitute their
+                spellcasting modifier for Dexterity.
+              </p>
+
+              <h3>Volatile Components</h3>
+              <p>
+                Components marked <mat-icon class="inline-icon warn" matTooltip="Volatile">warning</mat-icon>
+                can explode if you <em>start</em> harvesting them but don't <em>finish</em>.
+                The GM uses the creature's ability to determine the save DC and effect.
+              </p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </mat-tab>
+
+    <!-- ====================================================== -->
+    <!-- TAB 2 — HARVEST TABLES                                 -->
+    <!-- ====================================================== -->
+    <mat-tab label="Harvest Tables">
+      <div class="tab-content">
+
+        <p class="section-hint">
+          Select a creature type to see its harvestable components and DCs.
+        </p>
+
+        <!-- Creature type selector -->
+        <div class="creature-type-chips">
+          @for (ct of creatureTypes; track ct.id) {
+            <button mat-flat-button
+                    [class.selected]="selectedCreatureTypeId() === ct.id"
+                    (click)="selectCreatureType(ct.id)">
+              {{ ct.name }}
+            </button>
+          }
+        </div>
+
+        <!-- Harvest table for selected type -->
+        @if (selectedCreatureType(); as ct) {
+          <div class="harvest-table-container">
+            <div class="harvest-header">
+              <h3>{{ ct.name }} Components</h3>
+              <mat-chip class="skill-chip">
+                <mat-icon matChipAvatar>psychology</mat-icon>
+                Harvesting Skill: {{ ct.harvestSkill ?? 'Unknown' }}
+              </mat-chip>
+              <span class="harvest-formula">
+                Assessment: INT ({{ ct.harvestSkill }}) + Carving: DEX ({{ ct.harvestSkill }})
+              </span>
+            </div>
+
+            @for (group of componentsByDc(); track group.dc) {
+              <div class="dc-group">
+                <div class="dc-label">
+                  <span class="dc-badge dc-{{ group.dc }}">DC {{ group.dc }}</span>
+                  <span class="dc-hint">{{ dcGroupLabels[group.dc] ?? '' }}</span>
+                </div>
+                <div class="component-list">
+                  @for (comp of group.components; track comp.id) {
+                    <div class="component-row">
+                      <span class="component-name">{{ comp.name }}</span>
+
+                      <div class="component-badges">
+                        @if (comp.isVolatile) {
+                          <mat-chip class="volatile-chip" [matTooltip]="comp.notes ?? 'Volatile: triggers effect on partial harvest'">
+                            <mat-icon matChipAvatar>warning</mat-icon>
+                            Volatile
+                          </mat-chip>
+                        }
+                        @if (comp.isEdible && comp.edibleAs) {
+                          <a [routerLink]="['/rules']"
+                             [fragment]="comp.edibleAs"
+                             class="edible-chip-link"
+                             [matTooltip]="'Counts as ' + COMPONENT_TYPE_LABELS[comp.edibleAs] + ' for cooking'">
+                            <mat-chip class="edible-chip">
+                              <mat-icon matChipAvatar>restaurant</mat-icon>
+                              {{ COMPONENT_TYPE_LABELS[comp.edibleAs] }}
+                            </mat-chip>
+                          </a>
+                        }
+                        @if (comp.notes && !comp.isVolatile) {
+                          <span class="component-note" [matTooltip]="comp.notes">
+                            <mat-icon class="info-icon">info_outline</mat-icon>
+                          </span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <mat-icon>search</mat-icon>
+            <p>Select a creature type above to view its harvest table.</p>
+          </div>
+        }
+
+      </div>
+    </mat-tab>
+
+    <!-- ====================================================== -->
+    <!-- TAB 3 — REFERENCE                                      -->
+    <!-- ====================================================== -->
+    <mat-tab label="Reference">
+      <div class="tab-content">
+
+        <div class="reference-grid">
+
+          <div class="ref-section">
+            <h3>Essence by Creature CR</h3>
+            <p class="section-hint">Higher-CR creatures yield rarer essence types.</p>
+            <table class="reference-table">
+              <thead>
+                <tr><th>Creature CR</th><th>Harvest DC</th><th>Essence</th><th>Item Rarity</th></tr>
+              </thead>
+              <tbody>
+                @for (row of essenceTable; track row.cr) {
+                  <tr>
+                    <td>{{ row.cr }}</td>
+                    <td>{{ row.dc }}</td>
+                    <td>{{ row.essence }}</td>
+                    <td><span class="rarity-badge rarity-{{ row.rarity }}">{{ row.rarity }}</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ref-section">
+            <h3>Component Trading Values</h3>
+            <p class="section-hint">
+              Values without harvesting supplies / with harvesting supplies.
+            </p>
+            <table class="reference-table">
+              <thead>
+                <tr><th>Comp. DC</th><th>Sell</th><th>Buy</th><th>Sell (supplied)</th><th>Buy (supplied)</th></tr>
+              </thead>
+              <tbody>
+                @for (row of componentValueTable; track row.dc) {
+                  <tr>
+                    <td>{{ row.dc }}</td>
+                    <td>{{ row.sell }}</td>
+                    <td>{{ row.buy }}</td>
+                    <td>{{ row.sellSupplied }}</td>
+                    <td>{{ row.buySupplied }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ref-section">
+            <h3>Essence Trading Values</h3>
+            <table class="reference-table">
+              <thead>
+                <tr><th>Essence</th><th>Sell</th><th>Buy</th></tr>
+              </thead>
+              <tbody>
+                @for (row of essenceValueTable; track row.essence) {
+                  <tr>
+                    <td>{{ row.essence }}</td>
+                    <td>{{ row.sell }}</td>
+                    <td>{{ row.buy }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ref-section">
+            <h3>Finding Traders</h3>
+            <p class="section-hint">
+              Make a check using the creature type's harvest skill + settlement modifier.
+              Roll a d20 + INT or CHA modifier + proficiency (if applicable).
+            </p>
+            <table class="reference-table">
+              <thead>
+                <tr><th>Check Total</th><th>Buyer's Offer</th><th>Seller's Offer</th></tr>
+              </thead>
+              <tbody>
+                @for (row of tradingTable; track row.check) {
+                  <tr>
+                    <td>{{ row.check }}</td>
+                    <td>{{ row.buyer }}</td>
+                    <td>{{ row.seller }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+
+</div>

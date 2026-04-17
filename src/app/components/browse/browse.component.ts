@@ -6,11 +6,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { CookingDataService } from '../../services/cooking-data.service';
 import { MonsterCardComponent } from '../shared/monster-card/monster-card.component';
 import { RecipeCardComponent } from '../shared/recipe-card/recipe-card.component';
 import { IngredientCardComponent } from '../shared/ingredient-card/ingredient-card.component';
 import { RecipeTier } from '../../models/recipe.model';
+import { CreateIngredientSourceDialogComponent } from '../shared/create-ingredient-source-dialog/create-ingredient-source-dialog.component';
+import { CreateRecipeDialogComponent } from '../shared/create-recipe-dialog/create-recipe-dialog.component';
 
 @Component({
   selector: 'app-browse',
@@ -22,6 +26,7 @@ import { RecipeTier } from '../../models/recipe.model';
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
+    MatTooltipModule,
     MonsterCardComponent,
     RecipeCardComponent,
     IngredientCardComponent,
@@ -31,6 +36,7 @@ import { RecipeTier } from '../../models/recipe.model';
 })
 export class BrowseComponent {
   private dataService = inject(CookingDataService);
+  private dialog = inject(MatDialog);
 
   monsterQuery = signal('');
   recipeQuery = signal('');
@@ -78,5 +84,13 @@ export class BrowseComponent {
 
   toggleComponentType(id: string): void {
     this.selectedComponentType.set(this.selectedComponentType() === id ? null : id);
+  }
+
+  openAddMonster(): void {
+    this.dialog.open(CreateIngredientSourceDialogComponent, { width: '900px', maxWidth: '95vw', disableClose: true });
+  }
+
+  openAddRecipe(): void {
+    this.dialog.open(CreateRecipeDialogComponent, { width: '900px', maxWidth: '95vw' });
   }
 }

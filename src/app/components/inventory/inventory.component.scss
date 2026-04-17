@@ -62,6 +62,7 @@
   &.rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
   &.rarity-very-rare { background: #dfd0ea; color: #3e1560; }
   &.rarity-legendary { background: #f0e0a0; color: #5a3200; }
+  &.rarity-artifact  { background: #f5c8a0; color: #5a1500; }
 }
 
 .qty-controls {
@@ -184,4 +185,74 @@ mat-divider {
     color: var(--mat-sys-on-surface-variant);
     cursor: help;
   }
+}
+
+.tab-content {
+  padding: 20px 0;
+}
+
+// ── Harvest Stock tab ──────────────────────────────────────────────────────
+
+.craftable-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s;
+
+  &:hover { filter: brightness(0.95); }
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  .arrow-icon { margin-left: auto; }
+}
+
+.harvest-search {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.search-results {
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.search-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  &:last-child { border-bottom: none; }
+}
+
+.search-result-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.search-result-actions {
+  .qty-controls.inline {
+    gap: 2px;
+  }
+}
+
+.ingredients-header {
+  margin-bottom: 16px;
 }

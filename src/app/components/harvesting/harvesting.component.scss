@@ -1,0 +1,363 @@
+:host {
+  display: block;
+}
+
+.harvesting-page {
+  padding: var(--page-padding);
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+
+  @media (max-width: 768px) { padding: var(--page-padding-mobile); }
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 20px;
+}
+
+// ── Tab 1 — Rules ──────────────────────────────────────────────────────
+
+.rules-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--mat-sys-on-surface);
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+}
+
+.intro-text {
+  font-size: 0.9rem;
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.step-card {
+  .step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-right: 10px;
+  }
+
+  mat-card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  mat-card-content {
+    font-size: 0.85rem;
+    color: var(--mat-sys-on-surface-variant);
+    line-height: 1.5;
+    padding-top: 8px;
+  }
+}
+
+.rules-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+
+  ul {
+    margin: 0 0 8px;
+    padding-left: 20px;
+    font-size: 0.875rem;
+    color: var(--mat-sys-on-surface-variant);
+    line-height: 1.6;
+
+    li + li { margin-top: 4px; }
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: var(--mat-sys-on-surface-variant);
+    line-height: 1.5;
+    margin: 0 0 16px;
+  }
+}
+
+.reference-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: 8px;
+
+  th {
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--mat-sys-on-surface-variant);
+    padding: 6px 10px 6px 0;
+    border-bottom: 2px solid var(--mat-sys-outline-variant);
+  }
+
+  td {
+    padding: 7px 10px 7px 0;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    color: var(--mat-sys-on-surface);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+.inline-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+
+  &.warn { color: var(--mat-sys-error, #c62828); }
+}
+
+// ── Tab 2 — Harvest Tables ─────────────────────────────────────────────
+
+.section-hint {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: 0;
+}
+
+.creature-type-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 20px;
+
+  button {
+    font-size: 0.8rem;
+    height: 32px;
+    line-height: 32px;
+    padding: 0 14px;
+    border-radius: 16px;
+
+    &.selected {
+      background: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
+    }
+  }
+}
+
+.harvest-table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.harvest-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .skill-chip {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+    font-size: 0.8rem;
+  }
+
+  .harvest-formula {
+    font-size: 0.78rem;
+    color: var(--mat-sys-on-surface-variant);
+    font-style: italic;
+    width: 100%;
+    margin-top: -6px;
+  }
+}
+
+.dc-group {
+  margin-bottom: 16px;
+}
+
+.dc-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+
+  .dc-hint {
+    font-size: 0.75rem;
+    color: var(--mat-sys-on-surface-variant);
+    font-style: italic;
+  }
+}
+
+.dc-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+
+  &.dc-5  { background: #d8f0d8; color: #1b4520; }
+  &.dc-10 { background: #d0e4f4; color: #1a2f4a; }
+  &.dc-15 { background: #e4d8f4; color: #3e1560; }
+  &.dc-20 { background: #f4e4d0; color: #5a2800; }
+  &.dc-25 { background: #f0d8d8; color: #5a1010; }
+}
+
+.component-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.component-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  &:last-child { border-bottom: none; }
+}
+
+.component-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+  flex: 1;
+}
+
+.component-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.volatile-chip {
+  background: color-mix(in srgb, var(--mat-sys-error, #c62828) 15%, transparent);
+  color: var(--mat-sys-error, #c62828);
+  font-size: 0.75rem;
+  cursor: help;
+}
+
+.edible-chip-link {
+  text-decoration: none;
+  display: inline-flex;
+}
+
+.edible-chip {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.8; }
+}
+
+.component-note {
+  display: inline-flex;
+  align-items: center;
+  color: var(--mat-sys-on-surface-variant);
+  cursor: help;
+}
+
+.info-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 0;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.35;
+  }
+
+  p {
+    font-size: 0.875rem;
+    margin: 0;
+    font-style: italic;
+  }
+}
+
+// ── Tab 3 — Reference ──────────────────────────────────────────────────
+
+.reference-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2, 1fr));
+  gap: 24px;
+}
+
+.ref-section {
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+}
+
+.rarity-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+
+  &.rarity-uncommon  { background: #cce5cc; color: #1b4520; }
+  &.rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
+  &.rarity-very-rare { background: #dfd0ea; color: #3e1560; }
+  &.rarity-legendary { background: #f0e0a0; color: #5a3200; }
+  &.rarity-artifact  { background: #f0c8a0; color: #5a2000; }
+}

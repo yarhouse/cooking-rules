@@ -4,4 +4,5 @@ export interface CreatureType {
   id: string;
   name: string;
   availableComponents: ComponentTypeName[];
+  harvestSkill: string | null;
 }

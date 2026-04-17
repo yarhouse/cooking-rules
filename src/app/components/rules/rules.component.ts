@@ -120,6 +120,7 @@ export class RulesComponent {
       rare: 'rare',
       'very-rare': 'veryRare',
       legendary: 'legendary',
+      artifact: 'legendary',
     };
     return effect.scaling[map[rarity]] ?? null;
   }
@@ -155,6 +156,7 @@ export class RulesComponent {
     rare: 'Rare',
     'very-rare': 'Very Rare',
     legendary: 'Legendary',
+    artifact: 'Artifact',
   };
 
   readonly rarities: Rarity[] = ['uncommon', 'rare', 'very-rare', 'legendary'];

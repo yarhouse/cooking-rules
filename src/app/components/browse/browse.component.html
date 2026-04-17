@@ -5,7 +5,7 @@
 
     <!-- Monsters Tab -->
     <mat-tab label="Monsters">
-      <div class="tab-content">
+      <div class="tab-content tab-content--fab">
         <mat-form-field appearance="outline" class="filter-field">
           <mat-label>Filter monsters…</mat-label>
           <input matInput [value]="monsterQuery()" (input)="monsterQuery.set($any($event.target).value)" />
@@ -30,12 +30,18 @@
             <p class="empty">No monsters found.</p>
           }
         </div>
+
+        <button type="button" mat-fab class="tab-fab" color="primary"
+                matTooltip="Add custom monster" aria-label="Add custom monster"
+                (click)="openAddMonster()">
+          <mat-icon>add</mat-icon>
+        </button>
       </div>
     </mat-tab>
 
     <!-- Recipes Tab -->
     <mat-tab label="Recipes">
-      <div class="tab-content">
+      <div class="tab-content tab-content--fab">
         <mat-form-field appearance="outline" class="filter-field">
           <mat-label>Filter recipes…</mat-label>
           <input matInput [value]="recipeQuery()" (input)="recipeQuery.set($any($event.target).value)" />
@@ -60,6 +66,12 @@
             <p class="empty">No recipes found.</p>
           }
         </div>
+
+        <button type="button" mat-fab class="tab-fab" color="primary"
+                matTooltip="Add custom recipe" aria-label="Add custom recipe"
+                (click)="openAddRecipe()">
+          <mat-icon>add</mat-icon>
+        </button>
       </div>
     </mat-tab>
 

@@ -8,8 +8,9 @@
 -- ============================================================
 
 CREATE TABLE creature_types (
-  id   TEXT PRIMARY KEY,
-  name TEXT NOT NULL
+  id            TEXT PRIMARY KEY,
+  name          TEXT NOT NULL,
+  harvest_skill TEXT            -- skill used for harvesting checks (e.g. Arcana, Survival)
 );
 
 CREATE TABLE component_types (
@@ -88,6 +89,51 @@ CREATE TABLE recipe_ingredients (
   component_type_id TEXT NOT NULL REFERENCES component_types(id),
   boss_specific     TEXT
 );
+
+-- ============================================================
+-- HARVESTING & CRAFTING REFERENCE TABLES
+-- ============================================================
+
+CREATE TABLE harvest_components (
+  id               TEXT PRIMARY KEY,            -- e.g. "aberration-eye"
+  creature_type_id TEXT NOT NULL REFERENCES creature_types(id),
+  name             TEXT NOT NULL,
+  component_dc     INTEGER NOT NULL,
+  is_edible        INTEGER NOT NULL DEFAULT 0,  -- bool
+  edible_as        TEXT,                        -- nullable → component_type_id
+  is_volatile      INTEGER NOT NULL DEFAULT 0,  -- bool
+  notes            TEXT
+);
+
+CREATE TABLE magic_item_recipes (
+  id                TEXT PRIMARY KEY,
+  name              TEXT NOT NULL,
+  category          TEXT NOT NULL CHECK(category IN
+    ('ammunition','armour','potion','ring','rod','scroll','staff','wand','weapon','wondrous')),
+  rarity            TEXT NOT NULL CHECK(rarity IN
+    ('common','uncommon','rare','very-rare','legendary','artifact')),
+  item_value_gp     INTEGER,
+  crafting_dc       INTEGER,
+  crafting_time_hrs REAL,
+  essence_type      TEXT,
+  notes             TEXT
+);
+
+CREATE TABLE magic_item_components (
+  id               INTEGER PRIMARY KEY AUTOINCREMENT,
+  recipe_id        TEXT NOT NULL REFERENCES magic_item_recipes(id),
+  creature_type_id TEXT REFERENCES creature_types(id),
+  component_name   TEXT NOT NULL,
+  metatag          TEXT,
+  quantity         INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE INDEX idx_harvest_components_creature   ON harvest_components(creature_type_id);
+CREATE INDEX idx_harvest_components_dc         ON harvest_components(component_dc);
+CREATE INDEX idx_magic_item_recipes_category   ON magic_item_recipes(category);
+CREATE INDEX idx_magic_item_recipes_rarity     ON magic_item_recipes(rarity);
+CREATE INDEX idx_magic_item_components_recipe  ON magic_item_components(recipe_id);
+CREATE INDEX idx_magic_item_components_type    ON magic_item_components(creature_type_id);
 
 -- ============================================================
 -- CAMPAIGN / USER DATA

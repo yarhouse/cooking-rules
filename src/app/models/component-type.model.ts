@@ -2,7 +2,7 @@ export type ComponentTypeName =
   | 'blood' | 'bone' | 'brain' | 'egg' | 'eye'
   | 'fat' | 'flesh' | 'heart' | 'liver' | 'spice';
 
-export type Rarity = 'uncommon' | 'rare' | 'very-rare' | 'legendary';
+export type Rarity = 'uncommon' | 'rare' | 'very-rare' | 'legendary' | 'artifact';
 
 export interface RarityScaling {
   uncommon: string;

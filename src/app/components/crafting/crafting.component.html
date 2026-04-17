@@ -1,0 +1,479 @@
+<div class="crafting-page">
+
+  <mat-tab-group animationDuration="150ms">
+
+    <!-- ====================================================== -->
+    <!-- TAB 1 — RULES                                          -->
+    <!-- ====================================================== -->
+    <mat-tab label="Rules">
+      <div class="tab-content">
+
+        <!-- Manufacturing -->
+        <section class="rules-section">
+          <h2>Manufacturing</h2>
+          <p class="intro-text">
+            Manufacturing is the process of using tools and raw materials to craft non-magical items.
+            Choose a tool you are proficient with, gather the required materials, and make a check
+            (tool ability modifier + proficiency). Meeting or exceeding the item's DC produces the item
+            in the listed time. Failing by 4 or less wastes only your time; failing by 5 or more
+            also destroys half the materials.
+          </p>
+
+          <div class="rules-two-col">
+            <div>
+              <h3>Key Rules</h3>
+              <ul>
+                <li>You must be <strong>proficient</strong> with the relevant tool.</li>
+                <li>Each item lists a <strong>material cost</strong>, <strong>DC</strong>, and <strong>crafting time</strong>.</li>
+                <li>Up to 3 proficient helpers can assist — each adds their proficiency bonus.</li>
+                <li>Helpers also reduce the time (divide by number of participants).</li>
+                <li>You can hire a journeyman (×1 speed, +6 mod, 1 gp/hr) or expert (×2 speed, +8 mod, 4 gp/hr).</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Outcome</h3>
+              <table class="reference-table">
+                <thead>
+                  <tr><th>Check vs DC</th><th>Result</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>−5 or more below</td><td>Fail — half materials lost</td></tr>
+                  <tr><td>−4 to −1</td><td>Fail — time only wasted</td></tr>
+                  <tr><td>0 to +4</td><td>Success</td></tr>
+                  <tr><td>+5 or more</td><td>Success + one boon (roll on Mfg. Boons)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <mat-divider />
+
+        <!-- Enchanting -->
+        <section class="rules-section">
+          <h2>Enchanting</h2>
+          <p class="intro-text">
+            Enchanting imbues an existing item with magic using the essence of a slain creature.
+            Make an enchanting check using the skill associated with the creature type whose essence
+            you are using. You must have the required <strong>essence</strong> and have it in your
+            possession for the full crafting time.
+          </p>
+
+          <div class="rules-two-col">
+            <div>
+              <h3>Key Rules</h3>
+              <ul>
+                <li>Each magic item specifies the required creature type and component.</li>
+                <li>The check uses <strong>INT, WIS, or CHA</strong> (your choice) + proficiency in the associated skill.</li>
+                <li>Essence is consumed on success or failure.</li>
+                <li>Enchanting <em>boons</em> accumulate based on the essence rarity used (max 3).</li>
+                <li>Enchanting quirks do <strong>not</strong> stack — each unique quirk can only apply once.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Essence & Boon Limit</h3>
+              <table class="reference-table">
+                <thead>
+                  <tr><th>Essence</th><th>Rarity</th><th>Max Boons</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>—</td><td>Common</td><td>0</td></tr>
+                  <tr><td>Frail</td><td>Uncommon</td><td>1</td></tr>
+                  <tr><td>Robust</td><td>Rare</td><td>2</td></tr>
+                  <tr><td>Potent</td><td>Very Rare</td><td>3</td></tr>
+                  <tr><td>Mythic</td><td>Legendary</td><td>3</td></tr>
+                  <tr><td>Deific</td><td>Artifact</td><td>3</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <h3>Enchanting DC &amp; Time by Rarity</h3>
+          <div class="table-scroll">
+            <table class="reference-table">
+              <thead>
+                <tr>
+                  <th>Rarity</th>
+                  <th>Essence</th>
+                  <th>DC</th>
+                  <th>Consumable</th>
+                  <th>Non-Attunement</th>
+                  <th>Attunement</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of enchantingTable; track row.rarity) {
+                  <tr>
+                    <td><span class="rarity-badge rarity-{{ rarityClass(row.rarity) }}">{{ row.rarity }}</span></td>
+                    <td>{{ row.essence }}</td>
+                    <td><strong>{{ row.dc }}</strong></td>
+                    <td>{{ row.consumable }}</td>
+                    <td>{{ row.nonAttunement }}</td>
+                    <td>{{ row.attunement }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="rules-two-col">
+            <div>
+              <h3>Creature Type → Enchanting Skill</h3>
+              <table class="reference-table">
+                <thead>
+                  <tr><th>Creature Type</th><th>Skill</th></tr>
+                </thead>
+                <tbody>
+                  @for (row of enchantingSkillTable; track row.type) {
+                    <tr>
+                      <td>{{ row.type }}</td>
+                      <td>{{ row.skill }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>Quirks Gained</h3>
+              <p class="intro-text">
+                The difference between your crafting check result and the crafting DC determines
+                whether the item gains quirks.
+              </p>
+              <table class="reference-table">
+                <thead>
+                  <tr><th>Check − DC</th><th>Quirks</th></tr>
+                </thead>
+                <tbody>
+                  @for (row of quirksGainedTable; track row.result) {
+                    <tr>
+                      <td>{{ row.result }}</td>
+                      <td>{{ row.outcome }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <mat-divider />
+
+        <!-- Forging -->
+        <section class="rules-section">
+          <h2>Monster Forging</h2>
+          <p class="intro-text">
+            Monster forging uses harvested creature parts — hide, bone, antlers, talons, and similar
+            components — in place of standard materials when crafting armour and weapons. The creature
+            must be at least the minimum size listed for each item type. Monster-forged items use the
+            same DC and time as normal crafted versions but may grant additional properties based on
+            the creature's abilities (GM discretion).
+          </p>
+          <div class="rules-two-col">
+            <div>
+              <h3>Hide / Pelt / Membrane Items</h3>
+              <table class="reference-table">
+                <thead><tr><th>Minimum Size</th><th>Items</th></tr></thead>
+                <tbody>
+                  <tr><td>Small</td><td>Sling</td></tr>
+                  <tr><td>Medium</td><td>Net, Whip</td></tr>
+                  <tr><td>Large</td><td>Light and medium armour, shields</td></tr>
+                  <tr><td>Huge</td><td>Heavy armour</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>Bone / Antler / Claw / Tooth Items</h3>
+              <table class="reference-table">
+                <thead><tr><th>Component</th><th>Min. Size</th><th>Items</th></tr></thead>
+                <tbody>
+                  <tr><td>Bone</td><td>Tiny</td><td>Arrow, bolt, dart</td></tr>
+                  <tr><td>Antler/Beak/Horn/Pincer/Talon/Tusk</td><td>Small</td><td>Arrow, bolt, dart</td></tr>
+                  <tr><td>Claw/Tooth</td><td>Medium</td><td>Arrow, bolt, dart, daggers</td></tr>
+                  <tr><td>Bone</td><td>Large</td><td>Spears, staffs, clubs, quarterstaffs</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </mat-tab>
+
+    <!-- ====================================================== -->
+    <!-- TAB 2 — MAGIC ITEMS                                    -->
+    <!-- ====================================================== -->
+    <mat-tab label="Magic Items">
+      <div class="tab-content">
+
+        <!-- Search -->
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search magic items</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Potion of Healing, Monstrosity…" />
+        </mat-form-field>
+
+        <!-- Category filter -->
+        <div class="filter-row">
+          <span class="filter-label">Category</span>
+          <div class="chip-row">
+            @for (cat of ALL_CATEGORIES; track cat) {
+              <button type="button" mat-stroked-button
+                      [class.selected]="selectedCategory() === cat"
+                      (click)="selectCategory(cat)">
+                {{ CATEGORY_LABELS[cat] }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Rarity filter -->
+        <div class="filter-row">
+          <span class="filter-label">Rarity</span>
+          <div class="chip-row">
+            @for (rar of ALL_RARITIES; track rar) {
+              <button type="button" mat-stroked-button
+                      [class.selected]="selectedRarity() === rar"
+                      (click)="selectRarity(rar)">
+                {{ RARITY_LABELS[rar] }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Craftable filter -->
+        <div class="filter-row craftable-filter-row">
+          <button type="button" mat-stroked-button
+                  [class.selected]="craftableOnly()"
+                  (click)="craftableOnly.set(!craftableOnly())">
+            <mat-icon>construction</mat-icon>
+            Craftable only
+            @if (craftableItemIds().size > 0) {
+              <span class="craftable-count-badge">{{ craftableItemIds().size }}</span>
+            }
+          </button>
+        </div>
+
+        <!-- Results -->
+        @if (filteredMagicItems().length === 0) {
+          <div class="empty-state">
+            <mat-icon>auto_awesome</mat-icon>
+            <p>No magic items match the current filters.</p>
+          </div>
+        } @else {
+          <p class="results-hint">{{ filteredMagicItems().length }} item{{ filteredMagicItems().length !== 1 ? 's' : '' }}</p>
+          <div class="magic-item-list">
+            @for (item of filteredMagicItems(); track item.id) {
+              <div class="magic-item-row" [class.expanded]="expandedItemId() === item.id">
+                <div class="item-summary" (click)="toggleExpand(item.id)" role="button"
+                     [attr.aria-expanded]="expandedItemId() === item.id">
+                  <span class="item-name">{{ item.name }}</span>
+                  <div class="item-badges">
+                    <span class="category-badge">{{ CATEGORY_LABELS[item.category] }}</span>
+                    <span class="rarity-badge rarity-{{ item.rarity }}">{{ RARITY_LABELS[item.rarity] }}</span>
+                    @if (item.essenceType) {
+                      <span class="essence-badge">{{ item.essenceType }}</span>
+                    }
+                    @if (item.craftingDc) {
+                      <span class="dc-badge">DC {{ item.craftingDc }}</span>
+                    }
+                    @if (craftableItemIds().has(item.id)) {
+                      <span class="craftable-badge">✓ Craftable</span>
+                    }
+                  </div>
+                  <mat-icon class="expand-icon">{{ expandedItemId() === item.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </div>
+
+                @if (expandedItemId() === item.id) {
+                  <div class="item-detail">
+                    @if (item.itemValueGp) {
+                      <div class="detail-row">
+                        <span class="detail-label">Value</span>
+                        <span>{{ item.itemValueGp.toLocaleString() }} gp</span>
+                      </div>
+                    }
+                    @if (item.craftingTimeHrs) {
+                      <div class="detail-row">
+                        <span class="detail-label">Crafting Time</span>
+                        <span>{{ item.craftingTimeHrs }} hrs</span>
+                      </div>
+                    }
+                    @if (item.components.length > 0) {
+                      <div class="detail-row components-row">
+                        <span class="detail-label">Components</span>
+                        <div class="component-tags">
+                          @for (comp of item.components; track $index) {
+                            <span class="component-tag">
+                              @if (comp.creatureTypeId) {
+                                <span class="comp-type">{{ comp.creatureTypeId | titlecase }}</span>
+                              }
+                              @if (comp.metatag) {
+                                <span class="comp-metatag">({{ comp.metatag }})</span>
+                              }
+                              {{ comp.componentName }}
+                              @if (comp.quantity > 1) {
+                                <span class="comp-qty">×{{ comp.quantity }}</span>
+                              }
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    }
+                    @if (item.notes) {
+                      <div class="detail-row">
+                        <span class="detail-label">Notes</span>
+                        <span class="detail-notes">{{ item.notes }}</span>
+                      </div>
+                    }
+                    @if (craftableItemIds().has(item.id)) {
+                      <div class="detail-craft-row">
+                        <button mat-flat-button color="primary" type="button"
+                                (click)="confirmCraft(item, $event)">
+                          <mat-icon>construction</mat-icon> Craft
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    </mat-tab>
+
+    <!-- ====================================================== -->
+    <!-- TAB 3 — QUIRKS                                         -->
+    <!-- ====================================================== -->
+    <mat-tab label="Quirks">
+      <div class="tab-content">
+
+        <div class="quirk-controls">
+          <div class="quirk-toggle-group">
+            <span class="filter-label">Section</span>
+            <div class="chip-row">
+              @for (opt of SECTION_OPTS; track opt.value) {
+                <button type="button" mat-stroked-button
+                        [class.selected]="quirkSection() === opt.value"
+                        (click)="quirkSection.set(opt.value)">
+                  {{ opt.label }}
+                </button>
+              }
+            </div>
+          </div>
+          <div class="quirk-toggle-group">
+            <span class="filter-label">Type</span>
+            <div class="chip-row">
+              @for (opt of FILTER_OPTS; track opt.value) {
+                <button type="button" mat-stroked-button
+                        [class.selected]="quirkFilter() === opt.value"
+                        (click)="quirkFilter.set(opt.value)">
+                  {{ opt.label }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Manufacturing Flaws -->
+        @if (visibleManufacturingFlaws().length > 0) {
+          <div class="quirk-section-block">
+            <h3 class="quirk-section-heading">
+              <span class="section-type manufacturing">Manufacturing</span>
+              <span class="section-kind flaw">Flaws</span>
+              <span class="roll-hint">d20</span>
+            </h3>
+            <div class="quirk-list">
+              @for (q of visibleManufacturingFlaws(); track q.roll) {
+                <div class="quirk-row is-flaw">
+                  <span class="quirk-roll">{{ q.roll }}</span>
+                  <div class="quirk-body">
+                    <div class="quirk-header">
+                      <span class="quirk-name">{{ q.name }}</span>
+                    </div>
+                    <p class="quirk-effect">{{ q.effect }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Manufacturing Boons -->
+        @if (visibleManufacturingBoons().length > 0) {
+          <div class="quirk-section-block">
+            <h3 class="quirk-section-heading">
+              <span class="section-type manufacturing">Manufacturing</span>
+              <span class="section-kind boon">Boons</span>
+              <span class="roll-hint">d20 (d12 for wondrous items)</span>
+            </h3>
+            <div class="quirk-list">
+              @for (q of visibleManufacturingBoons(); track q.roll) {
+                <div class="quirk-row is-boon">
+                  <span class="quirk-roll">{{ q.roll }}</span>
+                  <div class="quirk-body">
+                    <div class="quirk-header">
+                      <span class="quirk-name">{{ q.name }}</span>
+                    </div>
+                    <p class="quirk-effect">{{ q.effect }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Enchanting Flaws -->
+        @if (visibleEnchantingFlaws().length > 0) {
+          <div class="quirk-section-block">
+            <h3 class="quirk-section-heading">
+              <span class="section-type enchanting">Enchanting</span>
+              <span class="section-kind flaw">Flaws</span>
+              <span class="roll-hint">d20</span>
+            </h3>
+            <div class="quirk-list">
+              @for (q of visibleEnchantingFlaws(); track q.roll) {
+                <div class="quirk-row is-flaw">
+                  <span class="quirk-roll">{{ q.roll }}</span>
+                  <div class="quirk-body">
+                    <div class="quirk-header">
+                      <span class="quirk-name">{{ q.name }}</span>
+                    </div>
+                    <p class="quirk-effect">{{ q.effect }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Enchanting Boons -->
+        @if (visibleEnchantingBoons().length > 0) {
+          <div class="quirk-section-block">
+            <h3 class="quirk-section-heading">
+              <span class="section-type enchanting">Enchanting</span>
+              <span class="section-kind boon">Boons</span>
+              <span class="roll-hint">d20</span>
+            </h3>
+            <div class="quirk-list">
+              @for (q of visibleEnchantingBoons(); track q.roll) {
+                <div class="quirk-row is-boon">
+                  <span class="quirk-roll">{{ q.roll }}</span>
+                  <div class="quirk-body">
+                    <div class="quirk-header">
+                      <span class="quirk-name">{{ q.name }}</span>
+                    </div>
+                    <p class="quirk-effect">{{ q.effect }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+
+</div>

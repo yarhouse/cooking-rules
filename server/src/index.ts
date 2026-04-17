@@ -4,11 +4,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 
-import { creatureTypesRouter } from './routes/creature-types.js';
-import { componentTypesRouter } from './routes/component-types.js';
-import { monstersRouter }       from './routes/monsters.js';
-import { ingredientsRouter }    from './routes/ingredients.js';
-import { recipesRouter }        from './routes/recipes.js';
+import { creatureTypesRouter }      from './routes/creature-types.js';
+import { componentTypesRouter }     from './routes/component-types.js';
+import { monstersRouter }           from './routes/monsters.js';
+import { ingredientsRouter }        from './routes/ingredients.js';
+import { recipesRouter }            from './routes/recipes.js';
+import { harvestComponentsRouter }  from './routes/harvest-components.js';
+import { magicItemsRouter }         from './routes/magic-items.js';
 
 const app  = express();
 const port = Number(process.env['PORT'] ?? 3000);
@@ -34,11 +36,13 @@ app.use('/api/', rateLimit({
 }));
 
 // ----- Routes ---------------------------------------------------------------
-app.use('/api/creature-types',  creatureTypesRouter);
-app.use('/api/component-types', componentTypesRouter);
-app.use('/api/monsters',        monstersRouter);
-app.use('/api/ingredients',     ingredientsRouter);
-app.use('/api/recipes',         recipesRouter);
+app.use('/api/creature-types',       creatureTypesRouter);
+app.use('/api/component-types',      componentTypesRouter);
+app.use('/api/monsters',             monstersRouter);
+app.use('/api/ingredients',          ingredientsRouter);
+app.use('/api/recipes',              recipesRouter);
+app.use('/api/harvest-components',   harvestComponentsRouter);
+app.use('/api/magic-items',          magicItemsRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));

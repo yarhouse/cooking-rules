@@ -5,4 +5,9 @@ export interface InventoryEntry {
   quantity: number;
 }
 
+export interface HarvestStockEntry {
+  harvestComponentId: string;
+  quantity: number;
+}
+
 export type EssenceStock = Record<Rarity, number>;

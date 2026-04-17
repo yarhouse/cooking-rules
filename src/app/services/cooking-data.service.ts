@@ -9,12 +9,18 @@ import { ComponentType, ComponentEffect, ComponentTypeName } from '../models/com
 import { Monster } from '../models/monster.model';
 import { Ingredient } from '../models/ingredient.model';
 import { Recipe } from '../models/recipe.model';
+import { HarvestComponent } from '../models/harvest-component.model';
+import { MagicItem, MagicItemCategory } from '../models/magic-item.model';
+import { EssenceStock, } from '../models/inventory.model';
+import { Rarity } from '../models/component-type.model';
 import { environment } from '../../environments/environment';
 import { CREATURE_TYPES } from '../data/creature-types.data';
 import { COMPONENT_TYPES } from '../data/component-types.data';
 import { MONSTERS } from '../data/monsters.data';
 import { INGREDIENTS } from '../data/ingredients.data';
 import { RECIPES } from '../data/recipes.data';
+import { HARVEST_COMPONENTS } from '../data/harvest-components.data';
+import { MAGIC_ITEMS } from '../data/magic-items.data';
 
 export interface SearchResults {
   monsters: Monster[];
@@ -85,6 +91,14 @@ export class CookingDataService {
         this._recipesRefresh$.pipe(startWith(null), switchMap(() => this.api.get<Recipe[]>('/recipes'))),
         { initialValue: [] as Recipe[] }
       );
+
+  private _harvestComponents: Signal<HarvestComponent[]> = environment.staticData
+    ? signal(HARVEST_COMPONENTS)
+    : toSignal(this.api.get<HarvestComponent[]>('/harvest-components'), { initialValue: [] as HarvestComponent[] });
+
+  private _magicItems: Signal<MagicItem[]> = environment.staticData
+    ? signal(MAGIC_ITEMS)
+    : toSignal(this.api.get<MagicItem[]>('/magic-items'), { initialValue: [] as MagicItem[] });
 
   /** Always false in static builds (data is available synchronously).
    *  True while any reference dataset has not yet arrived from the API otherwise. */
@@ -243,6 +257,67 @@ export class CookingDataService {
     }
 
     return results;
+  }
+
+  // --- Harvest Components ---
+
+  getHarvestComponents(): HarvestComponent[] {
+    return this._harvestComponents();
+  }
+
+  getHarvestComponentsByCreatureType(creatureTypeId: string): HarvestComponent[] {
+    return this._harvestComponents().filter(hc => hc.creatureTypeId === creatureTypeId);
+  }
+
+  // --- Magic Items ---
+
+  getMagicItems(query?: string): MagicItem[] {
+    const all = this._magicItems();
+    if (!query) return all;
+    const q = query.toLowerCase();
+    return all.filter(m =>
+      m.name.toLowerCase().includes(q) ||
+      m.category.toLowerCase().includes(q) ||
+      m.components.some(c => c.componentName.toLowerCase().includes(q))
+    );
+  }
+
+  getMagicItemsByCategory(category: MagicItemCategory): MagicItem[] {
+    return this._magicItems().filter(m => m.category === category);
+  }
+
+  getMagicItemsByCreatureType(creatureTypeId: string): MagicItem[] {
+    return this._magicItems().filter(m =>
+      m.components.some(c => c.creatureTypeId === creatureTypeId)
+    );
+  }
+
+  // --- Craftability ---
+
+  private static readonly ESSENCE_RARITY_MAP: Record<string, Rarity> = {
+    Frail: 'uncommon', Robust: 'rare', Potent: 'very-rare',
+    Mythic: 'legendary', Deific: 'artifact',
+  };
+
+  isMagicItemCraftable(
+    item: MagicItem,
+    stockMap: Map<string, number>,
+    essence: EssenceStock
+  ): boolean {
+    const allComponents = this._harvestComponents();
+    for (const req of item.components) {
+      const matching = allComponents.filter(
+        hc => hc.creatureTypeId === req.creatureTypeId &&
+              hc.name.toLowerCase() === req.componentName.toLowerCase()
+      );
+      const owned = matching.reduce((sum, hc) => sum + (stockMap.get(hc.id) ?? 0), 0);
+      if (owned < req.quantity) return false;
+    }
+    if (item.essenceType) {
+      const rarity = CookingDataService.ESSENCE_RARITY_MAP[item.essenceType];
+      if (rarity && (essence[rarity] ?? 0) < 1) return false;
+    }
+    return true;
   }
 
   // --- Federated Search ---

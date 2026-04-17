@@ -1,13 +1,16 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { InventoryEntry, EssenceStock } from '../models/inventory.model';
+import { InventoryEntry, HarvestStockEntry, EssenceStock } from '../models/inventory.model';
 import { Monster } from '../models/monster.model';
 import { Ingredient } from '../models/ingredient.model';
 import { Recipe } from '../models/recipe.model';
 import { Rarity } from '../models/component-type.model';
+import { MagicItem } from '../models/magic-item.model';
+import { HarvestComponent } from '../models/harvest-component.model';
 
 const STORAGE_KEYS = {
   inventory: 'cooking-rules:inventory',
   essence: 'cooking-rules:essence',
+  harvestStock: 'cooking-rules:harvest-stock',
   customMonsters: 'cooking-rules:custom-monsters',
   customRecipes: 'cooking-rules:custom-recipes',
   customIngredients: 'cooking-rules:custom-ingredients',
@@ -19,6 +22,15 @@ const DEFAULT_ESSENCE: EssenceStock = {
   rare: 0,
   'very-rare': 0,
   legendary: 0,
+  artifact: 0,
+};
+
+const ESSENCE_RARITY_MAP: Record<string, Rarity> = {
+  Frail: 'uncommon',
+  Robust: 'rare',
+  Potent: 'very-rare',
+  Mythic: 'legendary',
+  Deific: 'artifact',
 };
 
 function loadFromStorage<T>(key: string, fallback: T): T {
@@ -40,9 +52,10 @@ export class InventoryService {
   readonly inventory = signal<InventoryEntry[]>(
     loadFromStorage(STORAGE_KEYS.inventory, [])
   );
-  readonly essence = signal<EssenceStock>(
-    loadFromStorage(STORAGE_KEYS.essence, { ...DEFAULT_ESSENCE })
-  );
+  readonly essence = signal<EssenceStock>({
+    ...DEFAULT_ESSENCE,
+    ...loadFromStorage<Partial<EssenceStock>>(STORAGE_KEYS.essence, {}),
+  });
   readonly customMonsters = signal<Monster[]>(
     loadFromStorage(STORAGE_KEYS.customMonsters, [])
   );
@@ -57,7 +70,15 @@ export class InventoryService {
     loadFromStorage(STORAGE_KEYS.effectOverrides, {})
   );
 
+  readonly harvestStock = signal<HarvestStockEntry[]>(
+    loadFromStorage(STORAGE_KEYS.harvestStock, [])
+  );
+
   // Derived
+  readonly harvestStockMap = computed(() =>
+    new Map(this.harvestStock().map(e => [e.harvestComponentId, e.quantity]))
+  );
+
   readonly inventoryMap = computed(() =>
     new Map(this.inventory().map(e => [e.ingredientId, e.quantity]))
   );
@@ -113,6 +134,70 @@ export class InventoryService {
 
   adjustEssence(rarity: Rarity, delta: number): void {
     this.setEssence(rarity, (this.essence()[rarity] ?? 0) + delta);
+  }
+
+  // --- Harvest Stock ---
+
+  getHarvestQuantity(harvestComponentId: string): number {
+    return this.harvestStockMap().get(harvestComponentId) ?? 0;
+  }
+
+  updateHarvestQuantity(harvestComponentId: string, delta: number): void {
+    const current = this.harvestStock();
+    const idx = current.findIndex(e => e.harvestComponentId === harvestComponentId);
+    let next: HarvestStockEntry[];
+
+    if (idx === -1) {
+      next = delta > 0 ? [...current, { harvestComponentId, quantity: delta }] : current;
+    } else {
+      const newQty = Math.max(0, current[idx].quantity + delta);
+      next = newQty === 0
+        ? current.filter((_, i) => i !== idx)
+        : current.map((e, i) => i === idx ? { ...e, quantity: newQty } : e);
+    }
+
+    this.harvestStock.set(next);
+    saveToStorage(STORAGE_KEYS.harvestStock, next);
+  }
+
+  setHarvestQuantity(harvestComponentId: string, quantity: number): void {
+    const current = this.harvestStock();
+    let next: HarvestStockEntry[];
+
+    if (quantity <= 0) {
+      next = current.filter(e => e.harvestComponentId !== harvestComponentId);
+    } else {
+      const idx = current.findIndex(e => e.harvestComponentId === harvestComponentId);
+      next = idx === -1
+        ? [...current, { harvestComponentId, quantity }]
+        : current.map(e => e.harvestComponentId === harvestComponentId ? { ...e, quantity } : e);
+    }
+
+    this.harvestStock.set(next);
+    saveToStorage(STORAGE_KEYS.harvestStock, next);
+  }
+
+  craftMagicItem(item: MagicItem, allHarvestComponents: HarvestComponent[]): void {
+    for (const req of item.components) {
+      const matching = allHarvestComponents.filter(
+        hc => hc.creatureTypeId === req.creatureTypeId &&
+              hc.name.toLowerCase() === req.componentName.toLowerCase()
+      );
+      let remaining = req.quantity;
+      for (const hc of matching) {
+        if (remaining <= 0) break;
+        const available = this.getHarvestQuantity(hc.id);
+        const deduct = Math.min(available, remaining);
+        if (deduct > 0) {
+          this.updateHarvestQuantity(hc.id, -deduct);
+          remaining -= deduct;
+        }
+      }
+    }
+    if (item.essenceType) {
+      const rarity = ESSENCE_RARITY_MAP[item.essenceType];
+      if (rarity) this.adjustEssence(rarity, -1);
+    }
   }
 
   // --- Effect Overrides (house rules) ---

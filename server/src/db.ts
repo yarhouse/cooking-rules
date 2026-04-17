@@ -22,14 +22,36 @@ export const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
-// user_version === 0 means this is a fresh database — run schema + seed.
-if ((db.pragma('user_version', { simple: true }) as number) === 0) {
+const userVersion = db.pragma('user_version', { simple: true }) as number;
+
+// user_version === 0 means this is a fresh database — run schema + all seeds.
+if (userVersion === 0) {
   const schema = fs.readFileSync(path.join(resourcesPath, 'db/sqlite/schema.sql'), 'utf8');
   const seed   = fs.readFileSync(path.join(resourcesPath, 'db/seeds/001_reference_data.sql'), 'utf8');
+  const seed2  = fs.readFileSync(path.join(resourcesPath, 'db/seeds/002_harvest_data.sql'), 'utf8');
+  const seed3  = fs.readFileSync(path.join(resourcesPath, 'db/seeds/003_magic_items_full.sql'), 'utf8');
   db.exec(schema);
   db.exec(seed);
-  db.pragma('user_version = 1');
+  db.exec(seed2);
+  db.exec(seed3);
+  db.pragma('user_version = 3');
   console.log('[db] SQLite database initialised at', dbPath);
 } else {
+  if (userVersion < 2) {
+    // Migration: add harvesting & crafting tables (v1 → v2)
+    const migration = fs.readFileSync(path.join(resourcesPath, 'db/migrations/002_harvesting_crafting.sql'), 'utf8');
+    const seed2     = fs.readFileSync(path.join(resourcesPath, 'db/seeds/002_harvest_data.sql'), 'utf8');
+    db.exec(migration);
+    db.exec(seed2);
+    db.pragma('user_version = 2');
+    console.log('[db] Migration v2 applied — harvesting & crafting tables added');
+  }
+  if (userVersion < 3) {
+    // Migration: seed full magic item catalogue (v2 → v3, no DDL changes)
+    const seed3 = fs.readFileSync(path.join(resourcesPath, 'db/seeds/003_magic_items_full.sql'), 'utf8');
+    db.exec(seed3);
+    db.pragma('user_version = 3');
+    console.log('[db] Migration v3 applied — full magic item catalogue seeded');
+  }
   console.log('[db] Connected to', dbPath);
 }
