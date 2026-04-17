@@ -52,6 +52,7 @@
     "appId": "dev.yarhouse.aratus-cookbook",
     "productName": "Chef Aratus Cookbook",
     "copyright": "Copyright © 2025 Aaron Yarhouse",
+    "afterPack": "./electron/after-pack.js",
     "files": [
       "electron/**/*",
       "dist/cooking-rules/browser/**/*",
@@ -74,6 +75,18 @@
       {
         "from": "db/seeds/001_reference_data.sql",
         "to": "db/seeds/001_reference_data.sql"
+      },
+      {
+        "from": "db/seeds/002_harvest_data.sql",
+        "to": "db/seeds/002_harvest_data.sql"
+      },
+      {
+        "from": "db/seeds/003_magic_items_full.sql",
+        "to": "db/seeds/003_magic_items_full.sql"
+      },
+      {
+        "from": "db/migrations",
+        "to": "db/migrations"
       }
     ],
     "mac": {
