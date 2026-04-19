@@ -60,12 +60,22 @@ npx png-to-ico /tmp/fav-32.png > public/favicon.ico
 sips -z 32 32 build/icon.png --out public/favicon.png --setProperty format png
 ```
 
-## 6 — Confirm output
+## 6 — PWA icons
+
+Generate the two sizes required by the web app manifest.
+
+```bash
+mkdir -p public/icons
+sips -z 192 192 build/icon.png --out public/icons/icon-192x192.png --setProperty format png
+sips -z 512 512 build/icon.png --out public/icons/icon-512x512.png --setProperty format png
+```
+
+## 7 — Confirm output
 
 List all generated files with sizes so the user can see everything succeeded.
 
 ```bash
-ls -lh build/icon.icns build/icon.ico public/favicon.ico public/favicon.png
+ls -lh build/icon.icns build/icon.ico public/favicon.ico public/favicon.png public/icons/icon-192x192.png public/icons/icon-512x512.png
 ```
 
 Report success and remind the user that `build/icon.png` is the only file they ever need to replace.

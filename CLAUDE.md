@@ -12,6 +12,8 @@ There are three distinct build targets, each with its own Angular environment fi
 | `npm run build:electron` | `electron` | `environment.electron.ts` | API at `localhost:3000` | SQLite via API |
 | `npm run build:static` | `static` | `environment.static.ts` | Static TS data files | `localStorage` only |
 
+`build:static` is a PWA build — Angular's service worker (`ngsw-worker.js`) and a web app manifest are included in the output. The service worker is only registered when `environment.staticData === true`, so it never activates in dev or Electron. The static output must be hosted at `/cooking-rules/` (matches `baseHref`).
+
 The `staticData` boolean in each environment file controls whether `CookingDataService` uses `toSignal(http.get(...))` or `signal(STATIC_DATA)`. Angular's build optimiser tree-shakes the unused path.
 
 ## Development — starting everything
@@ -30,6 +32,12 @@ ng serve
 The Angular app is at `http://localhost:4200`. The API is at `http://localhost:3000`.
 
 The SQLite database is created automatically at `data/cooking-rules.db` on first API server start. No manual setup needed.
+
+> **After any `dist:mac` or `dist:win` run**, `better-sqlite3` in `server/node_modules/` will be compiled against Electron's Node ABI. The dev server will crash with a `NODE_MODULE_VERSION` mismatch until you restore it:
+
+```bash
+cd server && npm rebuild better-sqlite3
+```
 
 ## Electron desktop app
 
@@ -101,14 +109,21 @@ server/
     ├── index.ts          ← Express app, helmet, rate-limit, CORS, routes, error handler
     ├── db.ts             ← better-sqlite3 connection, WAL mode, first-run init via user_version pragma
     └── routes/
-        ├── creature-types.ts   GET /api/creature-types
-        ├── component-types.ts  GET /api/component-types
-        ├── monsters.ts         GET /api/monsters
-        ├── ingredients.ts      GET /api/ingredients
-        └── recipes.ts          GET /api/recipes
+        ├── creature-types.ts       GET /api/creature-types
+        ├── component-types.ts      GET /api/component-types
+        ├── monsters.ts             GET /api/monsters
+        ├── ingredients.ts          GET /api/ingredients
+        ├── recipes.ts              GET /api/recipes
+        ├── harvest-components.ts   GET /api/harvest-components[?creatureTypeId=]
+        └── magic-items.ts          GET /api/magic-items[?category=][&rarity=][&creatureTypeId=]
 ```
 
 All routes are synchronous (better-sqlite3 is sync). Each runs a single SQL query using `json_group_array` + `json_object` for junction table aggregation, returning nested camelCase JSON. Results include `JSON.parse()` for SQLite's JSON string columns.
+
+The two harvesting/crafting routes support optional query params for filtering:
+
+- `GET /api/harvest-components?creatureTypeId=<id>` — filter by creature type
+- `GET /api/magic-items?category=<cat>&rarity=<rar>&creatureTypeId=<id>` — filter by any combination
 
 ```bash
 cd server
@@ -160,6 +175,9 @@ Override with the `DB_PATH` environment variable.
 | `ingredient_source_monsters` | Junction: which monsters drop each ingredient |
 | `recipes` | 32 recipes across 5 tiers (novice → boss) |
 | `recipe_ingredients` | Junction: required components per recipe with optional `boss_specific` label |
+| `harvest_components` | 208 harvestable parts per creature type — DC, skill, edibility, volatility |
+| `magic_item_recipes` | Magic item crafting recipes — category, rarity, DC, time, essence type |
+| `magic_item_components` | Junction: component requirements per magic item recipe |
 
 Campaign/inventory tables (`campaigns`, `inventory_entries`, `essence_stock`) exist in the schema but are currently managed client-side by `InventoryService` via `localStorage`.
 
@@ -175,6 +193,8 @@ Campaign/inventory tables (`campaigns`, `inventory_entries`, `essence_stock`) ex
 | `/#/browse` | `BrowseComponent` | Filter/browse by creature type, component type, tier |
 | `/#/builder` | `RecipeBuilderComponent` | Select ingredients, see which recipes are craftable |
 | `/#/inventory` | `InventoryComponent` | Track ingredient stock and loose essence |
+| `/#/harvesting` | `HarvestingComponent` | Browse harvest components by creature type — DC, skill, edibility, volatility |
+| `/#/crafting` | `CraftingComponent` | Browse magic item recipes by category/rarity; craft from inventory |
 | `/#/rules` | `RulesComponent` | Rules reference — effects by component/creature, quirks |
 
 ### Services
@@ -182,11 +202,12 @@ Campaign/inventory tables (`campaigns`, `inventory_entries`, `essence_stock`) ex
 **`CookingDataService`** (`src/app/services/cooking-data.service.ts`)
 
 - Central data access layer — all components inject this, none import data directly
-- In API mode: fetches all 5 datasets via `toSignal(api.get(...))` — loads once, cached in signals
+- In API mode: fetches all 7 datasets via `toSignal(api.get(...))` — loads once, cached in signals
 - In static mode (`environment.staticData === true`): initialises signals directly from `src/app/data/*.data.ts`
-- All 5 private signals are typed as `Signal<T>` with a ternary on `environment.staticData`
+- All 7 private signals are typed as `Signal<T>` with a ternary on `environment.staticData`
 - `loading` computed returns `false` immediately in static mode
 - Merges custom user-created entities from `InventoryService` into every getter
+- Exposes `harvestComponents()` and `magicItems()` getters alongside the original 5
 
 **`InventoryService`** (`src/app/services/inventory.service.ts`)
 
@@ -244,3 +265,5 @@ TypeScript interfaces matching the API response shapes exactly (camelCase). The 
 | `ingredient.model.ts` | `Ingredient` |
 | `recipe.model.ts` | `Recipe`, `RecipeIngredient`, `RecipeTier` |
 | `inventory.model.ts` | `InventoryEntry`, `EssenceStock` |
+| `harvest-component.model.ts` | `HarvestComponent` |
+| `magic-item.model.ts` | `MagicItem`, `MagicItemComponent`, `MagicItemCategory`, `MAGIC_ITEM_CATEGORY_LABELS` |

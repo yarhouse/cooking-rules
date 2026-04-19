@@ -24,6 +24,8 @@ See [db/sqlite/schema.sql](db/sqlite/schema.sql) for the full database schema an
 - **Browse** — filter by creature type, component type, or recipe tier
 - **Recipe Builder** — select the components you have and see which recipes you can craft
 - **Inventory** — track ingredient quantities and loose essence stock by rarity
+- **Harvesting** — browse all 208 harvestable components by creature type, with DC, required skill, edibility, and volatility
+- **Crafting** — browse magic item recipes by category and rarity; craft directly from your inventory with a confirm dialog
 - **Rules Reference** — full component effect tables with rarity scaling, and rules quirks
 
 ---
@@ -33,7 +35,7 @@ See [db/sqlite/schema.sql](db/sqlite/schema.sql) for the full database schema an
 | Target | Description |
 | --- | --- |
 | **Desktop (Electron)** | Native macOS / Windows app with a local SQLite database. Data persists across restarts. |
-| **Static web** | No-backend build for hosting on a website. Inventory lives in `localStorage` for the session only — nothing is persisted. |
+| **Static web (PWA)** | No-backend build for hosting on a website. Installable as a Progressive Web App. Inventory lives in `localStorage` — nothing is server-persisted. Must be served from the `/cooking-rules/` path. |
 | **Dev server** | Angular dev server + Express API server running locally against a local SQLite file. |
 
 ---
@@ -92,6 +94,45 @@ The SQLite database is created automatically at `data/aratus-cookbook.db` on fir
 
 ---
 
+## Common workflows
+
+### Deploy the static web build to your personal site
+
+```bash
+npm run build:static
+# Output: dist/cooking-rules/browser/
+# Host at: https://yoursite.com/cooking-rules/
+```
+
+The output is a self-contained PWA — no server needed. Upload the contents of `dist/cooking-rules/browser/` to your host. It must be served from the `/cooking-rules/` path (matching `baseHref`). On first load in Chrome/Safari, users will be offered an "Add to Home Screen" / install prompt.
+
+### Package a macOS distribution
+
+```bash
+npm run dist:mac
+# Output: release/*.dmg (x64 and arm64)
+```
+
+This builds Angular + the Express server, recompiles `better-sqlite3` for Electron's Node ABI, then packages two DMGs. After it completes, the native module in `server/node_modules/` is compiled for Electron — **you must restore it before using the dev server again** (see step below).
+
+### Return to the development server (after a dist build)
+
+```bash
+# Restore better-sqlite3 for your system Node (required after any dist:mac or dist:win run)
+cd server && npm rebuild better-sqlite3
+
+# Then start both processes as normal:
+# Terminal 1
+cd server && npm run dev
+
+# Terminal 2 (from project root)
+ng serve
+```
+
+Open `http://localhost:4200`. If you skip the rebuild step, the API server will crash with a `NODE_MODULE_VERSION` mismatch error.
+
+---
+
 ## Scripts
 
 All scripts are run from the **project root** unless noted.
@@ -111,7 +152,7 @@ All scripts are run from the **project root** unless noted.
 | Script | What it does |
 | --- | --- |
 | `npm run build` | Production Angular build (outputs to `dist/`) |
-| `npm run build:static` | Static web build — uses local data files, no API |
+| `npm run build:static` | Static PWA build — data from local TS files, no API, service worker included |
 | `npm run build:electron` | Electron Angular build — points API at `localhost:3000` |
 | `npm run build:server` | Compiles the Express server TypeScript to `server/dist/` |
 
@@ -168,7 +209,15 @@ aratus-cookbook/
 │   └── seeds/
 │       └── 001_reference_data.sql   # Local seed data (not committed — see Data section above)
 ├── build/
-│   └── icon.png                # App icon (512×512) used by electron-builder
+│   └── icon.png                # Master app icon (512×512) — source for all derived icons
+├── public/
+│   ├── favicon.ico / favicon.png   # Web favicons (generated from build/icon.png)
+│   └── icons/
+│       ├── icon-192x192.png    # PWA icon (generated from build/icon.png)
+│       └── icon-512x512.png    # PWA icon (generated from build/icon.png)
+├── src/
+│   └── manifest.webmanifest    # Web app manifest (PWA install metadata)
+├── ngsw-config.json            # Angular service worker cache config (static build only)
 └── release/                    # Packaged installers output (gitignored)
 ```
 
@@ -183,6 +232,8 @@ aratus-cookbook/
 | `GET` | `/api/monsters` | All monsters with harvestable component IDs |
 | `GET` | `/api/ingredients` | All ingredients with source monster IDs |
 | `GET` | `/api/recipes` | All recipes with nested ingredient slots |
+| `GET` | `/api/harvest-components` | All 208 harvest components — optional `?creatureTypeId=` filter |
+| `GET` | `/api/magic-items` | All magic item recipes — optional `?category=`, `?rarity=`, `?creatureTypeId=` filters |
 | `GET` | `/api/health` | `{ "status": "ok" }` |
 
 All responses are camelCase JSON. Junction table joins are handled server-side — every endpoint is a single SQL query with no N+1.
