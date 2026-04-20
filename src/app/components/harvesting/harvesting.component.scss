@@ -145,11 +145,20 @@
 
 // ── Tab 2 — Harvest Tables ─────────────────────────────────────────────
 
-.section-hint {
-  font-size: 0.875rem;
-  color: var(--mat-sys-on-surface-variant);
-  font-style: italic;
-  margin: 0;
+.harvesting-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--mat-sys-primary);
+    margin: 0;
+  }
 }
 
 .creature-type-chips {
@@ -252,12 +261,29 @@
 .component-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   border-bottom: 1px solid var(--mat-sys-outline-variant);
 
   &:last-child { border-bottom: none; }
+}
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.qty {
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 28px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+
+  &.has-qty { color: var(--mat-sys-primary); }
 }
 
 .component-name {

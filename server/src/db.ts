@@ -34,7 +34,7 @@ if (userVersion === 0) {
   db.exec(seed);
   db.exec(seed2);
   db.exec(seed3);
-  db.pragma('user_version = 3');
+  db.pragma('user_version = 4');
   console.log('[db] SQLite database initialised at', dbPath);
 } else {
   if (userVersion < 2) {
@@ -52,6 +52,13 @@ if (userVersion === 0) {
     db.exec(seed3);
     db.pragma('user_version = 3');
     console.log('[db] Migration v3 applied — full magic item catalogue seeded');
+  }
+  if (userVersion < 4) {
+    // Migration: add component_metatype column (v3 → v4)
+    const migration4 = fs.readFileSync(path.join(resourcesPath, 'db/migrations/004_component_metatype.sql'), 'utf8');
+    db.exec(migration4);
+    db.pragma('user_version = 4');
+    console.log('[db] Migration v4 applied — component_metatype column added');
   }
   console.log('[db] Connected to', dbPath);
 }

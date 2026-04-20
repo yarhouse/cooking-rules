@@ -20,7 +20,8 @@ harvestComponentsRouter.get('/', (req, res, next) => {
         hc.is_edible          AS isEdible,
         hc.edible_as          AS edibleAs,
         hc.is_volatile        AS isVolatile,
-        hc.notes
+        hc.notes,
+        hc.component_metatype AS componentMetatype
       FROM harvest_components hc
       JOIN creature_types ct ON hc.creature_type_id = ct.id
       ${creatureTypeId ? 'WHERE hc.creature_type_id = ?' : ''}
@@ -36,6 +37,7 @@ harvestComponentsRouter.get('/', (req, res, next) => {
       harvestSkill: string; name: string; componentDc: number;
       isEdible: number; edibleAs: string | null;
       isVolatile: number; notes: string | null;
+      componentMetatype: string | null;
     }>;
 
     res.json(rows.map(row => ({

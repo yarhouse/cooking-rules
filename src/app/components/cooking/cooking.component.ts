@@ -11,13 +11,13 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CookingDataService } from '../../services/cooking-data.service';
 import { InventoryService } from '../../services/inventory.service';
-import { Ingredient } from '../../models/ingredient.model';
+import { HarvestComponent } from '../../models/harvest-component.model';
 import { ComponentTypeName } from '../../models/component-type.model';
 
 type BuilderMode = 'ingredient' | 'effect';
 
 @Component({
-  selector: 'app-recipe-builder',
+  selector: 'app-cooking',
   imports: [
     FormsModule,
     MatButtonToggleModule,
@@ -30,39 +30,34 @@ type BuilderMode = 'ingredient' | 'effect';
     MatDividerModule,
     MatTooltipModule,
   ],
-  templateUrl: './recipe-builder.component.html',
-  styleUrl: './recipe-builder.component.scss',
+  templateUrl: './cooking.component.html',
+  styleUrl: './cooking.component.scss',
 })
-export class RecipeBuilderComponent {
+export class CookingComponent {
   private dataService = inject(CookingDataService);
   readonly inventoryService = inject(InventoryService);
 
   mode = signal<BuilderMode>('ingredient');
 
-  // Shared selection state — persists when switching modes
-  selectedIngredients = signal<Ingredient[]>([]);
+  selectedItems = signal<HarvestComponent[]>([]);
 
-  // Ingredient-first mode
   ingredientOnlyInventory = signal(false);
   ingredientQuery = signal('');
-
-  // Effect-first mode
   effectQuery = signal('');
 
-  // Derived
-  readonly allIngredients = computed(() => this.dataService.getIngredients());
+  readonly allEdibleComponents = computed(() => this.dataService.getEdibleHarvestComponents());
 
   readonly filteredIngredientList = computed(() => {
     let list = this.ingredientOnlyInventory()
-      ? this.allIngredients().filter(i => this.inventoryService.hasIngredient(i.id))
-      : this.allIngredients();
+      ? this.allEdibleComponents().filter(c => this.inventoryService.getHarvestQuantity(c.id) > 0)
+      : this.allEdibleComponents();
 
     const q = this.ingredientQuery().toLowerCase();
     if (q) {
-      list = list.filter(i =>
-        i.name.toLowerCase().includes(q) ||
-        i.componentTypeId.toLowerCase().includes(q) ||
-        (this.dataService.getCreatureType(i.creatureTypeId)?.name.toLowerCase().includes(q) ?? false)
+      list = list.filter(c =>
+        c.name.toLowerCase().includes(q) ||
+        c.creatureTypeName.toLowerCase().includes(q) ||
+        (c.edibleAs?.toLowerCase().includes(q) ?? false)
       );
     }
 
@@ -70,7 +65,7 @@ export class RecipeBuilderComponent {
   });
 
   readonly selectedComponentTypes = computed<ComponentTypeName[]>(() =>
-    this.selectedIngredients().map(i => i.componentTypeId)
+    this.selectedItems().map(c => c.edibleAs as ComponentTypeName).filter(Boolean)
   );
 
   readonly recipeMatches = computed(() =>
@@ -78,10 +73,10 @@ export class RecipeBuilderComponent {
   );
 
   readonly selectedEffects = computed(() =>
-    this.selectedIngredients().map(ingredient => {
-      const effect = this.dataService.getEffectFor(ingredient.componentTypeId, ingredient.creatureTypeId);
-      const componentType = this.dataService.getComponentType(ingredient.componentTypeId);
-      return { ingredient, effect, componentType };
+    this.selectedItems().map(item => {
+      const effect = this.dataService.getEffectFor(item.edibleAs as ComponentTypeName, item.creatureTypeId);
+      const componentType = this.dataService.getComponentType(item.edibleAs as ComponentTypeName);
+      return { item, effect, componentType };
     }).filter(e => e.effect != null)
   );
 
@@ -91,42 +86,42 @@ export class RecipeBuilderComponent {
     return this.dataService.searchEffects(q);
   });
 
-  isSelected(ingredient: Ingredient): boolean {
-    return this.selectedIngredients().some(i => i.id === ingredient.id);
+  isSelected(comp: HarvestComponent): boolean {
+    return this.selectedItems().some(c => c.id === comp.id);
   }
 
-  toggleIngredient(ingredient: Ingredient): void {
-    if (this.isSelected(ingredient)) {
-      this.selectedIngredients.update(list => list.filter(i => i.id !== ingredient.id));
+  toggleIngredient(comp: HarvestComponent): void {
+    if (this.isSelected(comp)) {
+      this.selectedItems.update(list => list.filter(c => c.id !== comp.id));
     } else {
-      this.selectedIngredients.update(list => [...list, ingredient]);
+      this.selectedItems.update(list => [...list, comp]);
     }
   }
 
-  removeSelected(ingredient: Ingredient): void {
-    this.selectedIngredients.update(list => list.filter(i => i.id !== ingredient.id));
+  removeSelected(comp: HarvestComponent): void {
+    this.selectedItems.update(list => list.filter(c => c.id !== comp.id));
   }
 
   clearSelection(): void {
-    this.selectedIngredients.set([]);
+    this.selectedItems.set([]);
   }
 
   loadFromInventory(): void {
-    const inventoryIngredients = this.allIngredients().filter(i =>
-      this.inventoryService.hasIngredient(i.id)
+    const inStock = this.allEdibleComponents().filter(
+      c => this.inventoryService.getHarvestQuantity(c.id) > 0
     );
-    this.selectedIngredients.set(inventoryIngredients);
+    this.selectedItems.set(inStock);
   }
 
-  addFromEffect(ingredient: Ingredient): void {
-    if (!this.isSelected(ingredient)) {
-      this.selectedIngredients.update(list => [...list, ingredient]);
+  addFromEffect(comp: HarvestComponent): void {
+    if (!this.isSelected(comp)) {
+      this.selectedItems.update(list => [...list, comp]);
     }
     this.mode.set('ingredient');
   }
 
-  getQuantity(id: string): number {
-    return this.inventoryService.getQuantity(id);
+  getHarvestQty(id: string): number {
+    return this.inventoryService.getHarvestQuantity(id);
   }
 
   getComponentName(id: string): string {

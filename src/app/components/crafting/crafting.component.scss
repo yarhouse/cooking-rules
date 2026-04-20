@@ -117,7 +117,41 @@
   &.rarity-artifact   { background: #f0c8a0; color: #5a2000; }
 }
 
-// ── Tab 2 — Magic Items ────────────────────────────────────────────────
+.crafting-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--mat-sys-primary);
+    margin: 0;
+  }
+}
+
+.craftable-header-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+
+  &.selected {
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+    border-color: var(--mat-sys-primary);
+  }
+}
+
+.filters-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
 
 .search-field {
   width: 100%;
@@ -192,40 +226,54 @@
   }
 }
 
-.magic-item-list {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 8px;
-  overflow: hidden;
+.items-table {
+  th.col-name      { min-width: 160px; }
+  th.col-cost      { min-width: 80px; white-space: nowrap; }
+  th.col-components { min-width: 240px; }
+  th.col-tags      { min-width: 200px; }
+  th.col-action    { width: 36px; padding: 0; }
+
+  .item-row {
+    cursor: pointer;
+    transition: background 0.1s;
+
+    &:hover td { background: color-mix(in srgb, var(--mat-sys-primary) 4%, transparent); }
+    &.is-expanded td { background: color-mix(in srgb, var(--mat-sys-primary-container) 18%, transparent); }
+  }
+
+  .item-detail-row td {
+    padding: 0 14px 12px 14px;
+    border-top: none;
+  }
 }
 
-.magic-item-row {
-  border-bottom: 1px solid var(--mat-sys-outline-variant);
-  transition: background 0.12s;
-
-  &:last-child { border-bottom: none; }
-
-  &.expanded { background: color-mix(in srgb, var(--mat-sys-primary-container) 25%, transparent); }
-}
-
-.item-summary {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  flex-wrap: wrap;
-  cursor: pointer;
-
-  &:hover { background: color-mix(in srgb, var(--mat-sys-primary) 4%, transparent); }
-}
-
-.item-name {
-  font-size: 0.9rem;
+.name-cell {
   font-weight: 600;
   color: var(--mat-sys-on-surface);
-  flex: 1;
-  min-width: 140px;
+}
+
+.cost-cell {
+  white-space: nowrap;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.82rem;
+}
+
+.components-cell {
+  vertical-align: top;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+.tags-cell {
+  vertical-align: top;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+.action-cell {
+  text-align: center;
+  padding: 0 8px !important;
+  vertical-align: middle;
 }
 
 .item-badges {
@@ -273,11 +321,11 @@
 }
 
 .item-detail {
-  padding: 0 14px 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   border-top: 1px solid var(--mat-sys-outline-variant);
+  padding-top: 10px;
 }
 
 .detail-row {
@@ -354,30 +402,6 @@
   color: #1b5e20;
 }
 
-.craftable-filter-row {
-  padding-bottom: 4px;
-
-  button {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .craftable-count-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 4px;
-    border-radius: 999px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    background: var(--mat-sys-primary);
-    color: var(--mat-sys-on-primary);
-    margin-left: 2px;
-  }
-}
 
 // ── Tab 3 — Quirks ─────────────────────────────────────────────────────
 

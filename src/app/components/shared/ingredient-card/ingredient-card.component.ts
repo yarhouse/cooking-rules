@@ -43,11 +43,27 @@ export class IngredientCardComponent {
     return this.dataService.getEffectFor(this.ingredient.componentTypeId, this.ingredient.creatureTypeId);
   }
 
+  private get bestMatchHarvestComponent() {
+    const comps = this.dataService.getHarvestComponents().filter(
+      hc => hc.creatureTypeId === this.ingredient.creatureTypeId &&
+            hc.edibleAs === this.ingredient.componentTypeId
+    );
+    return comps.sort((a, b) => a.componentDc - b.componentDc)[0] ?? null;
+  }
+
   get quantity(): number {
-    return this.inventoryService.getQuantity(this.ingredient.id);
+    return this.dataService.getCookingIngredientCount(
+      this.ingredient.creatureTypeId,
+      this.ingredient.componentTypeId
+    );
   }
 
   adjust(delta: number): void {
-    this.inventoryService.updateQuantity(this.ingredient.id, delta);
+    const hc = this.bestMatchHarvestComponent;
+    if (hc) {
+      this.inventoryService.updateHarvestQuantity(hc.id, delta);
+    } else {
+      this.inventoryService.updateQuantity(this.ingredient.id, delta);
+    }
   }
 }

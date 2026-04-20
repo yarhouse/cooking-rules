@@ -16,6 +16,11 @@ interface NavItem {
   icon: string;
 }
 
+interface NavGroup {
+  header: string | null;
+  items: NavItem[];
+}
+
 const COLLAPSED_KEY = 'sidenav-collapsed';
 const DARK_MODE_KEY = 'dark-mode';
 
@@ -71,14 +76,24 @@ export class App {
       });
   }
 
-  navItems: NavItem[] = [
-    { label: 'Search', route: '/search', icon: 'search' },
-    { label: 'Browse', route: '/browse', icon: 'menu_book' },
-    { label: 'Recipe Builder', route: '/builder', icon: 'restaurant' },
-    { label: 'Inventory', route: '/inventory', icon: 'kitchen' },
-    { label: 'Harvesting', route: '/harvesting', icon: 'agriculture' },
-    { label: 'Crafting', route: '/crafting', icon: 'build' },
-    { label: 'Rules', route: '/rules', icon: 'book' },
+  navGroups: NavGroup[] = [
+    {
+      header: null,
+      items: [
+        { label: 'Search',  route: '/search', icon: 'search' },
+        { label: 'Browse',  route: '/browse', icon: 'menu_book' },
+        { label: 'Rules',   route: '/rules',  icon: 'book' },
+      ],
+    },
+    {
+      header: 'Gameplay',
+      items: [
+        { label: 'Harvesting', route: '/harvesting', icon: 'agriculture' },
+        { label: 'Cooking',    route: '/cooking',    icon: 'restaurant' },
+        { label: 'Crafting',   route: '/crafting',   icon: 'build' },
+        { label: 'Inventory',  route: '/inventory',  icon: 'kitchen' },
+      ],
+    },
   ];
 
   toggleCollapsed(): void {

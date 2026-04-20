@@ -20,18 +20,26 @@
 
         <mat-divider [class.collapsed]="isRail()" />
 
-        <mat-nav-list [class.collapsed]="isRail()" >
-          @for (item of navItems; track item.route) {
-            <a mat-list-item
-               [routerLink]="item.route"
-               routerLinkActive="active-nav-item"
-               [class.rail-item]="isRail()"
-               [matTooltip]="isRail() ? item.label : ''"
-               matTooltipPosition="right"
-               (click)="onNavClick()">
-              <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-              <span class="nav-label">{{ item.label }}</span>
-            </a>
+        <mat-nav-list [class.collapsed]="isRail()">
+          @for (group of navGroups; track group.header; let first = $first) {
+            @if (!first) {
+              <mat-divider class="nav-group-divider" />
+            }
+            @if (group.header && !isRail()) {
+              <div class="nav-group-header">{{ group.header }}</div>
+            }
+            @for (item of group.items; track item.route) {
+              <a mat-list-item
+                 [routerLink]="item.route"
+                 routerLinkActive="active-nav-item"
+                 [class.rail-item]="isRail()"
+                 [matTooltip]="isRail() ? item.label : ''"
+                 matTooltipPosition="right"
+                 (click)="onNavClick()">
+                <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+                <span class="nav-label">{{ item.label }}</span>
+              </a>
+            }
           }
         </mat-nav-list>
       </div>

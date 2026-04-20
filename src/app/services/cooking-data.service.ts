@@ -234,10 +234,11 @@ export class CookingDataService {
       });
   }
 
-  /** Searches effects across all component types for a keyword */
-  searchEffects(query: string): Array<{ ingredient: Ingredient; effect: ComponentEffect; componentType: ComponentType }> {
+  /** Searches effects across all component types for a keyword, returning the
+   *  edible harvest components that produce each matching effect. */
+  searchEffects(query: string): Array<{ harvestComponent: HarvestComponent; effect: ComponentEffect; componentType: ComponentType }> {
     const q = query.toLowerCase();
-    const results: Array<{ ingredient: Ingredient; effect: ComponentEffect; componentType: ComponentType }> = [];
+    const results: Array<{ harvestComponent: HarvestComponent; effect: ComponentEffect; componentType: ComponentType }> = [];
 
     for (const ct of this._componentTypes()) {
       for (const effect of ct.effects) {
@@ -246,11 +247,11 @@ export class CookingDataService {
           ? Object.values(effect.scaling).some(v => v.toLowerCase().includes(q))
           : false;
         if (matchesDescription || matchesScaling) {
-          const ingredients = this.getIngredients().filter(
-            i => i.componentTypeId === ct.id && i.creatureTypeId === effect.creatureTypeId
+          const components = this._harvestComponents().filter(
+            hc => hc.isEdible && hc.edibleAs === ct.id && hc.creatureTypeId === effect.creatureTypeId
           );
-          for (const ingredient of ingredients) {
-            results.push({ ingredient, effect, componentType: ct });
+          for (const harvestComponent of components) {
+            results.push({ harvestComponent, effect, componentType: ct });
           }
         }
       }
@@ -267,6 +268,32 @@ export class CookingDataService {
 
   getHarvestComponentsByCreatureType(creatureTypeId: string): HarvestComponent[] {
     return this._harvestComponents().filter(hc => hc.creatureTypeId === creatureTypeId);
+  }
+
+  getEdibleHarvestComponents(query?: string): HarvestComponent[] {
+    const all = this._harvestComponents().filter(hc => hc.isEdible && hc.edibleAs);
+    if (!query) return all;
+    const q = query.toLowerCase();
+    return all.filter(hc =>
+      hc.name.toLowerCase().includes(q) ||
+      hc.creatureTypeName.toLowerCase().includes(q) ||
+      (hc.edibleAs?.toLowerCase().includes(q) ?? false)
+    );
+  }
+
+  readonly cookingIngredientAvailability = computed(() => {
+    const stockMap = this.inventory.harvestStockMap();
+    const counts = new Map<string, number>(); // key: `${creatureTypeId}:${edibleAs}`
+    for (const hc of this._harvestComponents()) {
+      if (!hc.isEdible || !hc.edibleAs) continue;
+      const key = `${hc.creatureTypeId}:${hc.edibleAs}`;
+      counts.set(key, (counts.get(key) ?? 0) + (stockMap.get(hc.id) ?? 0));
+    }
+    return counts;
+  });
+
+  getCookingIngredientCount(creatureTypeId: string, componentTypeId: string): number {
+    return this.cookingIngredientAvailability().get(`${creatureTypeId}:${componentTypeId}`) ?? 0;
   }
 
   // --- Magic Items ---

@@ -95,14 +95,15 @@ CREATE TABLE recipe_ingredients (
 -- ============================================================
 
 CREATE TABLE harvest_components (
-  id               TEXT PRIMARY KEY,            -- e.g. "aberration-eye"
-  creature_type_id TEXT NOT NULL REFERENCES creature_types(id),
-  name             TEXT NOT NULL,
-  component_dc     INTEGER NOT NULL,
-  is_edible        INTEGER NOT NULL DEFAULT 0,  -- bool
-  edible_as        TEXT,                        -- nullable → component_type_id
-  is_volatile      INTEGER NOT NULL DEFAULT 0,  -- bool
-  notes            TEXT
+  id                  TEXT PRIMARY KEY,            -- e.g. "aberration-eye"
+  creature_type_id    TEXT NOT NULL REFERENCES creature_types(id),
+  name                TEXT NOT NULL,
+  component_dc        INTEGER NOT NULL,
+  is_edible           INTEGER NOT NULL DEFAULT 0,  -- bool
+  edible_as           TEXT,                        -- nullable → component_type_id
+  is_volatile         INTEGER NOT NULL DEFAULT 0,  -- bool
+  notes               TEXT,
+  component_metatype  TEXT                         -- groups identical parts across creature types
 );
 
 CREATE TABLE magic_item_recipes (

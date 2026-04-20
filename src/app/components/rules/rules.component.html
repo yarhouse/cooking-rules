@@ -1,306 +1,870 @@
 <div class="rules-page">
   <h1>Rules Reference</h1>
 
-  <mat-tab-group>
+  <mat-tab-group class="domain-tabs">
 
-    <!-- ── Tab 1: How to Cook ───────────────────────────────────────── -->
-    <mat-tab label="How to Cook">
-      <div class="tab-content">
+    <!-- ================================================================ -->
+    <!-- DOMAIN: COOKING                                                   -->
+    <!-- ================================================================ -->
+    <mat-tab label="Cooking">
+      <mat-tab-group animationDuration="150ms" class="section-tabs">
 
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title><mat-icon>timer</mat-icon> Quick Facts</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="fact-grid">
-              <div class="fact">
-                <span class="fact-label">Cook time</span>
-                <span class="fact-value">1 hour</span>
-              </div>
-              <div class="fact">
-                <span class="fact-label">Consume</span>
-                <span class="fact-value">10 minutes</span>
-              </div>
-              <div class="fact">
-                <span class="fact-label">Duration</span>
-                <span class="fact-value">8 hours</span>
-              </div>
-            </div>
-            <mat-divider />
-            <p class="rule-note">
-              Eating a new magical meal replaces the previous meal's effects at the end of the 10-minute consumption period.
-            </p>
-            <p class="rule-note">
-              Portions: 1 Large creature <em>or</em> up to 4 Medium/smaller creatures.
-            </p>
-            <mat-divider />
-            <p class="prereq-title">Prerequisites</p>
-            <div class="prereq-list">
-              <span class="prereq-chip">Recipe</span>
-              <span class="prereq-chip">Monster Components</span>
-              <span class="prereq-chip">Essence</span>
-              <span class="prereq-chip">Cook's Utensils</span>
-              <span class="prereq-chip">Heat Source</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
+        <!-- ── How to Cook ──────────────────────────────────────────── -->
+        <mat-tab label="How to Cook">
+          <div class="tab-content">
 
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title><mat-icon>casino</mat-icon> The Cook Check</mat-card-title>
-            <mat-card-subtitle>Constitution (cook's utensils) vs. recipe DC</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="dc-table">
-              @for (row of dcTable; track row.tier) {
-                <div class="dc-row">
-                  <span class="tier-name">{{ row.tier }}</span>
-                  <span class="dc-badge">DC {{ row.dc }}</span>
-                  <span class="ing-count">{{ row.ingredients }} ingredient{{ row.ingredients > 1 ? 's' : '' }}</span>
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title><mat-icon>timer</mat-icon> Quick Facts</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="fact-grid">
+                  <div class="fact">
+                    <span class="fact-label">Cook time</span>
+                    <span class="fact-value">1 hour</span>
+                  </div>
+                  <div class="fact">
+                    <span class="fact-label">Consume</span>
+                    <span class="fact-value">10 minutes</span>
+                  </div>
+                  <div class="fact">
+                    <span class="fact-label">Duration</span>
+                    <span class="fact-value">8 hours</span>
+                  </div>
                 </div>
-              }
-            </div>
-            <mat-divider />
-            <div class="outcome-list">
-              <div class="outcome-row">
-                <span class="outcome-tag success">Success</span>
-                <span class="outcome-text">No quirks. Beat DC by 5+: 1 boon (min. uncommon). Beat by 10+: 2 boons (min. rare). Beat by 15+: 3 boons (min. very rare).</span>
-              </div>
-              <div class="outcome-row">
-                <span class="outcome-tag failure">Miss</span>
-                <span class="outcome-text">Miss by 1–4: 1 flaw. Miss by 5–9: 2 flaws. Miss by 10–14: 3 flaws. Miss by 15+: 4 flaws.</span>
-              </div>
-            </div>
-            <mat-divider />
-            <p class="rule-note">
-              <strong>Sous chef:</strong> One helper spends the full hour assisting. Adds their proficiency bonus to your check — or half their proficiency bonus if they lack cook's utensils proficiency.
-            </p>
-          </mat-card-content>
-        </mat-card>
+                <mat-divider />
+                <p class="rule-note">
+                  Eating a new magical meal replaces the previous meal's effects at the end of the 10-minute consumption period.
+                </p>
+                <p class="rule-note">
+                  Portions: 1 Large creature <em>or</em> up to 4 Medium/smaller creatures.
+                </p>
+                <mat-divider />
+                <p class="prereq-title">Prerequisites</p>
+                <div class="prereq-list">
+                  <span class="prereq-chip">Recipe</span>
+                  <span class="prereq-chip">Monster Components</span>
+                  <span class="prereq-chip">Essence</span>
+                  <span class="prereq-chip">Cook's Utensils</span>
+                  <span class="prereq-chip">Heat Source</span>
+                </div>
+              </mat-card-content>
+            </mat-card>
 
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title><mat-icon>auto_fix_off</mat-icon> Dispelling Magical Meals</mat-card-title>
-            <mat-card-subtitle>All meal effects count as a single spell for dispel magic purposes</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="dispel-table">
-              <div class="dispel-row">
-                <span class="rarity-label rarity-uncommon">Uncommon</span>
-                <span class="dispel-value">2nd-level spell</span>
-              </div>
-              <div class="dispel-row">
-                <span class="rarity-label rarity-rare">Rare</span>
-                <span class="dispel-value">4th-level spell</span>
-              </div>
-              <div class="dispel-row">
-                <span class="rarity-label rarity-very-rare">Very Rare</span>
-                <span class="dispel-value">6th-level spell</span>
-              </div>
-              <div class="dispel-row">
-                <span class="rarity-label rarity-legendary">Legendary</span>
-                <span class="dispel-value">8th-level spell</span>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title><mat-icon>casino</mat-icon> The Cook Check</mat-card-title>
+                <mat-card-subtitle>Constitution (cook's utensils) vs. recipe DC</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="dc-table">
+                  @for (row of dcTable; track row.tier) {
+                    <div class="dc-row">
+                      <span class="tier-name">{{ row.tier }}</span>
+                      <span class="dc-badge">DC {{ row.dc }}</span>
+                      <span class="ing-count">{{ row.ingredients }} ingredient{{ row.ingredients > 1 ? 's' : '' }}</span>
+                    </div>
+                  }
+                </div>
+                <mat-divider />
+                <div class="outcome-list">
+                  <div class="outcome-row">
+                    <span class="outcome-tag success">Success</span>
+                    <span class="outcome-text">No quirks. Beat DC by 5+: 1 boon (min. uncommon). Beat by 10+: 2 boons (min. rare). Beat by 15+: 3 boons (min. very rare).</span>
+                  </div>
+                  <div class="outcome-row">
+                    <span class="outcome-tag failure">Miss</span>
+                    <span class="outcome-text">Miss by 1–4: 1 flaw. Miss by 5–9: 2 flaws. Miss by 10–14: 3 flaws. Miss by 15+: 4 flaws.</span>
+                  </div>
+                </div>
+                <mat-divider />
+                <p class="rule-note">
+                  <strong>Sous chef:</strong> One helper spends the full hour assisting. Adds their proficiency bonus to your check — or half their proficiency bonus if they lack cook's utensils proficiency.
+                </p>
+              </mat-card-content>
+            </mat-card>
 
-      </div>
-    </mat-tab>
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title><mat-icon>auto_fix_off</mat-icon> Dispelling Magical Meals</mat-card-title>
+                <mat-card-subtitle>All meal effects count as a single spell for dispel magic purposes</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="dispel-table">
+                  <div class="dispel-row">
+                    <span class="rarity-label rarity-uncommon">Uncommon</span>
+                    <span class="dispel-value">2nd-level spell</span>
+                  </div>
+                  <div class="dispel-row">
+                    <span class="rarity-label rarity-rare">Rare</span>
+                    <span class="dispel-value">4th-level spell</span>
+                  </div>
+                  <div class="dispel-row">
+                    <span class="rarity-label rarity-very-rare">Very Rare</span>
+                    <span class="dispel-value">6th-level spell</span>
+                  </div>
+                  <div class="dispel-row">
+                    <span class="rarity-label rarity-legendary">Legendary</span>
+                    <span class="dispel-value">8th-level spell</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
 
-    <!-- ── Tab 2: Component Effects ─────────────────────────────────── -->
-    <mat-tab label="Component Effects">
-      <div class="tab-content">
-
-        <div class="effects-controls">
-          <mat-button-toggle-group
-            [value]="effectMode()"
-            (change)="effectMode.set($event.value); selectedComponent.set(null); selectedCreature.set(null)">
-            <mat-button-toggle value="component">By Component</mat-button-toggle>
-            <mat-button-toggle value="creature">By Creature</mat-button-toggle>
-          </mat-button-toggle-group>
-
-          <mat-button-toggle-group [value]="selectedRarity()" (change)="selectedRarity.set($event.value)">
-            @for (rarity of rarities; track rarity) {
-              <mat-button-toggle [value]="rarity">{{ rarityLabels[rarity] }}</mat-button-toggle>
-            }
-          </mat-button-toggle-group>
-        </div>
-
-        <!-- By Component -->
-        @if (effectMode() === 'component') {
-          <div class="chip-row">
-            @for (comp of componentTypes; track comp.id) {
-              <button mat-stroked-button
-                [class.active-chip]="selectedComponent() === comp.id"
-                (click)="selectedComponent.set(selectedComponent() === comp.id ? null : comp.id)">
-                {{ comp.name }}
-              </button>
-            }
           </div>
+        </mat-tab>
 
-          @if (!selectedComponent()) {
-            <div class="empty-hint">
-              <mat-icon>touch_app</mat-icon>
-              <p>Select a component type above to see its effects by creature.</p>
+        <!-- ── Component Effects ─────────────────────────────────────── -->
+        <mat-tab label="Component Effects">
+          <div class="tab-content">
+
+            <div class="effects-controls">
+              <mat-button-toggle-group
+                [value]="effectMode()"
+                (change)="effectMode.set($event.value); selectedComponent.set(null); selectedCreature.set(null)">
+                <mat-button-toggle value="component">By Component</mat-button-toggle>
+                <mat-button-toggle value="creature">By Creature</mat-button-toggle>
+              </mat-button-toggle-group>
+
+              <mat-button-toggle-group [value]="selectedRarity()" (change)="selectedRarity.set($event.value)">
+                @for (rarity of rarities; track rarity) {
+                  <mat-button-toggle [value]="rarity">{{ rarityLabels[rarity] }}</mat-button-toggle>
+                }
+              </mat-button-toggle-group>
             </div>
-          } @else {
-            <p class="context-description">{{ selectedComponentType()?.description }}</p>
-            <div class="effect-list">
-              @for (row of effectsByComponent(); track row.key) {
-                <div class="effect-row" [class.is-overridden]="row.isOverridden">
-                  <div class="effect-header">
-                    <span class="effect-creature-label">{{ row.label }}</span>
-                    @if (row.isOverridden) {
-                      <span class="house-rule-badge" matTooltip="House rule override">
-                        <mat-icon>edit</mat-icon> house rule
-                      </span>
-                    }
-                    <div class="effect-actions">
-                      @if (editingKey() !== row.key) {
-                        <button mat-icon-button class="edit-btn"
-                          [matTooltip]="row.isOverridden ? 'Edit house rule' : 'Override with house rule'"
-                          (click)="startEdit(row.key, row.description)">
-                          <mat-icon>edit_note</mat-icon>
-                        </button>
+
+            @if (effectMode() === 'component') {
+              <div class="chip-row">
+                @for (comp of componentTypes; track comp.id) {
+                  <button mat-stroked-button
+                    [class.active-chip]="selectedComponent() === comp.id"
+                    (click)="selectedComponent.set(selectedComponent() === comp.id ? null : comp.id)">
+                    {{ comp.name }}
+                  </button>
+                }
+              </div>
+
+              @if (!selectedComponent()) {
+                <div class="empty-hint">
+                  <mat-icon>touch_app</mat-icon>
+                  <p>Select a component type above to see its effects by creature.</p>
+                </div>
+              } @else {
+                <p class="context-description">{{ selectedComponentType()?.description }}</p>
+                <div class="effect-list">
+                  @for (row of effectsByComponent(); track row.key) {
+                    <div class="effect-row" [class.is-overridden]="row.isOverridden">
+                      <div class="effect-header">
+                        <span class="effect-creature-label">{{ row.label }}</span>
                         @if (row.isOverridden) {
-                          <button mat-icon-button class="clear-btn" matTooltip="Restore original"
-                            (click)="clearOverride(row.key)">
-                            <mat-icon>restart_alt</mat-icon>
-                          </button>
+                          <span class="house-rule-badge" matTooltip="House rule override">
+                            <mat-icon>edit</mat-icon> house rule
+                          </span>
+                        }
+                        <div class="effect-actions">
+                          @if (editingKey() !== row.key) {
+                            <button mat-icon-button class="edit-btn"
+                              [matTooltip]="row.isOverridden ? 'Edit house rule' : 'Override with house rule'"
+                              (click)="startEdit(row.key, row.description)">
+                              <mat-icon>edit_note</mat-icon>
+                            </button>
+                            @if (row.isOverridden) {
+                              <button mat-icon-button class="clear-btn" matTooltip="Restore original"
+                                (click)="clearOverride(row.key)">
+                                <mat-icon>restart_alt</mat-icon>
+                              </button>
+                            }
+                          }
+                        </div>
+                      </div>
+
+                      @if (editingKey() === row.key) {
+                        <div class="inline-edit">
+                          <mat-form-field appearance="outline" class="edit-field">
+                            <mat-label>Effect description</mat-label>
+                            <textarea matInput [(ngModel)]="editText" cdkTextareaAutosize rows="2"></textarea>
+                          </mat-form-field>
+                          <div class="edit-buttons">
+                            <button mat-stroked-button (click)="saveEdit(row.key)">Save</button>
+                            <button mat-button (click)="cancelEdit()">Cancel</button>
+                          </div>
+                        </div>
+                      } @else {
+                        <p class="effect-description">{{ row.description }}</p>
+                        @if (row.scaledValue) {
+                          <span class="scaled-value rarity-{{ selectedRarity() }}">{{ row.scaledValue }}</span>
                         }
                       }
                     </div>
-                  </div>
-
-                  @if (editingKey() === row.key) {
-                    <div class="inline-edit">
-                      <mat-form-field appearance="outline" class="edit-field">
-                        <mat-label>Effect description</mat-label>
-                        <textarea matInput [(ngModel)]="editText" cdkTextareaAutosize rows="2"></textarea>
-                      </mat-form-field>
-                      <div class="edit-buttons">
-                        <button mat-stroked-button (click)="saveEdit(row.key)">Save</button>
-                        <button mat-button (click)="cancelEdit()">Cancel</button>
-                      </div>
-                    </div>
-                  } @else {
-                    <p class="effect-description">{{ row.description }}</p>
-                    @if (row.scaledValue) {
-                      <span class="scaled-value rarity-{{ selectedRarity() }}">{{ row.scaledValue }}</span>
-                    }
                   }
                 </div>
               }
-            </div>
-          }
-        }
-
-        <!-- By Creature -->
-        @if (effectMode() === 'creature') {
-          <div class="chip-row">
-            @for (creature of creatureTypes; track creature.id) {
-              <button mat-stroked-button
-                [class.active-chip]="selectedCreature() === creature.id"
-                (click)="selectedCreature.set(selectedCreature() === creature.id ? null : creature.id)">
-                {{ creature.name }}
-              </button>
             }
-          </div>
 
-          @if (!selectedCreature()) {
-            <div class="empty-hint">
-              <mat-icon>touch_app</mat-icon>
-              <p>Select a creature type above to see all harvestable component effects.</p>
-            </div>
-          } @else {
-            <p class="context-description">
-              Harvestable components: {{ selectedCreatureType()?.availableComponents?.join(', ') }}
-            </p>
-            <div class="effect-list">
-              @for (row of effectsByCreature(); track row.key) {
-                <div class="effect-row" [class.is-overridden]="row.isOverridden">
-                  <div class="effect-header">
-                    <span class="effect-creature-label">{{ row.label }}</span>
-                    @if (row.isOverridden) {
-                      <span class="house-rule-badge" matTooltip="House rule override">
-                        <mat-icon>edit</mat-icon> house rule
-                      </span>
-                    }
-                    <div class="effect-actions">
-                      @if (editingKey() !== row.key) {
-                        <button mat-icon-button class="edit-btn"
-                          [matTooltip]="row.isOverridden ? 'Edit house rule' : 'Override with house rule'"
-                          (click)="startEdit(row.key, row.description)">
-                          <mat-icon>edit_note</mat-icon>
-                        </button>
+            @if (effectMode() === 'creature') {
+              <div class="chip-row">
+                @for (creature of creatureTypes; track creature.id) {
+                  <button mat-stroked-button
+                    [class.active-chip]="selectedCreature() === creature.id"
+                    (click)="selectedCreature.set(selectedCreature() === creature.id ? null : creature.id)">
+                    {{ creature.name }}
+                  </button>
+                }
+              </div>
+
+              @if (!selectedCreature()) {
+                <div class="empty-hint">
+                  <mat-icon>touch_app</mat-icon>
+                  <p>Select a creature type above to see all harvestable component effects.</p>
+                </div>
+              } @else {
+                <p class="context-description">
+                  Harvestable components: {{ selectedCreatureType()?.availableComponents?.join(', ') }}
+                </p>
+                <div class="effect-list">
+                  @for (row of effectsByCreature(); track row.key) {
+                    <div class="effect-row" [class.is-overridden]="row.isOverridden">
+                      <div class="effect-header">
+                        <span class="effect-creature-label">{{ row.label }}</span>
                         @if (row.isOverridden) {
-                          <button mat-icon-button class="clear-btn" matTooltip="Restore original"
-                            (click)="clearOverride(row.key)">
-                            <mat-icon>restart_alt</mat-icon>
-                          </button>
+                          <span class="house-rule-badge" matTooltip="House rule override">
+                            <mat-icon>edit</mat-icon> house rule
+                          </span>
+                        }
+                        <div class="effect-actions">
+                          @if (editingKey() !== row.key) {
+                            <button mat-icon-button class="edit-btn"
+                              [matTooltip]="row.isOverridden ? 'Edit house rule' : 'Override with house rule'"
+                              (click)="startEdit(row.key, row.description)">
+                              <mat-icon>edit_note</mat-icon>
+                            </button>
+                            @if (row.isOverridden) {
+                              <button mat-icon-button class="clear-btn" matTooltip="Restore original"
+                                (click)="clearOverride(row.key)">
+                                <mat-icon>restart_alt</mat-icon>
+                              </button>
+                            }
+                          }
+                        </div>
+                      </div>
+
+                      @if (editingKey() === row.key) {
+                        <div class="inline-edit">
+                          <mat-form-field appearance="outline" class="edit-field">
+                            <mat-label>Effect description</mat-label>
+                            <textarea matInput [(ngModel)]="editText" cdkTextareaAutosize rows="2"></textarea>
+                          </mat-form-field>
+                          <div class="edit-buttons">
+                            <button mat-stroked-button (click)="saveEdit(row.key)">Save</button>
+                            <button mat-button (click)="cancelEdit()">Cancel</button>
+                          </div>
+                        </div>
+                      } @else {
+                        <p class="effect-description">{{ row.description }}</p>
+                        @if (row.scaledValue) {
+                          <span class="scaled-value rarity-{{ selectedRarity() }}">{{ row.scaledValue }}</span>
                         }
                       }
                     </div>
-                  </div>
-
-                  @if (editingKey() === row.key) {
-                    <div class="inline-edit">
-                      <mat-form-field appearance="outline" class="edit-field">
-                        <mat-label>Effect description</mat-label>
-                        <textarea matInput [(ngModel)]="editText" cdkTextareaAutosize rows="2"></textarea>
-                      </mat-form-field>
-                      <div class="edit-buttons">
-                        <button mat-stroked-button (click)="saveEdit(row.key)">Save</button>
-                        <button mat-button (click)="cancelEdit()">Cancel</button>
-                      </div>
-                    </div>
-                  } @else {
-                    <p class="effect-description">{{ row.description }}</p>
-                    @if (row.scaledValue) {
-                      <span class="scaled-value rarity-{{ selectedRarity() }}">{{ row.scaledValue }}</span>
-                    }
                   }
                 </div>
               }
-            </div>
-          }
-        }
+            }
 
-      </div>
+          </div>
+        </mat-tab>
+
+        <!-- ── Cooking Quirks ────────────────────────────────────────── -->
+        <mat-tab label="Quirks">
+          <div class="tab-content">
+
+            <div class="quirk-controls">
+              <mat-button-toggle-group [value]="cookingQuirkFilter()" (change)="cookingQuirkFilter.set($event.value)">
+                <mat-button-toggle value="all">All</mat-button-toggle>
+                <mat-button-toggle value="flaw">Flaws</mat-button-toggle>
+                <mat-button-toggle value="boon">Boons</mat-button-toggle>
+              </mat-button-toggle-group>
+              <span class="quirk-hint">Roll d8 to determine which quirk you receive</span>
+            </div>
+
+            <div class="quirk-list">
+              @for (quirk of filteredCookingQuirks(); track quirk.type + quirk.roll) {
+                <div class="quirk-row" [class.is-flaw]="quirk.type === 'flaw'" [class.is-boon]="quirk.type === 'boon'">
+                  <span class="quirk-roll">{{ quirk.roll }}</span>
+                  <div class="quirk-body">
+                    <div class="quirk-header">
+                      <span class="quirk-name">{{ quirk.name }}</span>
+                      <span class="quirk-type-badge" [class.flaw-badge]="quirk.type === 'flaw'" [class.boon-badge]="quirk.type === 'boon'">
+                        {{ quirk.type }}
+                      </span>
+                    </div>
+                    <p class="quirk-effect">{{ quirk.effect }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
     </mat-tab>
 
-    <!-- ── Tab 3: Quirks ─────────────────────────────────────────────── -->
-    <mat-tab label="Quirks">
-      <div class="tab-content">
+    <!-- ================================================================ -->
+    <!-- DOMAIN: HARVESTING                                                -->
+    <!-- ================================================================ -->
+    <mat-tab label="Harvesting">
+      <mat-tab-group animationDuration="150ms" class="section-tabs">
 
-        <div class="quirk-controls">
-          <mat-button-toggle-group [value]="quirkFilter()" (change)="quirkFilter.set($event.value)">
-            <mat-button-toggle value="all">All</mat-button-toggle>
-            <mat-button-toggle value="flaw">Flaws</mat-button-toggle>
-            <mat-button-toggle value="boon">Boons</mat-button-toggle>
-          </mat-button-toggle-group>
-          <span class="quirk-hint">Roll d8 to determine which quirk you receive</span>
-        </div>
+        <!-- ── How to Harvest ───────────────────────────────────────── -->
+        <mat-tab label="How to Harvest">
+          <div class="tab-content">
 
-        <div class="quirk-list">
-          @for (quirk of filteredQuirks(); track quirk.type + quirk.roll) {
-            <div class="quirk-row" [class.is-flaw]="quirk.type === 'flaw'" [class.is-boon]="quirk.type === 'boon'">
-              <span class="quirk-roll">{{ quirk.roll }}</span>
-              <div class="quirk-body">
-                <div class="quirk-header">
-                  <span class="quirk-name">{{ quirk.name }}</span>
-                  <span class="quirk-type-badge" [class.flaw-badge]="quirk.type === 'flaw'" [class.boon-badge]="quirk.type === 'boon'">
-                    {{ quirk.type }}
-                  </span>
+            <section class="rules-section">
+              <h2>How Harvesting Works</h2>
+              <p class="intro-text">
+                Harvesting is the act of extracting magical components from a slain creature before its
+                latent magic fades. You have five steps — and a tight time limit.
+              </p>
+
+              <div class="steps-grid">
+                <mat-card appearance="outlined" class="step-card">
+                  <mat-card-header>
+                    <div class="step-number">1</div>
+                    <mat-card-title>Description</mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    The GM consults the creature's type to determine which components are available.
+                    Boss monsters have unique harvest tables. CR also determines which
+                    <strong>essence</strong> tier can be extracted.
+                  </mat-card-content>
+                </mat-card>
+
+                <mat-card appearance="outlined" class="step-card">
+                  <mat-card-header>
+                    <div class="step-number">2</div>
+                    <mat-card-title>Harvest List</mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    The party decides what to harvest and <strong>in what order</strong>. Order matters —
+                    components later in the list require higher cumulative DCs to reach.
+                  </mat-card-content>
+                </mat-card>
+
+                <mat-card appearance="outlined" class="step-card">
+                  <mat-card-header>
+                    <div class="step-number">3</div>
+                    <mat-card-title>Harvest DCs</mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    Each component has a <strong>Component DC</strong>. The <strong>Harvest DC</strong> for
+                    each item is the cumulative sum of all Component DCs above it in the list.
+                    <em>Example: Eyes (DC 5) → Pouch of Teeth (DC 10+5=15) → Hide (DC 20+15=35).</em>
+                  </mat-card-content>
+                </mat-card>
+
+                <mat-card appearance="outlined" class="step-card">
+                  <mat-card-header>
+                    <div class="step-number">4</div>
+                    <mat-card-title>Harvesting Check</mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    Two harvesters make separate checks — an <strong>Assessing Harvester</strong>
+                    (Intelligence + skill) and a <strong>Carving Harvester</strong>
+                    (Dexterity + skill, or spellcasting ability for ritual carving).
+                    One creature can do both but makes both checks at <strong>disadvantage</strong>.
+                  </mat-card-content>
+                </mat-card>
+
+                <mat-card appearance="outlined" class="step-card">
+                  <mat-card-header>
+                    <div class="step-number">5</div>
+                    <mat-card-title>Loot</mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    Add the two check results together. You successfully harvest every component whose
+                    Harvest DC is met or exceeded. Components above your total are lost.
+                  </mat-card-content>
+                </mat-card>
+              </div>
+
+              <mat-divider />
+
+              <div class="rules-two-col">
+                <div>
+                  <h3>Degradation</h3>
+                  <ul>
+                    <li>A harvester must begin within <strong>1 minute</strong> of the creature's death.</li>
+                    <li>Harvesting must not be interrupted once started.</li>
+                    <li>A character can only fully harvest <strong>one creature</strong> per battle.</li>
+                    <li><em>Gentle repose</em> does <strong>not</strong> prevent degradation.</li>
+                  </ul>
+
+                  <h3>Harvest Time by Size</h3>
+                  <table class="reference-table">
+                    <thead><tr><th>Creature Size</th><th>Time</th><th>Max Helpers</th></tr></thead>
+                    <tbody>
+                      @for (row of harvestSizeTable; track row.size) {
+                        <tr>
+                          <td>{{ row.size }}</td>
+                          <td>{{ row.time }}</td>
+                          <td>{{ row.helpers }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
                 </div>
-                <p class="quirk-effect">{{ quirk.effect }}</p>
+
+                <div>
+                  <h3>Helpers</h3>
+                  <p>
+                    Additional creatures can assist by adding their proficiency bonus (or half,
+                    rounded down, without proficiency) to the check result. Helpers must assist for
+                    the <em>entire</em> duration.
+                  </p>
+
+                  <h3>Ritual Carving</h3>
+                  <p>
+                    When harvesting <strong>Aberrations, Celestials, Elementals, Fey, or Fiends</strong>,
+                    a carving harvester with a spellcasting ability can substitute their
+                    spellcasting modifier for Dexterity.
+                  </p>
+
+                  <h3>Volatile Components</h3>
+                  <p>
+                    Components marked <mat-icon class="inline-icon warn" matTooltip="Volatile">warning</mat-icon>
+                    can explode if you <em>start</em> harvesting them but don't <em>finish</em>.
+                    The GM uses the creature's ability to determine the save DC and effect.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </mat-tab>
+
+        <!-- ── Harvesting Reference ──────────────────────────────────── -->
+        <mat-tab label="Reference Tables">
+          <div class="tab-content">
+
+            <div class="reference-grid">
+
+              <div class="ref-section">
+                <h3>Essence by Creature CR</h3>
+                <p class="section-hint">Higher-CR creatures yield rarer essence types.</p>
+                <table class="reference-table">
+                  <thead>
+                    <tr><th>Creature CR</th><th>Harvest DC</th><th>Essence</th><th>Item Rarity</th></tr>
+                  </thead>
+                  <tbody>
+                    @for (row of essenceTable; track row.cr) {
+                      <tr>
+                        <td>{{ row.cr }}</td>
+                        <td>{{ row.dc }}</td>
+                        <td>{{ row.essence }}</td>
+                        <td><span class="rarity-badge rarity-{{ row.rarity }}">{{ row.rarity }}</span></td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="ref-section">
+                <h3>Component Trading Values</h3>
+                <p class="section-hint">
+                  Values without harvesting supplies / with harvesting supplies.
+                </p>
+                <table class="reference-table">
+                  <thead>
+                    <tr><th>Comp. DC</th><th>Sell</th><th>Buy</th><th>Sell (supplied)</th><th>Buy (supplied)</th></tr>
+                  </thead>
+                  <tbody>
+                    @for (row of componentValueTable; track row.dc) {
+                      <tr>
+                        <td>{{ row.dc }}</td>
+                        <td>{{ row.sell }}</td>
+                        <td>{{ row.buy }}</td>
+                        <td>{{ row.sellSupplied }}</td>
+                        <td>{{ row.buySupplied }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="ref-section">
+                <h3>Essence Trading Values</h3>
+                <table class="reference-table">
+                  <thead>
+                    <tr><th>Essence</th><th>Sell</th><th>Buy</th></tr>
+                  </thead>
+                  <tbody>
+                    @for (row of essenceValueTable; track row.essence) {
+                      <tr>
+                        <td>{{ row.essence }}</td>
+                        <td>{{ row.sell }}</td>
+                        <td>{{ row.buy }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="ref-section">
+                <h3>Finding Traders</h3>
+                <p class="section-hint">
+                  Make a check using the creature type's harvest skill + settlement modifier.
+                  Roll a d20 + INT or CHA modifier + proficiency (if applicable).
+                </p>
+                <table class="reference-table">
+                  <thead>
+                    <tr><th>Check Total</th><th>Buyer's Offer</th><th>Seller's Offer</th></tr>
+                  </thead>
+                  <tbody>
+                    @for (row of tradingTable; track row.check) {
+                      <tr>
+                        <td>{{ row.check }}</td>
+                        <td>{{ row.buyer }}</td>
+                        <td>{{ row.seller }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+    </mat-tab>
+
+    <!-- ================================================================ -->
+    <!-- DOMAIN: CRAFTING                                                  -->
+    <!-- ================================================================ -->
+    <mat-tab label="Crafting">
+      <mat-tab-group animationDuration="150ms" class="section-tabs">
+
+        <!-- ── How to Craft ─────────────────────────────────────────── -->
+        <mat-tab label="How to Craft">
+          <div class="tab-content">
+
+            <section class="rules-section">
+              <h2>Manufacturing</h2>
+              <p class="intro-text">
+                Manufacturing is the process of using tools and raw materials to craft non-magical items.
+                Choose a tool you are proficient with, gather the required materials, and make a check
+                (tool ability modifier + proficiency). Meeting or exceeding the item's DC produces the item
+                in the listed time. Failing by 4 or less wastes only your time; failing by 5 or more
+                also destroys half the materials.
+              </p>
+
+              <div class="rules-two-col">
+                <div>
+                  <h3>Key Rules</h3>
+                  <ul>
+                    <li>You must be <strong>proficient</strong> with the relevant tool.</li>
+                    <li>Each item lists a <strong>material cost</strong>, <strong>DC</strong>, and <strong>crafting time</strong>.</li>
+                    <li>Up to 3 proficient helpers can assist — each adds their proficiency bonus.</li>
+                    <li>Helpers also reduce the time (divide by number of participants).</li>
+                    <li>You can hire a journeyman (×1 speed, +6 mod, 1 gp/hr) or expert (×2 speed, +8 mod, 4 gp/hr).</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3>Outcome</h3>
+                  <table class="reference-table">
+                    <thead>
+                      <tr><th>Check vs DC</th><th>Result</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>−5 or more below</td><td>Fail — half materials lost</td></tr>
+                      <tr><td>−4 to −1</td><td>Fail — time only wasted</td></tr>
+                      <tr><td>0 to +4</td><td>Success</td></tr>
+                      <tr><td>+5 or more</td><td>Success + one boon (roll on Mfg. Boons)</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+            <mat-divider />
+
+            <section class="rules-section">
+              <h2>Enchanting</h2>
+              <p class="intro-text">
+                Enchanting imbues an existing item with magic using the essence of a slain creature.
+                Make an enchanting check using the skill associated with the creature type whose essence
+                you are using. You must have the required <strong>essence</strong> and have it in your
+                possession for the full crafting time.
+              </p>
+
+              <div class="rules-two-col">
+                <div>
+                  <h3>Key Rules</h3>
+                  <ul>
+                    <li>Each magic item specifies the required creature type and component.</li>
+                    <li>The check uses <strong>INT, WIS, or CHA</strong> (your choice) + proficiency in the associated skill.</li>
+                    <li>Essence is consumed on success or failure.</li>
+                    <li>Enchanting <em>boons</em> accumulate based on the essence rarity used (max 3).</li>
+                    <li>Enchanting quirks do <strong>not</strong> stack — each unique quirk can only apply once.</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3>Essence &amp; Boon Limit</h3>
+                  <table class="reference-table">
+                    <thead>
+                      <tr><th>Essence</th><th>Rarity</th><th>Max Boons</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>—</td><td>Common</td><td>0</td></tr>
+                      <tr><td>Frail</td><td>Uncommon</td><td>1</td></tr>
+                      <tr><td>Robust</td><td>Rare</td><td>2</td></tr>
+                      <tr><td>Potent</td><td>Very Rare</td><td>3</td></tr>
+                      <tr><td>Mythic</td><td>Legendary</td><td>3</td></tr>
+                      <tr><td>Deific</td><td>Artifact</td><td>3</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <h3>Enchanting DC &amp; Time by Rarity</h3>
+              <div class="table-scroll">
+                <table class="reference-table">
+                  <thead>
+                    <tr>
+                      <th>Rarity</th>
+                      <th>Essence</th>
+                      <th>DC</th>
+                      <th>Consumable</th>
+                      <th>Non-Attunement</th>
+                      <th>Attunement</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of enchantingTable; track row.rarity) {
+                      <tr>
+                        <td><span class="rarity-badge rarity-{{ rarityClass(row.rarity) }}">{{ row.rarity }}</span></td>
+                        <td>{{ row.essence }}</td>
+                        <td><strong>{{ row.dc }}</strong></td>
+                        <td>{{ row.consumable }}</td>
+                        <td>{{ row.nonAttunement }}</td>
+                        <td>{{ row.attunement }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="rules-two-col">
+                <div>
+                  <h3>Creature Type → Enchanting Skill</h3>
+                  <table class="reference-table">
+                    <thead>
+                      <tr><th>Creature Type</th><th>Skill</th></tr>
+                    </thead>
+                    <tbody>
+                      @for (row of enchantingSkillTable; track row.type) {
+                        <tr>
+                          <td>{{ row.type }}</td>
+                          <td>{{ row.skill }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+                <div>
+                  <h3>Quirks Gained</h3>
+                  <p class="intro-text">
+                    The difference between your crafting check result and the crafting DC determines
+                    whether the item gains quirks.
+                  </p>
+                  <table class="reference-table">
+                    <thead>
+                      <tr><th>Check − DC</th><th>Quirks</th></tr>
+                    </thead>
+                    <tbody>
+                      @for (row of quirksGainedTable; track row.result) {
+                        <tr>
+                          <td>{{ row.result }}</td>
+                          <td>{{ row.outcome }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+            <mat-divider />
+
+            <section class="rules-section">
+              <h2>Monster Forging</h2>
+              <p class="intro-text">
+                Monster forging uses harvested creature parts — hide, bone, antlers, talons, and similar
+                components — in place of standard materials when crafting armour and weapons. The creature
+                must be at least the minimum size listed for each item type. Monster-forged items use the
+                same DC and time as normal crafted versions but may grant additional properties based on
+                the creature's abilities (GM discretion).
+              </p>
+              <div class="rules-two-col">
+                <div>
+                  <h3>Hide / Pelt / Membrane Items</h3>
+                  <table class="reference-table">
+                    <thead><tr><th>Minimum Size</th><th>Items</th></tr></thead>
+                    <tbody>
+                      <tr><td>Small</td><td>Sling</td></tr>
+                      <tr><td>Medium</td><td>Net, Whip</td></tr>
+                      <tr><td>Large</td><td>Light and medium armour, shields</td></tr>
+                      <tr><td>Huge</td><td>Heavy armour</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div>
+                  <h3>Bone / Antler / Claw / Tooth Items</h3>
+                  <table class="reference-table">
+                    <thead><tr><th>Component</th><th>Min. Size</th><th>Items</th></tr></thead>
+                    <tbody>
+                      <tr><td>Bone</td><td>Tiny</td><td>Arrow, bolt, dart</td></tr>
+                      <tr><td>Antler/Beak/Horn/Pincer/Talon/Tusk</td><td>Small</td><td>Arrow, bolt, dart</td></tr>
+                      <tr><td>Claw/Tooth</td><td>Medium</td><td>Arrow, bolt, dart, daggers</td></tr>
+                      <tr><td>Bone</td><td>Large</td><td>Spears, staffs, clubs, quarterstaffs</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </mat-tab>
+
+        <!-- ── Crafting Quirks ───────────────────────────────────────── -->
+        <mat-tab label="Quirks">
+          <div class="tab-content">
+
+            <div class="quirk-controls">
+              <div class="quirk-toggle-group">
+                <span class="filter-label">Section</span>
+                <div class="chip-row">
+                  @for (opt of craftingQuirkSectionOpts; track opt.value) {
+                    <button type="button" mat-stroked-button
+                            [class.selected]="craftingQuirkSection() === opt.value"
+                            (click)="craftingQuirkSection.set(opt.value)">
+                      {{ opt.label }}
+                    </button>
+                  }
+                </div>
+              </div>
+              <div class="quirk-toggle-group">
+                <span class="filter-label">Type</span>
+                <div class="chip-row">
+                  @for (opt of craftingQuirkTypeOpts; track opt.value) {
+                    <button type="button" mat-stroked-button
+                            [class.selected]="craftingQuirkType() === opt.value"
+                            (click)="craftingQuirkType.set(opt.value)">
+                      {{ opt.label }}
+                    </button>
+                  }
+                </div>
               </div>
             </div>
-          }
-        </div>
 
-      </div>
+            @if (visibleManufacturingFlaws().length > 0) {
+              <div class="quirk-section-block">
+                <h3 class="quirk-section-heading">
+                  <span class="section-type manufacturing">Manufacturing</span>
+                  <span class="section-kind flaw">Flaws</span>
+                  <span class="roll-hint">d20</span>
+                </h3>
+                <div class="quirk-list">
+                  @for (q of visibleManufacturingFlaws(); track q.roll) {
+                    <div class="quirk-row is-flaw">
+                      <span class="quirk-roll">{{ q.roll }}</span>
+                      <div class="quirk-body">
+                        <div class="quirk-header">
+                          <span class="quirk-name">{{ q.name }}</span>
+                        </div>
+                        <p class="quirk-effect">{{ q.effect }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (visibleManufacturingBoons().length > 0) {
+              <div class="quirk-section-block">
+                <h3 class="quirk-section-heading">
+                  <span class="section-type manufacturing">Manufacturing</span>
+                  <span class="section-kind boon">Boons</span>
+                  <span class="roll-hint">d20 (d12 for wondrous items)</span>
+                </h3>
+                <div class="quirk-list">
+                  @for (q of visibleManufacturingBoons(); track q.roll) {
+                    <div class="quirk-row is-boon">
+                      <span class="quirk-roll">{{ q.roll }}</span>
+                      <div class="quirk-body">
+                        <div class="quirk-header">
+                          <span class="quirk-name">{{ q.name }}</span>
+                        </div>
+                        <p class="quirk-effect">{{ q.effect }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (visibleEnchantingFlaws().length > 0) {
+              <div class="quirk-section-block">
+                <h3 class="quirk-section-heading">
+                  <span class="section-type enchanting">Enchanting</span>
+                  <span class="section-kind flaw">Flaws</span>
+                  <span class="roll-hint">d20</span>
+                </h3>
+                <div class="quirk-list">
+                  @for (q of visibleEnchantingFlaws(); track q.roll) {
+                    <div class="quirk-row is-flaw">
+                      <span class="quirk-roll">{{ q.roll }}</span>
+                      <div class="quirk-body">
+                        <div class="quirk-header">
+                          <span class="quirk-name">{{ q.name }}</span>
+                        </div>
+                        <p class="quirk-effect">{{ q.effect }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (visibleEnchantingBoons().length > 0) {
+              <div class="quirk-section-block">
+                <h3 class="quirk-section-heading">
+                  <span class="section-type enchanting">Enchanting</span>
+                  <span class="section-kind boon">Boons</span>
+                  <span class="roll-hint">d20</span>
+                </h3>
+                <div class="quirk-list">
+                  @for (q of visibleEnchantingBoons(); track q.roll) {
+                    <div class="quirk-row is-boon">
+                      <span class="quirk-roll">{{ q.roll }}</span>
+                      <div class="quirk-body">
+                        <div class="quirk-header">
+                          <span class="quirk-name">{{ q.name }}</span>
+                        </div>
+                        <p class="quirk-effect">{{ q.effect }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
     </mat-tab>
 
   </mat-tab-group>

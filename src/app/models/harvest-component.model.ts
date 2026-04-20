@@ -9,4 +9,5 @@ export interface HarvestComponent {
   edibleAs: string | null;   // ComponentTypeName if edible (blood, bone, etc.)
   isVolatile: boolean;
   notes: string | null;
+  componentMetatype: string | null;
 }
