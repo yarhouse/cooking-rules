@@ -88,8 +88,9 @@ export class App {
     {
       header: 'Gameplay',
       items: [
-        { label: 'Harvesting', route: '/harvesting', icon: 'agriculture' },
-        { label: 'Cooking',    route: '/cooking',    icon: 'restaurant' },
+        { label: 'Harvesting',         route: '/harvesting',      icon: 'agriculture' },
+        { label: 'Harvest Session',    route: '/harvest-session', icon: 'content_cut' },
+        { label: 'Cooking',            route: '/cooking',         icon: 'restaurant' },
         { label: 'Crafting',   route: '/crafting',   icon: 'build' },
         { label: 'Inventory',  route: '/inventory',  icon: 'kitchen' },
       ],

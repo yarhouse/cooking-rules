@@ -1,0 +1,477 @@
+<div class="harvest-session-page">
+
+  <div class="page-header">
+    <h1>Harvest Session</h1>
+  </div>
+
+  <mat-stepper #stepper linear class="harvest-stepper">
+
+    <!-- ── Step 1: Pick Your Prey ────────────────────────────────────────── -->
+    <mat-step label="Pick Your Prey" [completed]="!!selectedMonster()">
+      <div class="step-content">
+
+        <div class="creature-type-chips">
+          @for (ct of creatureTypes; track ct.id) {
+            <button type="button" mat-flat-button
+                    [class.selected]="selectedCreatureTypeId() === ct.id"
+                    (click)="selectCreatureType(ct.id)">
+              {{ ct.name }}
+            </button>
+          }
+        </div>
+
+        @if (selectedCreatureTypeId()) {
+          <div class="step1-layout">
+
+            <!-- Left: monster list -->
+            <div class="step1-left">
+              @if (monstersForType().length === 0) {
+                <p class="empty-hint">No monsters found for this type.</p>
+              } @else {
+                <div class="monster-list">
+                  @for (m of monstersForType(); track m.id) {
+                    <button type="button" class="monster-item"
+                            [class.selected]="selectedMonster()?.id === m.id"
+                            (click)="selectMonster(m)">
+                      <span [class]="rarityDotClass(m.rarity)"></span>
+                      <span class="monster-name">{{ m.name }}</span>
+                      @if (m.isBoss) {
+                        <mat-icon class="boss-star" matTooltip="Boss monster — has a named drop">star</mat-icon>
+                      }
+                      <span class="monster-rarity">{{ m.rarity }}</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Right: selected monster preview -->
+            <div class="monster-preview-panel">
+              @if (selectedMonster(); as m) {
+                <div class="monster-preview-card">
+                  <div class="preview-card-header">
+                    <span class="preview-monster-name">{{ m.name }}</span>
+                    @if (m.isBoss) {
+                      <mat-icon class="preview-boss-star" matTooltip="Boss monster — has a named drop">star</mat-icon>
+                    }
+                    <span [class]="'rarity-badge rarity-' + m.rarity">{{ m.rarity }}</span>
+                  </div>
+
+                  <div class="preview-meta">
+                    <span class="preview-type-label">{{ selectedMonsterTypeName() }}</span>
+                    @if (harvestSkill()) {
+                      <span class="preview-skill-badge">{{ harvestSkill() }}</span>
+                    }
+                  </div>
+
+                  @if (selectedMonsterComponentTypes().length) {
+                    <div class="preview-section">
+                      <p class="preview-section-label">Component types</p>
+                      <div class="preview-comp-chips">
+                        @for (name of selectedMonsterComponentTypes(); track name) {
+                          <span class="preview-comp-chip">{{ name }}</span>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  @if (bossDrop(); as drop) {
+                    <div class="preview-section">
+                      <p class="preview-section-label">Named drop</p>
+                      <div class="preview-boss-drop">
+                        <mat-icon class="preview-boss-icon">star</mat-icon>
+                        <span>{{ drop.name }}</span>
+                      </div>
+                    </div>
+                  }
+
+                  @if (essenceEntry(); as ess) {
+                    <div class="preview-section">
+                      <p class="preview-section-label">Essence</p>
+                      <div class="preview-essence-row">
+                        <span>{{ ess.name }}</span>
+                        <span class="dc-tag">DC {{ ess.componentDc }}</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="preview-placeholder">
+                  <mat-icon>touch_app</mat-icon>
+                  <span>Select a monster to preview</span>
+                </div>
+              }
+            </div>
+
+          </div>
+        } @else {
+    <div class="empty-state">
+      <mat-icon>search</mat-icon>
+      <p>Select a creature type above you want to harvest.</p>
+    </div>
+  }
+
+
+        <div class="step-actions">
+          <button mat-flat-button type="button" matStepperNext [disabled]="!selectedMonster()">
+            Next <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- ── Step 2: Build Your Harvest List ──────────────────────────────── -->
+    <mat-step label="Harvest List" [completed]="harvestList().length > 0">
+      <div class="step-content">
+        <p class="step-hint">Choose which components to harvest and arrange them in order. Harvest DC accumulates — put easier or higher-priority items first.</p>
+
+        <div class="harvest-list-layout">
+
+          <!-- Left: available components -->
+          <div class="available-panel">
+            <p class="panel-label">Available components</p>
+            <div class="component-option-list">
+              @for (item of availableComponents(); track item.id) {
+                <div class="component-option" [class.in-list]="countInList(item.id) > 0">
+                  <span class="comp-option-name">{{ item.name }}</span>
+                  <div class="comp-option-badges">
+                    <span class="dc-tag">DC {{ item.componentDc }}</span>
+                    @if (item.isVolatile) {
+                      <span class="volatile-tag" matTooltip="Volatile — consequences if started but not finished">⚡</span>
+                    }
+                  </div>
+                  <div class="comp-qty-controls">
+                    <button type="button" mat-icon-button class="qty-btn"
+                            [disabled]="countInList(item.id) === 0"
+                            (click)="removeLastOfItem(item.id)">
+                      <mat-icon>remove</mat-icon>
+                    </button>
+                    <span class="qty-count" [class.has-qty]="countInList(item.id) > 0">
+                      {{ countInList(item.id) }}
+                    </span>
+                    <button type="button" mat-icon-button class="qty-btn"
+                            (click)="addItem(item)">
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (bossDrop(); as drop) {
+              <p class="panel-label section-sep">Named drop</p>
+              <div class="component-option-list">
+                <div class="component-option boss-option" [class.in-list]="countInList(drop.id) > 0">
+                  <span class="comp-option-name">{{ drop.name }}</span>
+                  <div class="comp-option-badges">
+                    <span class="dc-tag">DC {{ drop.componentDc }}</span>
+                    <span class="boss-tag">Named</span>
+                  </div>
+                  <div class="comp-qty-controls">
+                    <button type="button" mat-icon-button class="qty-btn"
+                            [disabled]="countInList(drop.id) === 0"
+                            (click)="removeLastOfItem(drop.id)">
+                      <mat-icon>remove</mat-icon>
+                    </button>
+                    <span class="qty-count" [class.has-qty]="countInList(drop.id) > 0">
+                      {{ countInList(drop.id) }}
+                    </span>
+                    <button type="button" mat-icon-button class="qty-btn"
+                            [disabled]="countInList(drop.id) >= 1"
+                            (click)="addItem(drop)">
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (essenceEntry(); as ess) {
+              <p class="panel-label section-sep">Essence</p>
+              <div class="component-option-list">
+                <div class="component-option essence-option" [class.in-list]="countInList(ess.id) > 0">
+                  <span class="comp-option-name">{{ ess.name }}</span>
+                  <div class="comp-option-badges">
+                    <span class="dc-tag">DC {{ ess.componentDc }}</span>
+                    <span class="essence-tag">Essence</span>
+                  </div>
+                  <div class="comp-qty-controls">
+                    <button type="button" mat-icon-button class="qty-btn"
+                            [disabled]="countInList(ess.id) === 0"
+                            (click)="removeLastOfItem(ess.id)">
+                      <mat-icon>remove</mat-icon>
+                    </button>
+                    <span class="qty-count" [class.has-qty]="countInList(ess.id) > 0">
+                      {{ countInList(ess.id) }}
+                    </span>
+                    <button type="button" mat-icon-button class="qty-btn"
+                            [disabled]="countInList(ess.id) >= 1"
+                            (click)="addItem(ess)">
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Right: ordered harvest list -->
+          <div class="list-panel">
+            <p class="panel-label">Harvest list <span class="panel-sublabel">(in order)</span></p>
+
+            @if (harvestList().length === 0) {
+              <p class="empty-hint">Click components on the left to add them here.</p>
+            } @else {
+              <div class="list-rows">
+                @for (item of harvestListWithDCs(); track i; let i = $index; let last = $last) {
+                  <div class="list-row">
+                    <span class="list-index">{{ i + 1 }}</span>
+                    <div class="list-row-info">
+                      <span class="list-name">{{ item.name }}</span>
+                      <span class="list-dcs">
+                        <span class="dc-tag small">+{{ item.componentDc }}</span>
+                        <span class="harvest-dc-tag">= DC {{ item.harvestDc }}</span>
+                      </span>
+                    </div>
+                    <div class="list-row-actions">
+                      <button mat-icon-button type="button" [disabled]="i === 0" (click)="moveItem(i, -1)">
+                        <mat-icon>arrow_upward</mat-icon>
+                      </button>
+                      <button mat-icon-button type="button" [disabled]="last" (click)="moveItem(i, 1)">
+                        <mat-icon>arrow_downward</mat-icon>
+                      </button>
+                      <button mat-icon-button type="button" (click)="removeItem(i)">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+              <div class="running-dc-row">
+                <span>Total Harvest DC to beat all components:</span>
+                <strong class="running-dc-value">{{ runningDC() }}</strong>
+              </div>
+            }
+          </div>
+
+        </div>
+
+        <div class="step-actions">
+          <button mat-stroked-button type="button" matStepperPrevious>Back</button>
+          <button mat-flat-button type="button" matStepperNext [disabled]="harvestList().length === 0">
+            Confirm DCs <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- ── Step 3: Confirm DCs ───────────────────────────────────────────── -->
+    <mat-step label="Confirm DCs">
+      <div class="step-content">
+        <div class="skill-info-bar">
+          <mat-icon>auto_stories</mat-icon>
+          <div class="skill-info-text">
+            <span>Roll <strong>INT ({{ harvestSkill() }})</strong> for Assessment and
+              <strong>DEX ({{ harvestSkill() }})</strong> for Carving.
+              Add both results together for your <strong>Harvesting Check total</strong>.</span>
+            @if (isRitualCarving()) {
+              <span class="ritual-note">
+                <mat-icon class="inline-icon">auto_awesome</mat-icon>
+                Spellcasters may use their Spellcasting ability instead of Dexterity for Carving.
+              </span>
+            }
+          </div>
+        </div>
+
+        <table class="dc-table">
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th>Component</th>
+              <th class="col-dc">Component DC</th>
+              <th class="col-dc">Harvest DC</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of harvestListWithDCs(); track item.id; let i = $index) {
+              <tr [class.volatile-row]="item.isVolatile" [class.boss-row]="item.isBossDrop" [class.essence-row]="item.isEssence">
+                <td class="col-num">{{ i + 1 }}</td>
+                <td class="comp-name-cell">
+                  {{ item.name }}
+                  @if (item.isVolatile) {
+                    <span class="volatile-inline" matTooltip="Volatile — consequences if started but not finished">⚡</span>
+                  }
+                  @if (item.isBossDrop) {
+                    <span class="boss-inline">Named</span>
+                  }
+                  @if (item.isEssence) {
+                    <span class="essence-inline">Essence</span>
+                  }
+                </td>
+                <td class="col-dc">+{{ item.componentDc }}</td>
+                <td class="col-dc harvest-dc-cell">{{ item.harvestDc }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="step-actions">
+          <button mat-stroked-button type="button" matStepperPrevious>Back</button>
+          <button mat-flat-button type="button" matStepperNext>
+            Let's Roll <mat-icon iconPositionEnd>casino</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- ── Step 4: Roll the Dice ─────────────────────────────────────────── -->
+    <mat-step label="Roll the Dice" [completed]="harvestingTotal() > 0">
+      <div class="step-content">
+        <p class="step-hint">Enter the result of each check (d20 + modifier + proficiency if applicable).</p>
+
+        <div class="roll-layout">
+
+          <div class="roll-block">
+            <div class="roll-block-header">
+              <mat-icon>psychology</mat-icon>
+              <span class="roll-block-title">Assessment</span>
+              <span class="roll-block-sub">INT ({{ harvestSkill() }})</span>
+            </div>
+            <mat-form-field appearance="outline" class="roll-field">
+              <mat-label>Roll result</mat-label>
+              <input matInput type="number" min="0"
+                     [value]="assessmentRoll()"
+                     (input)="assessmentRoll.set(+$any($event.target).value)" />
+            </mat-form-field>
+          </div>
+
+          <span class="roll-operator">+</span>
+
+          <div class="roll-block">
+            <div class="roll-block-header">
+              <mat-icon>content_cut</mat-icon>
+              <span class="roll-block-title">Carving</span>
+              <span class="roll-block-sub">
+                DEX ({{ harvestSkill() }})
+                @if (isRitualCarving()) { <em> or Spellcasting</em> }
+              </span>
+            </div>
+            <mat-form-field appearance="outline" class="roll-field">
+              <mat-label>Roll result</mat-label>
+              <input matInput type="number" min="0"
+                     [value]="carvingRoll()"
+                     (input)="carvingRoll.set(+$any($event.target).value)" />
+            </mat-form-field>
+          </div>
+
+          <span class="roll-operator">=</span>
+
+          <div class="roll-total-block">
+            <span class="roll-total-label">Harvesting Check</span>
+            <div class="roll-total" [class.total-success]="harvestingTotal() >= runningDC()"
+                                    [class.total-partial]="harvestingTotal() > 0 && harvestingTotal() < runningDC()">
+              {{ harvestingTotal() }}
+            </div>
+            <span class="roll-total-target">/ {{ runningDC() }} to harvest all</span>
+          </div>
+
+        </div>
+
+        <div class="step-actions">
+          <button mat-stroked-button type="button" matStepperPrevious>Back</button>
+          <button mat-flat-button type="button" matStepperNext [disabled]="harvestingTotal() === 0">
+            See Results <mat-icon iconPositionEnd>emoji_events</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- ── Step 5: Results ───────────────────────────────────────────────── -->
+    <mat-step label="Results">
+      <div class="step-content">
+
+        <div class="results-summary-bar">
+          <div class="results-score">
+            <span class="score-number">{{ harvestingTotal() }}</span>
+            <span class="score-label">Harvesting Check</span>
+          </div>
+          <div class="results-stat">
+            <span class="stat-number">{{ harvestedCount() }}</span>
+            <span class="stat-label">of {{ harvestList().length }} harvested</span>
+          </div>
+          <div class="results-stat">
+            <span class="stat-number">{{ suppliesCost() }} gp</span>
+            <span class="stat-label">supplies used</span>
+          </div>
+        </div>
+
+        @if (startedVolatiles().length > 0) {
+          <div class="volatile-warning">
+            <mat-icon>warning</mat-icon>
+            <div>
+              <strong>Volatile component consequence!</strong>
+              @for (v of startedVolatiles(); track v.id) {
+                <span> {{ v.name }} was started but not finished — trigger the creature's volatile effect (GM's discretion).</span>
+              }
+            </div>
+          </div>
+        }
+
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th class="col-result"></th>
+              <th>Component</th>
+              <th class="col-dc">Harvest DC</th>
+              <th class="col-dc">Your Roll</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of results(); track item.id) {
+              <tr [class.row-harvested]="item.harvested"
+                  [class.row-started]="item.started"
+                  [class.row-missed]="!item.harvested && !item.started">
+                <td class="col-result">
+                  @if (item.harvested) {
+                    <mat-icon class="result-icon success">check_circle</mat-icon>
+                  } @else if (item.started) {
+                    <mat-icon class="result-icon partial" [matTooltip]="item.isVolatile ? 'Started — volatile effect triggered!' : 'Started but not finished'">
+                      {{ item.isVolatile ? 'warning' : 'radio_button_unchecked' }}
+                    </mat-icon>
+                  } @else {
+                    <mat-icon class="result-icon missed">cancel</mat-icon>
+                  }
+                </td>
+                <td class="comp-name-cell">
+                  {{ item.name }}
+                  @if (item.isBossDrop) { <span class="boss-inline">Named</span> }
+                  @if (item.isEssence)  { <span class="essence-inline">Essence</span> }
+                </td>
+                <td class="col-dc">{{ item.harvestDc }}</td>
+                <td class="col-dc">{{ harvestingTotal() }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (harvestedCount() > 0) {
+          <div class="results-actions">
+            <button mat-flat-button type="button" (click)="addToInventory()">
+              <mat-icon>add_shopping_cart</mat-icon>
+              Add {{ harvestedCount() }} item{{ harvestedCount() === 1 ? '' : 's' }} to Inventory
+            </button>
+          </div>
+        }
+
+        <div class="step-actions">
+          <button mat-stroked-button type="button" (click)="reset()">
+            <mat-icon>refresh</mat-icon>
+            Harvest Again
+          </button>
+        </div>
+
+      </div>
+    </mat-step>
+
+  </mat-stepper>
+</div>
