@@ -1,155 +1,26 @@
 :host {
   display: block;
+  height: 100%;
 }
 
 .harvesting-page {
   padding: var(--page-padding);
   max-width: var(--page-max-width);
   margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
   @media (max-width: 768px) { padding: var(--page-padding-mobile); }
 }
 
-.tab-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding-top: 20px;
-}
-
-// ── Tab 1 — Rules ──────────────────────────────────────────────────────
-
-.rules-section {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-
-  h2 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin: 0;
-    color: var(--mat-sys-on-surface);
-  }
-
-  h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0 0 8px;
-  }
-}
-
-.intro-text {
-  font-size: 0.9rem;
-  color: var(--mat-sys-on-surface-variant);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
-}
-
-.step-card {
-  .step-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--mat-sys-primary);
-    color: var(--mat-sys-on-primary);
-    font-size: 0.85rem;
-    font-weight: 700;
-    flex-shrink: 0;
-    margin-right: 10px;
-  }
-
-  mat-card-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-  }
-
-  mat-card-content {
-    font-size: 0.85rem;
-    color: var(--mat-sys-on-surface-variant);
-    line-height: 1.5;
-    padding-top: 8px;
-  }
-}
-
-.rules-two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-  }
-
-  ul {
-    margin: 0 0 8px;
-    padding-left: 20px;
-    font-size: 0.875rem;
-    color: var(--mat-sys-on-surface-variant);
-    line-height: 1.6;
-
-    li + li { margin-top: 4px; }
-  }
-
-  p {
-    font-size: 0.875rem;
-    color: var(--mat-sys-on-surface-variant);
-    line-height: 1.5;
-    margin: 0 0 16px;
-  }
-}
-
-.reference-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-  margin-top: 8px;
-
-  th {
-    text-align: left;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--mat-sys-on-surface-variant);
-    padding: 6px 10px 6px 0;
-    border-bottom: 2px solid var(--mat-sys-outline-variant);
-  }
-
-  td {
-    padding: 7px 10px 7px 0;
-    border-bottom: 1px solid var(--mat-sys-outline-variant);
-    color: var(--mat-sys-on-surface);
-    vertical-align: middle;
-  }
-
-  tr:last-child td { border-bottom: none; }
-}
-
-.inline-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-  vertical-align: middle;
-
-  &.warn { color: var(--mat-sys-error, #c62828); }
-}
-
-// ── Tab 2 — Harvest Tables ─────────────────────────────────────────────
+// ── Header ─────────────────────────────────────────────────────────────
 
 .harvesting-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
   gap: 12px;
 
@@ -161,11 +32,13 @@
   }
 }
 
+// ── Creature type bar — always full width ──────────────────────────────
+
 .creature-type-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 4px 0 20px;
+  margin-bottom: 20px;
 
   button {
     font-size: 0.8rem;
@@ -180,6 +53,110 @@
     }
   }
 }
+
+// ── 2-column detail layout (appears after type selection) ──────────────
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.left-panel, .right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+}
+
+// ── Monster list (left panel) ──────────────────────────────────────────
+
+.panel-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.monster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.monster-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.12s;
+
+  &:hover {
+    background: var(--mat-sys-surface-container);
+  }
+
+  &.selected {
+    background: var(--mat-sys-primary-container);
+    border-color: var(--mat-sys-primary);
+  }
+
+  &.is-legendary {
+    border-color: #c8971a;
+  }
+
+  &.selected.is-legendary {
+    border-color: #c8971a;
+  }
+}
+
+.monster-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+  flex: 1;
+}
+
+.monster-rarity {
+  font-size: 0.68rem;
+  color: var(--mat-sys-on-surface-variant);
+  text-transform: capitalize;
+}
+
+.rarity-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.rarity-dot-common     { background: #aaa; }
+  &.rarity-dot-uncommon   { background: #4caf50; }
+  &.rarity-dot-rare       { background: #2196f3; }
+  &.rarity-dot-very-rare  { background: #9c27b0; }
+  &.rarity-dot-legendary  { background: #ff9800; }
+}
+
+.no-monsters-note {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: 0;
+}
+
+// ── Harvest table (right panel) ────────────────────────────────────────
 
 .harvest-table-container {
   display: flex;
@@ -268,6 +245,21 @@
   &:last-child { border-bottom: none; }
 }
 
+.component-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+  flex: 1;
+}
+
+.component-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .qty-controls {
   display: flex;
   align-items: center;
@@ -284,21 +276,6 @@
   color: var(--mat-sys-on-surface-variant);
 
   &.has-qty { color: var(--mat-sys-primary); }
-}
-
-.component-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--mat-sys-on-surface);
-  flex: 1;
-}
-
-.component-badges {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
 }
 
 .volatile-chip {
@@ -336,6 +313,102 @@
   height: 16px;
 }
 
+// ── Named drops section ────────────────────────────────────────────────
+
+.named-drops-container {
+  margin-top: 28px;
+  border-top: 2px solid var(--mat-sys-outline-variant);
+  padding-top: 20px;
+}
+
+.named-drops-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: var(--mat-sys-primary);
+    }
+  }
+}
+
+.boss-drops-section {
+  margin-top: 16px;
+}
+
+.boss-drops-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.boss-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  color: #c8971a;
+}
+
+.ingredient-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.ingredient-note {
+  font-size: 0.72rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+}
+
+.edible-chip-plain {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  white-space: nowrap;
+}
+
+.no-drops-note {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: 0;
+}
+
+.rarity-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+
+  &.rarity-uncommon  { background: #cce5cc; color: #1b4520; }
+  &.rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
+  &.rarity-very-rare { background: #dfd0ea; color: #3e1560; }
+  &.rarity-legendary { background: #f0e0a0; color: #5a3200; }
+  &.rarity-artifact  { background: #f0c8a0; color: #5a2000; }
+}
+
+// ── Empty state ────────────────────────────────────────────────────────
+
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -356,34 +429,4 @@
     margin: 0;
     font-style: italic;
   }
-}
-
-// ── Tab 3 — Reference ──────────────────────────────────────────────────
-
-.reference-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(2, 1fr));
-  gap: 24px;
-}
-
-.ref-section {
-  h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0 0 4px;
-  }
-}
-
-.rarity-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 8px;
-  font-size: 0.72rem;
-  font-weight: 600;
-
-  &.rarity-uncommon  { background: #cce5cc; color: #1b4520; }
-  &.rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
-  &.rarity-very-rare { background: #dfd0ea; color: #3e1560; }
-  &.rarity-legendary { background: #f0e0a0; color: #5a3200; }
-  &.rarity-artifact  { background: #f0c8a0; color: #5a2000; }
 }

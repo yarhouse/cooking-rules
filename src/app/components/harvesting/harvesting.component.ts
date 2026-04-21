@@ -7,6 +7,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { CookingDataService } from '../../services/cooking-data.service';
 import { InventoryService } from '../../services/inventory.service';
 import { HarvestComponent } from '../../models/harvest-component.model';
+import { Monster } from '../../models/monster.model';
+import { Ingredient } from '../../models/ingredient.model';
 
 @Component({
   selector: 'app-harvesting',
@@ -32,8 +34,9 @@ export class HarvestingComponent {
     this.inventory.updateHarvestQuantity(id, delta);
   }
 
-  readonly creatureTypes = this.dataService.getCreatureTypes();
+readonly creatureTypes = this.dataService.getCreatureTypes();
   selectedCreatureTypeId = signal<string | null>(null);
+  selectedMonsterId = signal<string | null>(null);
 
   readonly selectedComponents = computed((): HarvestComponent[] => {
     const id = this.selectedCreatureTypeId();
@@ -48,8 +51,56 @@ export class HarvestingComponent {
     return id ? this.dataService.getCreatureType(id) : null;
   });
 
+  readonly monstersForType = computed((): Monster[] => {
+    const id = this.selectedCreatureTypeId();
+    if (!id) return [];
+    const RARITY_ORDER: Record<string, number> = {
+      common: 0, uncommon: 1, rare: 2, 'very-rare': 3, legendary: 4,
+    };
+    return this.dataService.getMonstersByType(id).sort(
+      (a, b) => (RARITY_ORDER[a.rarity] ?? 0) - (RARITY_ORDER[b.rarity] ?? 0) || a.name.localeCompare(b.name)
+    );
+  });
+
+  readonly selectedMonster = computed((): Monster | undefined => {
+    const id = this.selectedMonsterId();
+    return id ? this.dataService.getMonster(id) : undefined;
+  });
+
+  readonly harvestComponentsForMonster = computed((): HarvestComponent[] => {
+    const monster = this.selectedMonster();
+    if (!monster) return [];
+    const metatypes = new Set(monster.harvestableComponents);
+    return this.dataService.getHarvestComponentsByCreatureType(monster.creatureTypeId)
+      .filter(hc => hc.componentMetatype != null && metatypes.has(hc.componentMetatype as never))
+      .sort((a, b) => a.componentDc - b.componentDc || a.name.localeCompare(b.name));
+  });
+
+  readonly bossDropsForMonster = computed((): Ingredient[] => {
+    const monster = this.selectedMonster();
+    if (!monster) return [];
+    const coveredIds = new Set(this.harvestComponentsForMonster().map(hc => hc.id));
+    return this.dataService.getIngredients()
+      .filter(i => i.sourceMonsterIds?.includes(monster.id) && !coveredIds.has(i.id))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  });
+
+  getIngredientQty(id: string): number {
+    return this.inventory.getQuantity(id);
+  }
+
+  adjustIngredient(id: string, delta: number): void {
+    this.inventory.updateQuantity(id, delta);
+  }
+
   selectCreatureType(id: string): void {
-    this.selectedCreatureTypeId.set(this.selectedCreatureTypeId() === id ? null : id);
+    const next = this.selectedCreatureTypeId() === id ? null : id;
+    this.selectedCreatureTypeId.set(next);
+    this.selectedMonsterId.set(null);
+  }
+
+  selectMonster(id: string): void {
+    this.selectedMonsterId.set(this.selectedMonsterId() === id ? null : id);
   }
 
   readonly dcGroupLabels: Record<number, string | undefined> = {

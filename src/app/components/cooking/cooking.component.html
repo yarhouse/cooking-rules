@@ -41,6 +41,34 @@
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
 
+        <div class="filter-group">
+          <span class="filter-label">Type</span>
+          <div class="filter-chips">
+            @for (ct of availableComponentTypes(); track ct.id) {
+              <button type="button"
+                      class="filter-chip"
+                      [class.active]="selectedComponentTypeFilter() === ct.id"
+                      (click)="toggleComponentTypeFilter(ct.id)">
+                {{ ct.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">Creature</span>
+          <div class="filter-chips">
+            @for (ct of availableCreatureTypes(); track ct.id) {
+              <button type="button"
+                      class="filter-chip"
+                      [class.active]="selectedCreatureTypeFilter() === ct.id"
+                      (click)="toggleCreatureTypeFilter(ct.id)">
+                {{ ct.name }}
+              </button>
+            }
+          </div>
+        </div>
+
         <div class="ingredient-list">
           @for (item of filteredIngredientList(); track item.id) {
             <button class="ingredient-item"
@@ -52,7 +80,10 @@
                 <span class="item-tags">
                   <span class="component-tag">{{ getComponentName(item.edibleAs!) }}</span>
                   <span class="creature-tag">{{ item.creatureTypeName }}</span>
-                  <span class="dc-tag">DC {{ item.componentDc }}</span>
+                  <span class="dc-tag dc-{{ item.componentDc }}">DC {{ item.componentDc }}</span>
+                  @if (item.isVolatile) {
+                    <span class="volatile-tag" title="Volatile: triggers effect on partial harvest">⚠ Volatile</span>
+                  }
                 </span>
               </div>
               <div class="item-right">
@@ -113,10 +144,10 @@
               <p class="effect-text">{{ result.effect.description }}</p>
               @if (result.effect.scaling) {
                 <div class="scaling-row">
-                  <span>U: {{ result.effect.scaling.uncommon }}</span>
-                  <span>R: {{ result.effect.scaling.rare }}</span>
-                  <span>VR: {{ result.effect.scaling.veryRare }}</span>
-                  <span>L: {{ result.effect.scaling.legendary }}</span>
+                  <span class="scale-cell"><span class="scale-pill rarity-uncommon">U</span>{{ result.effect.scaling.uncommon }}</span>
+                  <span class="scale-cell"><span class="scale-pill rarity-rare">R</span>{{ result.effect.scaling.rare }}</span>
+                  <span class="scale-cell"><span class="scale-pill rarity-very-rare">VR</span>{{ result.effect.scaling.veryRare }}</span>
+                  <span class="scale-cell"><span class="scale-pill rarity-legendary">L</span>{{ result.effect.scaling.legendary }}</span>
                 </div>
               }
               <button mat-stroked-button class="add-btn" (click)="addFromEffect(result.harvestComponent)">
@@ -180,10 +211,10 @@
               <p class="effect-desc">{{ e.effect!.description }}</p>
               @if (e.effect!.scaling) {
                 <div class="scaling-row">
-                  <span class="scale-cell"><span class="scale-label">U</span>{{ e.effect!.scaling!.uncommon }}</span>
-                  <span class="scale-cell"><span class="scale-label">R</span>{{ e.effect!.scaling!.rare }}</span>
-                  <span class="scale-cell"><span class="scale-label">VR</span>{{ e.effect!.scaling!.veryRare }}</span>
-                  <span class="scale-cell"><span class="scale-label">L</span>{{ e.effect!.scaling!.legendary }}</span>
+                  <span class="scale-cell"><span class="scale-pill rarity-uncommon">U</span>{{ e.effect!.scaling!.uncommon }}</span>
+                  <span class="scale-cell"><span class="scale-pill rarity-rare">R</span>{{ e.effect!.scaling!.rare }}</span>
+                  <span class="scale-cell"><span class="scale-pill rarity-very-rare">VR</span>{{ e.effect!.scaling!.veryRare }}</span>
+                  <span class="scale-cell"><span class="scale-pill rarity-legendary">L</span>{{ e.effect!.scaling!.legendary }}</span>
                 </div>
               }
             </div>

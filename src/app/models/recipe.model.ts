@@ -12,7 +12,7 @@ export const TIER_DC: Record<RecipeTier, number> = {
 
 export interface RecipeIngredient {
   componentTypeId: ComponentTypeName;
-  bossSpecific?: string; // e.g. "Fiend (pygmy) brain"
+  ingredientId?: string;
 }
 
 export interface Recipe {

@@ -39,9 +39,10 @@ export class RecipeDetailDialogComponent {
   get ingredientDetails() {
     return this.recipe.ingredients.map(ri => {
       const ct = this.dataService.getComponentType(ri.componentTypeId);
+      const ingredient = ri.ingredientId ? this.dataService.getIngredient(ri.ingredientId) : null;
       return {
         name: ct?.name ?? ri.componentTypeId,
-        bossSpecific: ri.bossSpecific,
+        ingredientName: ingredient?.name ?? null,
         effects: ct?.effects ?? [],
       };
     });

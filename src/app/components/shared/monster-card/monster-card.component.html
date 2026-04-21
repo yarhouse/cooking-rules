@@ -19,6 +19,23 @@
       }
     </div>
 
+    @if (bossDrop) {
+      <mat-divider class="drop-divider" />
+      <div class="boss-drop-row">
+        <span class="drop-label">Named drop:</span>
+        <span class="drop-name">{{ bossDrop.name }}</span>
+        <div class="drop-counter" (click)="$event.stopPropagation()">
+          <button mat-icon-button type="button" [disabled]="bossDropQuantity === 0" (click)="adjustBossDrop(-1, $event)">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <span class="drop-qty" [class.has-qty]="bossDropQuantity > 0">{{ bossDropQuantity }}</span>
+          <button mat-icon-button type="button" (click)="adjustBossDrop(1, $event)">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+
   </mat-card-content>
 
 </mat-card>

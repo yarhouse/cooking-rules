@@ -140,5 +140,41 @@
       </div>
     </mat-tab>
 
+    <!-- ── Named Drops Tab ──────────────────────────────────────────── -->
+    <mat-tab label="Named Drops">
+      <div class="tab-content">
+
+        @if (namedDropsInStock().length === 0) {
+          <div class="empty-inventory">
+            <mat-icon>star_border</mat-icon>
+            <p>No unique drops in stock.</p>
+            <p class="hint">Add unique boss drops from a monster's detail panel in Harvesting.</p>
+          </div>
+        }
+
+        @for (entry of namedDropsInStock(); track entry.ingredient.id) {
+          <div class="ingredient-row">
+            <div class="ingredient-info">
+              <span class="ingredient-name">{{ entry.ingredient.name }}</span>
+              <span class="creature-tag">{{ getCreatureName(entry.ingredient.creatureTypeId) }}</span>
+              <span class="edible-tag">{{ getComponentTypeName(entry.ingredient.componentTypeId) }}</span>
+            </div>
+            <div class="qty-controls">
+              <button mat-icon-button type="button"
+                      (click)="adjustIngredient(entry.ingredient.id, -1)"
+                      [disabled]="entry.qty === 0">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <span class="qty" [class.has-qty]="entry.qty > 0">{{ entry.qty }}</span>
+              <button mat-icon-button type="button" (click)="adjustIngredient(entry.ingredient.id, 1)">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+
+      </div>
+    </mat-tab>
+
   </mat-tab-group>
 </div>

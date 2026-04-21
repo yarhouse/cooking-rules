@@ -46,5 +46,5 @@ export interface CreateRecipePayload {
 
 export interface CreateRecipeIngredientPayload {
   componentTypeId: ComponentTypeName;
-  bossSpecific?: string;
+  ingredientId?: string;
 }

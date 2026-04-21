@@ -14,6 +14,7 @@ import { InventoryService } from '../../services/inventory.service';
 import { CookingDataService } from '../../services/cooking-data.service';
 import { Rarity, ComponentTypeName } from '../../models/component-type.model';
 import { HarvestComponent } from '../../models/harvest-component.model';
+import { Ingredient } from '../../models/ingredient.model';
 
 type ComponentGroupBy = 'creature' | 'metatype';
 
@@ -139,5 +140,27 @@ export class InventoryComponent {
   addFromSearch(comp: HarvestComponent): void {
     this.inventoryService.updateHarvestQuantity(comp.id, 1);
     this.harvestSearch.set('');
+  }
+
+  // ── Named Drops (boss / unique ingredients) ──────────────────────────
+
+  readonly namedDropsInStock = computed((): Array<{ ingredient: Ingredient; qty: number }> => {
+    const stockMap = this.inventoryService.inventoryMap();
+    return this.dataService.getIngredients()
+      .filter(i => (stockMap.get(i.id) ?? 0) > 0)
+      .map(i => ({ ingredient: i, qty: stockMap.get(i.id)! }))
+      .sort((a, b) => a.ingredient.name.localeCompare(b.ingredient.name));
+  });
+
+  getIngredientQty(id: string): number {
+    return this.inventoryService.getQuantity(id);
+  }
+
+  adjustIngredient(id: string, delta: number): void {
+    this.inventoryService.updateQuantity(id, delta);
+  }
+
+  getComponentTypeName(id: string): string {
+    return this.dataService.getComponentType(id as ComponentTypeName)?.name ?? id;
   }
 }

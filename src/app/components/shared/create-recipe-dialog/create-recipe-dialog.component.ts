@@ -73,7 +73,7 @@ export class CreateRecipeDialogComponent {
   addIngredientRow(): void {
     this.ingredientRows.push(new FormGroup({
       componentTypeId: new FormControl<ComponentTypeName | ''>('', Validators.required),
-      bossSpecific:    new FormControl(''),
+      ingredientId:    new FormControl(''),
     }));
   }
 
@@ -101,9 +101,9 @@ export class CreateRecipeDialogComponent {
       bossEffect:   v.bossEffect?.trim() || null,
       notes:        v.notes?.trim() || null,
       imageUrl:     null,
-      ingredients:  (v.ingredients as Array<{ componentTypeId: string; bossSpecific: string }>).map(i => ({
+      ingredients:  (v.ingredients as Array<{ componentTypeId: string; ingredientId: string }>).map(i => ({
         componentTypeId: i.componentTypeId as ComponentTypeName,
-        ...(i.bossSpecific?.trim() && { bossSpecific: i.bossSpecific.trim() }),
+        ...(i.ingredientId?.trim() && { ingredientId: i.ingredientId.trim() }),
       })),
     };
 

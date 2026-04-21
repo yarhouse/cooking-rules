@@ -41,16 +41,34 @@ export class CookingComponent {
 
   selectedItems = signal<HarvestComponent[]>([]);
 
-  ingredientOnlyInventory = signal(false);
+  ingredientOnlyInventory = signal(true);
   ingredientQuery = signal('');
   effectQuery = signal('');
+  selectedCreatureTypeFilter = signal<string | null>(null);
+  selectedComponentTypeFilter = signal<string | null>(null);
 
   readonly allEdibleComponents = computed(() => this.dataService.getEdibleHarvestComponents());
+
+  readonly availableCreatureTypes = computed(() => {
+    const ids = new Set(this.allEdibleComponents().map(c => c.creatureTypeId));
+    return this.dataService.getCreatureTypes().filter(ct => ids.has(ct.id));
+  });
+
+  readonly availableComponentTypes = computed(() => {
+    const ids = new Set(this.allEdibleComponents().map(c => c.edibleAs).filter(Boolean));
+    return this.dataService.getComponentTypes().filter(ct => ids.has(ct.id));
+  });
 
   readonly filteredIngredientList = computed(() => {
     let list = this.ingredientOnlyInventory()
       ? this.allEdibleComponents().filter(c => this.inventoryService.getHarvestQuantity(c.id) > 0)
       : this.allEdibleComponents();
+
+    const creatureType = this.selectedCreatureTypeFilter();
+    if (creatureType) list = list.filter(c => c.creatureTypeId === creatureType);
+
+    const componentType = this.selectedComponentTypeFilter();
+    if (componentType) list = list.filter(c => c.edibleAs === componentType);
 
     const q = this.ingredientQuery().toLowerCase();
     if (q) {
@@ -63,6 +81,14 @@ export class CookingComponent {
 
     return list;
   });
+
+  toggleCreatureTypeFilter(id: string): void {
+    this.selectedCreatureTypeFilter.set(this.selectedCreatureTypeFilter() === id ? null : id);
+  }
+
+  toggleComponentTypeFilter(id: string): void {
+    this.selectedComponentTypeFilter.set(this.selectedComponentTypeFilter() === id ? null : id);
+  }
 
   readonly selectedComponentTypes = computed<ComponentTypeName[]>(() =>
     this.selectedItems().map(c => c.edibleAs as ComponentTypeName).filter(Boolean)

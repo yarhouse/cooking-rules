@@ -21,7 +21,7 @@ recipesRouter.get('/', (_req, res, next) => {
         json_group_array(
           json_object(
             'componentTypeId', ri.component_type_id,
-            'bossSpecific',    ri.boss_specific
+            'ingredientId',    ri.ingredient_id
           )
         ) FILTER (WHERE ri.component_type_id IS NOT NULL) AS ingredients
       FROM recipes r
@@ -45,7 +45,7 @@ recipesRouter.get('/', (_req, res, next) => {
     }>;
 
     res.json(rows.map(row => {
-      const rawIngredients: Array<{ componentTypeId: string; bossSpecific: string | null }>
+      const rawIngredients: Array<{ componentTypeId: string; ingredientId: string | null }>
         = JSON.parse(row.ingredients ?? '[]');
       return {
         ...row,
@@ -53,7 +53,7 @@ recipesRouter.get('/', (_req, res, next) => {
         isCustom:     Boolean(row.isCustom),
         ingredients:  rawIngredients.map(i => ({
           componentTypeId: i.componentTypeId,
-          ...(i.bossSpecific !== null && { bossSpecific: i.bossSpecific }),
+          ...(i.ingredientId !== null && { ingredientId: i.ingredientId }),
         })),
       };
     }));

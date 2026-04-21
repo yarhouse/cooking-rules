@@ -4,9 +4,11 @@
     <h1>Harvesting</h1>
   </div>
 
+  <!-- Creature type selector — always full width -->
   <div class="creature-type-chips">
     @for (ct of creatureTypes; track ct.id) {
-      <button mat-flat-button
+      <button type="button"
+              mat-flat-button
               [class.selected]="selectedCreatureTypeId() === ct.id"
               (click)="selectCreatureType(ct.id)">
         {{ ct.name }}
@@ -15,71 +17,192 @@
   </div>
 
   @if (selectedCreatureType(); as ct) {
-    <div class="harvest-table-container">
-      <div class="harvest-header">
-        <h3>{{ ct.name }} Components</h3>
-        <mat-chip class="skill-chip">
-          <mat-icon matChipAvatar>psychology</mat-icon>
-          Harvesting Skill: {{ ct.harvestSkill ?? 'Unknown' }}
-        </mat-chip>
-        <span class="harvest-formula">
-          Assessment: INT ({{ ct.harvestSkill }}) + Carving: DEX ({{ ct.harvestSkill }})
-        </span>
-      </div>
+    <div class="detail-layout">
 
-      @for (group of componentsByDc(); track group.dc) {
-        <div class="dc-group">
-          <div class="dc-label">
-            <span class="dc-badge dc-{{ group.dc }}">DC {{ group.dc }}</span>
-            <span class="dc-hint">{{ dcGroupLabels[group.dc] ?? '' }}</span>
+      <!-- LEFT — monster list -->
+      <div class="left-panel">
+        <div class="panel-section-label">Monsters</div>
+
+        @if (monstersForType().length) {
+          <div class="monster-list">
+            @for (m of monstersForType(); track m.id) {
+              <button type="button"
+                      class="monster-item"
+                      [class.selected]="selectedMonsterId() === m.id"
+                      [class.is-legendary]="m.rarity === 'legendary'"
+                      (click)="selectMonster(m.id)"
+                      [matTooltip]="m.notes ?? ''">
+                <span class="rarity-dot rarity-dot-{{ m.rarity }}"></span>
+                <span class="monster-name">{{ m.name }}</span>
+                <span class="monster-rarity">{{ m.rarity }}</span>
+              </button>
+            }
           </div>
-          <div class="component-list">
-            @for (comp of group.components; track comp.id) {
-              <div class="component-row">
-                <span class="component-name">{{ comp.name }}</span>
+        } @else {
+          <p class="no-monsters-note">No monsters recorded for this type.</p>
+        }
 
-                <div class="component-badges">
-                  @if (comp.isVolatile) {
-                    <mat-chip class="volatile-chip" [matTooltip]="comp.notes ?? 'Volatile: triggers effect on partial harvest'">
-                      <mat-icon matChipAvatar>warning</mat-icon>
-                      Volatile
-                    </mat-chip>
-                  }
-                  @if (comp.isEdible && comp.edibleAs) {
-                    <a [routerLink]="['/rules']"
-                       [fragment]="comp.edibleAs"
-                       class="edible-chip-link"
-                       [matTooltip]="'Counts as ' + COMPONENT_TYPE_LABELS[comp.edibleAs] + ' for cooking'">
-                      <mat-chip class="edible-chip">
-                        <mat-icon matChipAvatar>restaurant</mat-icon>
-                        {{ COMPONENT_TYPE_LABELS[comp.edibleAs] }}
-                      </mat-chip>
-                    </a>
-                  }
-                  @if (comp.notes && !comp.isVolatile) {
-                    <span class="component-note" [matTooltip]="comp.notes">
-                      <mat-icon class="info-icon">info_outline</mat-icon>
-                    </span>
-                  }
+        @if (selectedMonster(); as monster) {
+          <div class="named-drops-container">
+            <div class="named-drops-header">
+              <h3>
+                <mat-icon>inventory_2</mat-icon>
+                {{ monster.name }}
+              </h3>
+              <span class="rarity-badge rarity-{{ monster.rarity }}">{{ monster.rarity }}</span>
+            </div>
+
+            @if (harvestComponentsForMonster().length) {
+              <div class="component-list">
+                @for (comp of harvestComponentsForMonster(); track comp.id) {
+                  <div class="component-row">
+                    <span class="component-name">{{ comp.name }}</span>
+                    <div class="component-badges">
+                      @if (comp.isVolatile) {
+                        <mat-chip class="volatile-chip" [matTooltip]="comp.notes ?? 'Volatile: triggers effect on partial harvest'">
+                          <mat-icon matChipAvatar>warning</mat-icon>
+                          Volatile
+                        </mat-chip>
+                      }
+                      @if (comp.isEdible && comp.edibleAs) {
+                        <mat-chip class="edible-chip">
+                          <mat-icon matChipAvatar>restaurant</mat-icon>
+                          {{ COMPONENT_TYPE_LABELS[comp.edibleAs] }}
+                        </mat-chip>
+                      }
+                      @if (comp.notes && !comp.isVolatile) {
+                        <span class="component-note" [matTooltip]="comp.notes">
+                          <mat-icon class="info-icon">info_outline</mat-icon>
+                        </span>
+                      }
+                    </div>
+                    <div class="qty-controls">
+                      <button mat-icon-button type="button"
+                              (click)="adjust(comp.id, -1)"
+                              [disabled]="getQty(comp.id) === 0">
+                        <mat-icon>remove</mat-icon>
+                      </button>
+                      <span class="qty" [class.has-qty]="getQty(comp.id) > 0">{{ getQty(comp.id) }}</span>
+                      <button mat-icon-button type="button" (click)="adjust(comp.id, 1)">
+                        <mat-icon>add</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="no-drops-note">No harvestable components for this monster.</p>
+            }
+
+            @if (bossDropsForMonster().length) {
+              <div class="boss-drops-section">
+                <div class="panel-section-label boss-drops-label">
+                  <mat-icon class="boss-icon">star</mat-icon>
+                  Unique Drops
                 </div>
-
-                <div class="qty-controls">
-                  <button mat-icon-button type="button"
-                          (click)="adjust(comp.id, -1)"
-                          [disabled]="getQty(comp.id) === 0">
-                    <mat-icon>remove</mat-icon>
-                  </button>
-                  <span class="qty" [class.has-qty]="getQty(comp.id) > 0">{{ getQty(comp.id) }}</span>
-                  <button mat-icon-button type="button" (click)="adjust(comp.id, 1)">
-                    <mat-icon>add</mat-icon>
-                  </button>
+                <div class="component-list">
+                  @for (ing of bossDropsForMonster(); track ing.id) {
+                    <div class="component-row">
+                      <div class="ingredient-main">
+                        <span class="component-name">{{ ing.name }}</span>
+                        @if (ing.notes) {
+                          <span class="ingredient-note">{{ ing.notes }}</span>
+                        }
+                      </div>
+                      <div class="component-badges">
+                        <span class="edible-chip-plain">{{ COMPONENT_TYPE_LABELS[ing.componentTypeId] }}</span>
+                      </div>
+                      <div class="qty-controls">
+                        <button mat-icon-button type="button"
+                                (click)="adjustIngredient(ing.id, -1)"
+                                [disabled]="getIngredientQty(ing.id) === 0">
+                          <mat-icon>remove</mat-icon>
+                        </button>
+                        <span class="qty" [class.has-qty]="getIngredientQty(ing.id) > 0">{{ getIngredientQty(ing.id) }}</span>
+                        <button mat-icon-button type="button" (click)="adjustIngredient(ing.id, 1)">
+                          <mat-icon>add</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  }
                 </div>
               </div>
             }
           </div>
+        }
+
+      </div>
+
+      <!-- RIGHT — harvest table -->
+      <div class="right-panel">
+
+        <div class="harvest-table-container">
+          <div class="harvest-header">
+            <h3>{{ ct.name }} Harvest Components</h3>
+            <mat-chip class="skill-chip">
+              <mat-icon matChipAvatar>psychology</mat-icon>
+              Harvesting Skill: {{ ct.harvestSkill ?? 'Unknown' }}
+            </mat-chip>
+            <span class="harvest-formula">
+              Assessment: INT ({{ ct.harvestSkill }}) + Carving: DEX ({{ ct.harvestSkill }})
+            </span>
+          </div>
+
+          @for (group of componentsByDc(); track group.dc) {
+            <div class="dc-group">
+              <div class="dc-label">
+                <span class="dc-badge dc-{{ group.dc }}">DC {{ group.dc }}</span>
+                <span class="dc-hint">{{ dcGroupLabels[group.dc] ?? '' }}</span>
+              </div>
+              <div class="component-list">
+                @for (comp of group.components; track comp.id) {
+                  <div class="component-row">
+                    <span class="component-name">{{ comp.name }}</span>
+                    <div class="component-badges">
+                      @if (comp.isVolatile) {
+                        <mat-chip class="volatile-chip" [matTooltip]="comp.notes ?? 'Volatile: triggers effect on partial harvest'">
+                          <mat-icon matChipAvatar>warning</mat-icon>
+                          Volatile
+                        </mat-chip>
+                      }
+                      @if (comp.isEdible && comp.edibleAs) {
+                        <a [routerLink]="['/rules']"
+                           [fragment]="comp.edibleAs"
+                           class="edible-chip-link"
+                           [matTooltip]="'Counts as ' + COMPONENT_TYPE_LABELS[comp.edibleAs] + ' for cooking'">
+                          <mat-chip class="edible-chip">
+                            <mat-icon matChipAvatar>restaurant</mat-icon>
+                            {{ COMPONENT_TYPE_LABELS[comp.edibleAs] }}
+                          </mat-chip>
+                        </a>
+                      }
+                      @if (comp.notes && !comp.isVolatile) {
+                        <span class="component-note" [matTooltip]="comp.notes">
+                          <mat-icon class="info-icon">info_outline</mat-icon>
+                        </span>
+                      }
+                    </div>
+                    <div class="qty-controls">
+                      <button mat-icon-button type="button"
+                              (click)="adjust(comp.id, -1)"
+                              [disabled]="getQty(comp.id) === 0">
+                        <mat-icon>remove</mat-icon>
+                      </button>
+                      <span class="qty" [class.has-qty]="getQty(comp.id) > 0">{{ getQty(comp.id) }}</span>
+                      <button mat-icon-button type="button" (click)="adjust(comp.id, 1)">
+                        <mat-icon>add</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
         </div>
-      }
+
+      </div>
     </div>
+
   } @else {
     <div class="empty-state">
       <mat-icon>search</mat-icon>

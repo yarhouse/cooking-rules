@@ -59,15 +59,10 @@ CREATE TABLE ingredients (
   name              TEXT NOT NULL,
   component_type_id TEXT NOT NULL REFERENCES component_types(id),
   creature_type_id  TEXT NOT NULL REFERENCES creature_types(id),
+  source_monster_id TEXT REFERENCES monsters(id),
   notes             TEXT,
   is_custom         INTEGER NOT NULL DEFAULT 0,
   created_at        TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
-CREATE TABLE ingredient_source_monsters (
-  ingredient_id TEXT NOT NULL REFERENCES ingredients(id),
-  monster_id    TEXT NOT NULL REFERENCES monsters(id),
-  PRIMARY KEY (ingredient_id, monster_id)
 );
 
 CREATE TABLE recipes (
@@ -87,7 +82,7 @@ CREATE TABLE recipe_ingredients (
   id                INTEGER PRIMARY KEY AUTOINCREMENT,
   recipe_id         TEXT NOT NULL REFERENCES recipes(id),
   component_type_id TEXT NOT NULL REFERENCES component_types(id),
-  boss_specific     TEXT
+  ingredient_id     TEXT REFERENCES ingredients(id)
 );
 
 -- ============================================================
