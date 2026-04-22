@@ -69,7 +69,7 @@ export class CraftingComponent {
   };
 
   readonly craftableItemIds = computed((): Set<string> => {
-    const stockMap = this.inventory.harvestStockMap();
+    const stockMap = this.inventory.harvestTotalMap();
     const essence  = this.inventory.essence();
     const ids = new Set<string>();
     for (const item of this.dataService.getMagicItems()) {

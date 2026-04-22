@@ -266,6 +266,10 @@ export class CookingDataService {
     return this._harvestComponents();
   }
 
+  getHarvestComponent(id: string): HarvestComponent | undefined {
+    return this._harvestComponents().find(hc => hc.id === id);
+  }
+
   getHarvestComponentsByCreatureType(creatureTypeId: string): HarvestComponent[] {
     return this._harvestComponents().filter(hc => hc.creatureTypeId === creatureTypeId);
   }

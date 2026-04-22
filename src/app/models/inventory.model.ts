@@ -1,4 +1,5 @@
 import { Rarity } from './component-type.model';
+import { MonsterRarity } from './monster.model';
 
 export interface InventoryEntry {
   ingredientId: string;
@@ -7,6 +8,7 @@ export interface InventoryEntry {
 
 export interface HarvestStockEntry {
   harvestComponentId: string;
+  rarity: MonsterRarity;
   quantity: number;
 }
 

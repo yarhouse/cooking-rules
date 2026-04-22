@@ -1,7 +1,7 @@
 <div class="harvest-session-page">
 
   <div class="page-header">
-    <h1>Harvest Session</h1>
+    <h1>Harvest</h1>
   </div>
 
   <mat-stepper #stepper linear class="harvest-stepper">
@@ -36,7 +36,7 @@
                       <span [class]="rarityDotClass(m.rarity)"></span>
                       <span class="monster-name">{{ m.name }}</span>
                       @if (m.isBoss) {
-                        <mat-icon class="boss-star" matTooltip="Boss monster — has a named drop">star</mat-icon>
+                        <mat-icon class="boss-star" matTooltip="Boss monster — has a unique ingredient">star</mat-icon>
                       }
                       <span class="monster-rarity">{{ m.rarity }}</span>
                     </button>
@@ -52,7 +52,7 @@
                   <div class="preview-card-header">
                     <span class="preview-monster-name">{{ m.name }}</span>
                     @if (m.isBoss) {
-                      <mat-icon class="preview-boss-star" matTooltip="Boss monster — has a named drop">star</mat-icon>
+                      <mat-icon class="preview-boss-star" matTooltip="Boss monster — has a unique ingredient">star</mat-icon>
                     }
                     <span [class]="'rarity-badge rarity-' + m.rarity">{{ m.rarity }}</span>
                   </div>
@@ -60,7 +60,10 @@
                   <div class="preview-meta">
                     <span class="preview-type-label">{{ selectedMonsterTypeName() }}</span>
                     @if (harvestSkill()) {
-                      <span class="preview-skill-badge">{{ harvestSkill() }}</span>
+                      <span class="preview-skill-badge">
+                        <mat-icon class="preview-skill-icon">{{ harvestSkillIcon(harvestSkill()) }}</mat-icon>
+                        {{ harvestSkill() }}
+                      </span>
                     }
                   </div>
 
@@ -77,10 +80,12 @@
 
                   @if (bossDrop(); as drop) {
                     <div class="preview-section">
-                      <p class="preview-section-label">Named drop</p>
+                      <p class="preview-section-label">Unique ingredient</p>
                       <div class="preview-boss-drop">
-                        <mat-icon class="preview-boss-icon">star</mat-icon>
-                        <span>{{ drop.name }}</span>
+                        <span class="preview-named-pill">
+                          <mat-icon class="preview-boss-icon">star</mat-icon>
+                          {{ drop.name }}
+                        </span>
                       </div>
                     </div>
                   }
@@ -89,8 +94,8 @@
                     <div class="preview-section">
                       <p class="preview-section-label">Essence</p>
                       <div class="preview-essence-row">
-                        <span>{{ ess.name }}</span>
-                        <span class="dc-tag">DC {{ ess.componentDc }}</span>
+                        <span class="preview-essence-pill">{{ ess.name }}</span>
+                        <span class="dc-tag dc-tag--essence">DC {{ ess.componentDc }}</span>
                       </div>
                     </div>
                   }
@@ -135,7 +140,7 @@
                 <div class="component-option" [class.in-list]="countInList(item.id) > 0">
                   <span class="comp-option-name">{{ item.name }}</span>
                   <div class="comp-option-badges">
-                    <span class="dc-tag">DC {{ item.componentDc }}</span>
+                    <span [class]="'dc-tag dc-' + item.componentDc">DC {{ item.componentDc }}</span>
                     @if (item.isVolatile) {
                       <span class="volatile-tag" matTooltip="Volatile — consequences if started but not finished">⚡</span>
                     }
@@ -159,13 +164,13 @@
             </div>
 
             @if (bossDrop(); as drop) {
-              <p class="panel-label section-sep">Named drop</p>
+              <p class="panel-label section-sep">Unique ingredient</p>
               <div class="component-option-list">
                 <div class="component-option boss-option" [class.in-list]="countInList(drop.id) > 0">
                   <span class="comp-option-name">{{ drop.name }}</span>
                   <div class="comp-option-badges">
-                    <span class="dc-tag">DC {{ drop.componentDc }}</span>
-                    <span class="boss-tag">Named</span>
+                    <span [class]="'dc-tag dc-' + drop.componentDc">DC {{ drop.componentDc }}</span>
+                    <span class="boss-tag">Unique</span>
                   </div>
                   <div class="comp-qty-controls">
                     <button type="button" mat-icon-button class="qty-btn"
@@ -192,7 +197,7 @@
                 <div class="component-option essence-option" [class.in-list]="countInList(ess.id) > 0">
                   <span class="comp-option-name">{{ ess.name }}</span>
                   <div class="comp-option-badges">
-                    <span class="dc-tag">DC {{ ess.componentDc }}</span>
+                    <span [class]="'dc-tag dc-' + ess.componentDc">DC {{ ess.componentDc }}</span>
                     <span class="essence-tag">Essence</span>
                   </div>
                   <div class="comp-qty-controls">
@@ -229,7 +234,7 @@
                     <div class="list-row-info">
                       <span class="list-name">{{ item.name }}</span>
                       <span class="list-dcs">
-                        <span class="dc-tag small">+{{ item.componentDc }}</span>
+                        <span [class]="'dc-tag small dc-' + item.componentDc">+{{ item.componentDc }}</span>
                         <span class="harvest-dc-tag">= DC {{ item.harvestDc }}</span>
                       </span>
                     </div>
@@ -302,7 +307,7 @@
                     <span class="volatile-inline" matTooltip="Volatile — consequences if started but not finished">⚡</span>
                   }
                   @if (item.isBossDrop) {
-                    <span class="boss-inline">Named</span>
+                    <span class="boss-inline">Unique</span>
                   }
                   @if (item.isEssence) {
                     <span class="essence-inline">Essence</span>
@@ -444,7 +449,7 @@
                 </td>
                 <td class="comp-name-cell">
                   {{ item.name }}
-                  @if (item.isBossDrop) { <span class="boss-inline">Named</span> }
+                  @if (item.isBossDrop) { <span class="boss-inline">Unique</span> }
                   @if (item.isEssence)  { <span class="essence-inline">Essence</span> }
                 </td>
                 <td class="col-dc">{{ item.harvestDc }}</td>

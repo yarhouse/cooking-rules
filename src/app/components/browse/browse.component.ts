@@ -11,7 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CookingDataService } from '../../services/cooking-data.service';
 import { MonsterCardComponent } from '../shared/monster-card/monster-card.component';
 import { RecipeCardComponent } from '../shared/recipe-card/recipe-card.component';
-import { IngredientCardComponent } from '../shared/ingredient-card/ingredient-card.component';
+import { ComponentCardComponent } from '../shared/component-card/component-card.component';
 import { RecipeTier } from '../../models/recipe.model';
 import { CreateIngredientSourceDialogComponent } from '../shared/create-ingredient-source-dialog/create-ingredient-source-dialog.component';
 import { CreateRecipeDialogComponent } from '../shared/create-recipe-dialog/create-recipe-dialog.component';
@@ -29,7 +29,7 @@ import { CreateRecipeDialogComponent } from '../shared/create-recipe-dialog/crea
     MatTooltipModule,
     MonsterCardComponent,
     RecipeCardComponent,
-    IngredientCardComponent,
+    ComponentCardComponent,
   ],
   templateUrl: './browse.component.html',
   styleUrl: './browse.component.scss',
@@ -40,14 +40,13 @@ export class BrowseComponent {
 
   monsterQuery = signal('');
   recipeQuery = signal('');
-  ingredientQuery = signal('');
+  componentQuery = signal('');
 
   selectedCreatureType = signal<string | null>(null);
   selectedRecipeTier = signal<RecipeTier | null>(null);
-  selectedComponentType = signal<string | null>(null);
+  selectedComponentCreatureType = signal<string | null>(null);
 
   readonly creatureTypes = this.dataService.getCreatureTypes();
-  readonly componentTypes = this.dataService.getComponentTypes();
   readonly recipeTiers: RecipeTier[] = ['novice', 'journeyman', 'expert', 'artisan', 'boss'];
 
   filteredMonsters = computed(() => {
@@ -66,12 +65,19 @@ export class BrowseComponent {
     return recipes;
   });
 
-  filteredIngredients = computed(() => {
-    let ingredients = this.dataService.getIngredients(this.ingredientQuery() || undefined);
-    if (this.selectedComponentType()) {
-      ingredients = ingredients.filter(i => i.componentTypeId === this.selectedComponentType());
+  filteredComponents = computed(() => {
+    let components = this.dataService.getHarvestComponents();
+    const q = this.componentQuery().toLowerCase();
+    if (q) {
+      components = components.filter(c =>
+        c.name.toLowerCase().includes(q) ||
+        c.creatureTypeName.toLowerCase().includes(q)
+      );
     }
-    return ingredients;
+    if (this.selectedComponentCreatureType()) {
+      components = components.filter(c => c.creatureTypeId === this.selectedComponentCreatureType());
+    }
+    return components;
   });
 
   toggleCreatureType(id: string): void {
@@ -82,8 +88,8 @@ export class BrowseComponent {
     this.selectedRecipeTier.set(this.selectedRecipeTier() === tier ? null : tier);
   }
 
-  toggleComponentType(id: string): void {
-    this.selectedComponentType.set(this.selectedComponentType() === id ? null : id);
+  toggleComponentCreatureType(id: string): void {
+    this.selectedComponentCreatureType.set(this.selectedComponentCreatureType() === id ? null : id);
   }
 
   openAddMonster(): void {

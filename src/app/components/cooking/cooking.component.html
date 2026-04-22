@@ -73,22 +73,26 @@
           @for (item of filteredIngredientList(); track item.id) {
             <button class="ingredient-item"
                     [class.selected]="isSelected(item)"
-                    [class.in-stock]="getHarvestQty(item.id) > 0"
+                    [class.in-stock]="getStockQty(item) > 0"
                     (click)="toggleIngredient(item)">
               <div class="item-main">
                 <span class="item-name">{{ item.name }}</span>
                 <span class="item-tags">
-                  <span class="component-tag">{{ getComponentName(item.edibleAs!) }}</span>
+                  <span class="component-tag">{{ getComponentName(item.componentTypeId) }}</span>
                   <span class="creature-tag">{{ item.creatureTypeName }}</span>
-                  <span class="dc-tag dc-{{ item.componentDc }}">DC {{ item.componentDc }}</span>
+                  @if (item.isUnique) {
+                    <span class="unique-tag">Unique</span>
+                  } @else if (item.dc) {
+                    <span class="dc-tag dc-{{ item.dc }}">DC {{ item.dc }}</span>
+                  }
                   @if (item.isVolatile) {
                     <span class="volatile-tag" title="Volatile: triggers effect on partial harvest">⚠ Volatile</span>
                   }
                 </span>
               </div>
               <div class="item-right">
-                @if (getHarvestQty(item.id) > 0) {
-                  <span class="stock-badge">×{{ getHarvestQty(item.id) }}</span>
+                @if (getStockQty(item) !== 0) {
+                  <span class="stock-badge">×{{ getStockQty(item) }}</span>
                 }
                 @if (isSelected(item)) {
                   <mat-icon class="check-icon">check_circle</mat-icon>
@@ -135,8 +139,8 @@
               <div class="result-header">
                 <span class="ingredient-name">{{ result.harvestComponent.name }}</span>
                 <span class="creature-sub">{{ result.harvestComponent.creatureTypeName }}</span>
-                @if (getHarvestQty(result.harvestComponent.id) > 0) {
-                  <span class="stock-badge">In stock: ×{{ getHarvestQty(result.harvestComponent.id) }}</span>
+                @if (getEffectStockQty(result.harvestComponent) !== 0) {
+                  <span class="stock-badge">In stock: ×{{ getEffectStockQty(result.harvestComponent) }}</span>
                 } @else {
                   <span class="no-stock">Not in stock</span>
                 }
@@ -185,7 +189,7 @@
         <div class="selected-chips">
           @for (item of selectedItems(); track item.id) {
             <div class="selected-chip">
-              <span class="chip-type">{{ getComponentName(item.edibleAs!) }}</span>
+              <span class="chip-type">{{ getComponentName(item.componentTypeId) }}</span>
               <span class="chip-name">{{ item.name }}</span>
               <span class="chip-creature">{{ item.creatureTypeName }}</span>
               <button mat-icon-button (click)="removeSelected(item)">
@@ -205,7 +209,7 @@
           @for (e of selectedEffects(); track e.item.id) {
             <div class="effect-preview">
               <div class="effect-header">
-                <span class="comp-label">{{ getComponentName(e.item.edibleAs!) }}</span>
+                <span class="comp-label">{{ getComponentName(e.item.componentTypeId) }}</span>
                 <span class="creature-label">{{ e.item.creatureTypeName }}</span>
               </div>
               <p class="effect-desc">{{ e.effect!.description }}</p>
@@ -234,9 +238,12 @@
         @for (match of recipeMatches(); track match.recipe.id) {
           <div class="recipe-match" [class]="matchClass(match.complete, match.covered, match.recipe.ingredients.map(i => i.componentTypeId))">
             <div class="match-header">
-              <span class="match-name">{{ match.recipe.name }}</span>
+              <button type="button" class="match-name-btn" (click)="openRecipe(match.recipe)">{{ match.recipe.name }}</button>
               <span class="match-dc">DC {{ match.recipe.dc }}</span>
               <span class="match-tier">{{ match.recipe.tier }}</span>
+              <button type="button" mat-icon-button class="match-info-btn" (click)="openRecipe(match.recipe)">
+                <mat-icon>info_outline</mat-icon>
+              </button>
             </div>
             <div class="match-ingredients">
               @for (ri of match.recipe.ingredients; track ri.componentTypeId) {

@@ -1,0 +1,109 @@
+<h2 mat-dialog-title class="dialog-title">
+  {{ component.name }}
+  <div class="title-badges">
+    <span class="creature-badge">{{ component.creatureTypeName }}</span>
+    <span class="dc-badge">DC {{ component.componentDc }}</span>
+    @if (component.isEdible && component.edibleAs) {
+      <span class="type-badge">
+        <mat-icon class="badge-icon">restaurant</mat-icon>
+        {{ componentTypeName }}
+      </span>
+    }
+    @if (component.isVolatile) {
+      <span class="volatile-badge">
+        <mat-icon class="badge-icon">warning</mat-icon>
+        Volatile
+      </span>
+    }
+  </div>
+</h2>
+
+<mat-dialog-content>
+
+  @if (component.harvestSkill) {
+    <div class="harvest-meta">
+      <mat-icon class="meta-icon">psychology</mat-icon>
+      Harvest skill: <strong>{{ component.harvestSkill }}</strong>
+    </div>
+  }
+
+  @if (component.isEdible && component.edibleAs) {
+
+    <mat-divider />
+
+    <section class="section">
+      <h3 class="section-label">Magical Effect</h3>
+
+      @if (effect) {
+        <p class="effect-desc">{{ effect.description }}</p>
+
+        @if (effect.scaling) {
+          <div class="scaling-table">
+            <div class="scale-row">
+              <span class="scale-rarity uncommon">Uncommon</span>
+              <span class="scale-value">{{ effect.scaling.uncommon || '—' }}</span>
+            </div>
+            <div class="scale-row">
+              <span class="scale-rarity rare">Rare</span>
+              <span class="scale-value">{{ effect.scaling.rare || '—' }}</span>
+            </div>
+            <div class="scale-row">
+              <span class="scale-rarity very-rare">Very Rare</span>
+              <span class="scale-value">{{ effect.scaling.veryRare || '—' }}</span>
+            </div>
+            <div class="scale-row">
+              <span class="scale-rarity legendary">Legendary</span>
+              <span class="scale-value">{{ effect.scaling.legendary || '—' }}</span>
+            </div>
+          </div>
+        }
+      } @else {
+        <p class="no-effect">No magical effect recorded for {{ component.creatureTypeName }} × {{ componentTypeName }}.</p>
+      }
+    </section>
+
+    @if (relatedRecipes.length > 0) {
+      <mat-divider />
+      <section class="section">
+        <h3 class="section-label">Used in Recipes</h3>
+        <div class="tag-list">
+          @for (r of relatedRecipes; track r.id) {
+            <span class="recipe-tag">{{ r.name }}</span>
+          }
+        </div>
+      </section>
+    }
+
+  } @else {
+    <section class="section">
+      <p class="not-edible-note">
+        <mat-icon>info</mat-icon>
+        This component is used for crafting only — it cannot be cooked or eaten.
+      </p>
+    </section>
+  }
+
+  @if (component.isVolatile) {
+    <mat-divider />
+    <section class="section">
+      <h3 class="section-label">Volatile</h3>
+      <p class="volatile-note">
+        @if (component.notes) {
+          {{ component.notes }}
+        } @else {
+          Triggers its effect even on a partial harvest. Handle with care.
+        }
+      </p>
+    </section>
+  } @else if (component.notes) {
+    <mat-divider />
+    <section class="section">
+      <p class="notes">{{ component.notes }}</p>
+    </section>
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

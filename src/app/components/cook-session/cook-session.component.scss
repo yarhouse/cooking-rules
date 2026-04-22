@@ -1,0 +1,1199 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.cook-session-page {
+  padding: var(--page-padding);
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+
+  @media (max-width: 768px) { padding: var(--page-padding-mobile); }
+}
+
+// ── Page header ────────────────────────────────────────────────────────────
+
+.page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--mat-sys-primary);
+    margin: 0;
+  }
+}
+
+// ── Stepper override ───────────────────────────────────────────────────────
+
+.cook-stepper {
+  background: transparent;
+
+  ::ng-deep .mat-horizontal-content-container {
+    padding: 0;
+  }
+}
+
+// ── Step content wrapper ───────────────────────────────────────────────────
+
+.step-content {
+  padding: 20px 0 8px;
+}
+
+.step-hint {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0 0 16px;
+}
+
+.step-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+// ── Empty state ────────────────────────────────────────────────────────────
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 0;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.35;
+  }
+
+  p {
+    font-size: 0.875rem;
+    margin: 0;
+    font-style: italic;
+  }
+}
+
+.empty-hint {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: 8px 0 0;
+}
+
+// ── Step 1: two-column layout ──────────────────────────────────────────────
+
+.step1-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+  height: calc(100dvh - 280px);
+  overflow: hidden;
+  margin-bottom: 4px;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+}
+
+.step1-left {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// ── Step 1: recipe list ────────────────────────────────────────────────────
+
+.recipe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 10px;
+  padding: 6px;
+}
+
+.recipe-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.12s;
+
+  &:hover { background: var(--mat-sys-surface-container); }
+
+  &.selected {
+    background: var(--mat-sys-primary-container);
+    border-color: var(--mat-sys-primary);
+  }
+}
+
+.recipe-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recipe-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.recipe-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ing-count {
+  font-size: 0.72rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// ── Step 1: recipe preview panel ───────────────────────────────────────────
+
+.recipe-preview-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.recipe-preview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container-low);
+}
+
+.preview-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preview-recipe-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+}
+
+.preview-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preview-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.preview-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+}
+
+.preview-comp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.preview-comp-chip {
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  border: 1.5px solid var(--mat-sys-outline);
+}
+
+// ── Step 1: ingredient detail list ────────────────────────────────────────
+
+.preview-ingredient-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preview-ingredient-slot {
+  padding: 10px 12px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  background: var(--mat-sys-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.slot-header-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.slot-type-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.slots-needed-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  white-space: nowrap;
+}
+
+.stock-count {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--mat-sys-outline-variant);
+
+  &.stock-ok    { background: #d8f0d8; color: #1b4520; border-color: #4caf50; }
+  &.stock-short { background: #fde8e8; color: #7a0000; border-color: #f44336; }
+}
+
+.slot-effect-desc {
+  font-size: 0.78rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.slot-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.slot-item-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.78rem;
+  padding: 4px 0;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+
+  &:first-child { border-top: none; }
+}
+
+.item-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.item-rarity-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  text-transform: capitalize;
+  flex-shrink: 0;
+
+  &.rarity-common     { background: #e8e8e8; color: #555; border: 1px solid #bbb; }
+  &.rarity-uncommon   { background: #d8f0d8; color: #1b4520; border: 1px solid #4caf50; }
+  &.rarity-rare       { background: #d0e4f4; color: #1a2f4a; border: 1px solid #2196f3; }
+  &.rarity-very-rare  { background: #e4d8f4; color: #3e1560; border: 1px solid #9c27b0; }
+  &.rarity-legendary  { background: #fff3d8; color: #5a3800; border: 1px solid #ff9800; }
+  &.rarity-named      { background: var(--mat-sys-primary-container); color: var(--mat-sys-on-primary-container); border: 1px solid var(--mat-sys-outline-variant); }
+}
+
+.item-creature {
+  color: var(--mat-sys-on-surface-variant);
+  flex-shrink: 0;
+}
+
+.item-qty {
+  color: var(--mat-sys-on-surface-variant);
+  flex-shrink: 0;
+}
+
+.item-effect-desc {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.item-scaling-text {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+  line-height: 1.4;
+}
+
+.slot-none-in-stock {
+  font-size: 0.75rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: 2px 0 0;
+}
+
+.preview-boss-effect {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+  font-style: italic;
+  padding: 6px 10px;
+  background: #f0e0a020;
+  border-left: 3px solid #c8971a;
+  border-radius: 0 6px 6px 0;
+}
+
+.preview-notes {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+  font-style: italic;
+}
+
+.preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 16px;
+  border: 1px dashed var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.82rem;
+  font-style: italic;
+  text-align: center;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    opacity: 0.4;
+  }
+}
+
+// ── Shared badges & tags ───────────────────────────────────────────────────
+
+.dc-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  white-space: nowrap;
+}
+
+.tier-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  text-transform: capitalize;
+  white-space: nowrap;
+
+  &.tier-novice     { background: #d8f0d8; color: #1b4520; }
+  &.tier-journeyman { background: #d0e4f4; color: #1a2f4a; }
+  &.tier-expert     { background: #e4d8f4; color: #3e1560; }
+  &.tier-artisan    { background: #f4e4d0; color: #5a2800; }
+  &.tier-boss       { background: #f0d0d0; color: #5a0808; }
+}
+
+.rarity-effect-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+  border: 1px solid var(--mat-sys-outline);
+
+  &.large {
+    font-size: 0.82rem;
+    padding: 4px 12px;
+  }
+}
+
+.heat-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.creature-type-tag {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface-variant);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.component-type-tag {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.rarity-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  text-transform: capitalize;
+
+  &.rarity-common     { background: #e8e8e8; color: #555; border: 1px solid #bbb; }
+  &.rarity-uncommon   { background: #d8f0d8; color: #1b4520; border: 1px solid #4caf50; }
+  &.rarity-rare       { background: #d0e4f4; color: #1a2f4a; border: 1px solid #2196f3; }
+  &.rarity-very-rare  { background: #e4d8f4; color: #3e1560; border: 1px solid #9c27b0; }
+  &.rarity-legendary  { background: #fff3d8; color: #5a3800; border: 1px solid #ff9800; }
+}
+
+.qty-tag {
+  font-size: 0.7rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// ── Step 2: ingredient slots ───────────────────────────────────────────────
+
+.slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.slot-row {
+  padding: 14px 16px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container-low);
+  transition: border-color 0.15s;
+
+  &.slot-filled {
+    border-color: var(--mat-sys-primary);
+    background: color-mix(in srgb, var(--mat-sys-primary-container) 30%, var(--mat-sys-surface-container-low));
+  }
+}
+
+.slot-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.slot-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  flex: 1;
+  color: var(--mat-sys-on-surface);
+}
+
+.slot-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--mat-sys-primary);
+}
+
+.slot-chosen-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px 2px 6px;
+  border-radius: 999px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// ── Step 2: candidate rows ─────────────────────────────────────────────────
+
+.candidate-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.candidate-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.12s, border-color 0.12s;
+
+  &:hover:not(.unavailable):not(.selected) {
+    background: var(--mat-sys-surface-container);
+    border-color: var(--mat-sys-outline);
+  }
+
+  &.selected {
+    background: var(--mat-sys-secondary-container);
+    border-color: var(--mat-sys-secondary);
+  }
+
+  &.unavailable {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.candidate-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.candidate-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.candidate-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.candidate-effect {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-secondary-container);
+  padding: 6px 8px;
+  background: var(--mat-sys-secondary-container);
+  border-radius: 6px;
+  font-style: italic;
+
+  &.no-effect {
+    color: var(--mat-sys-on-surface-variant);
+    background: var(--mat-sys-surface-container);
+  }
+}
+
+.effect-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--mat-sys-secondary);
+}
+
+// ── Step 3: skill info bar ─────────────────────────────────────────────────
+
+.skill-info-bar {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 16px;
+  background: var(--mat-sys-surface-container);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 0.875rem;
+
+  mat-icon { flex-shrink: 0; color: var(--mat-sys-primary); margin-top: 2px; }
+}
+
+.skill-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.heat-note, .sous-chef-note {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inline-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+// ── Step 3: roll layout ────────────────────────────────────────────────────
+
+.roll-layout {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.roll-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 160px;
+}
+
+.roll-block-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  mat-icon { color: var(--mat-sys-primary); font-size: 20px; width: 20px; height: 20px; }
+}
+
+.roll-block-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.roll-block-sub {
+  font-size: 0.78rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.roll-field {
+  width: 160px;
+}
+
+.roll-operator {
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: var(--mat-sys-on-surface-variant);
+  padding-bottom: 18px;
+  flex-shrink: 0;
+}
+
+.roll-total-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-bottom: 4px;
+}
+
+.roll-total-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.roll-total {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 72px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+  transition: color 0.2s;
+
+  &.total-success { color: #2e7d32; }
+  &.total-failure { color: var(--mat-sys-error, #c62828); }
+}
+
+.roll-total-target {
+  font-size: 0.78rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// ── Step 4: pass / fail banner ─────────────────────────────────────────────
+
+.result-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+
+  &.banner-success {
+    background: color-mix(in srgb, #4caf50 14%, transparent);
+    border: 1px solid color-mix(in srgb, #4caf50 35%, transparent);
+    mat-icon { color: #2e7d32; }
+  }
+
+  &.banner-failure {
+    background: color-mix(in srgb, var(--mat-sys-error, #c62828) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--mat-sys-error, #c62828) 30%, transparent);
+    mat-icon { color: var(--mat-sys-error, #c62828); }
+  }
+}
+
+.banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.banner-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.banner-sub {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// ── Step 4: effect rows ────────────────────────────────────────────────────
+
+.results-section {
+  margin-bottom: 20px;
+}
+
+.results-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0 0 8px;
+}
+
+.effect-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.effect-row {
+  padding: 12px 14px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 10px;
+  background: var(--mat-sys-surface-container-low);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.effect-row-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.effect-ingredient-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.effect-text {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface);
+  margin: 0;
+  font-style: italic;
+
+  &.no-effect { color: var(--mat-sys-on-surface-variant); }
+}
+
+// ── Step 4: boss effect banner ─────────────────────────────────────────────
+
+.boss-effect-banner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 16px;
+  background: #f0e0a020;
+  border: 1px solid #c8971a40;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 0.875rem;
+
+  mat-icon { color: #c8971a; flex-shrink: 0; }
+
+  p { margin: 4px 0 0; font-size: 0.82rem; font-style: italic; }
+}
+
+// ── Step 4: no-quirks note ─────────────────────────────────────────────────
+
+.no-quirks-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--mat-sys-surface-container);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin-bottom: 20px;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: #2e7d32; }
+}
+
+// ── Step 4: quirks section ─────────────────────────────────────────────────
+
+.quirks-section {
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+
+  &.quirks-flaws {
+    background: color-mix(in srgb, var(--mat-sys-error, #c62828) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--mat-sys-error, #c62828) 25%, transparent);
+  }
+
+  &.quirks-boons {
+    background: color-mix(in srgb, #4caf50 8%, transparent);
+    border: 1px solid color-mix(in srgb, #4caf50 25%, transparent);
+  }
+}
+
+.quirks-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+
+    .quirks-flaws & { color: var(--mat-sys-error, #c62828); }
+    .quirks-boons & { color: #2e7d32; }
+  }
+}
+
+.quirks-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: block;
+}
+
+.quirks-sub {
+  font-size: 0.78rem;
+  color: var(--mat-sys-on-surface-variant);
+  display: block;
+}
+
+.quirk-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quirk-slot {
+  // empty, styles come from children
+}
+
+.roll-quirk-btn {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.quirk-slot-rolled {}
+
+.quirk-result {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.quirk-result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.quirk-roll-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quirk-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.reroll-btn {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.quirk-effect {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+// ── Step 1: essence picker ─────────────────────────────────────────────────
+
+.essence-picker {
+  margin: 16px 0 4px;
+}
+
+.essence-picker-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0 0 8px;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.essence-btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.essence-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  min-width: 76px;
+  transition: box-shadow 0.12s;
+
+  &.rarity-uncommon  { background: #d8f0d8; color: #1b4520; border-color: #4caf50; }
+  &.rarity-rare      { background: #d0e4f4; color: #1a2f4a; border-color: #2196f3; }
+  &.rarity-very-rare { background: #e4d8f4; color: #3e1560; border-color: #9c27b0; }
+  &.rarity-legendary { background: #fff3d8; color: #5a3800; border-color: #ff9800; }
+
+  &.selected { box-shadow: 0 0 0 3px currentColor; font-weight: 700; }
+  &:disabled { opacity: 0.35; cursor: not-allowed; }
+}
+
+.essence-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.essence-qty {
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+
+// ── Step 2: recipe context bar ─────────────────────────────────────────────
+
+.recipe-context-bar {
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.recipe-context-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  strong {
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.dc-chip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+}
+
+.heat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px 2px 5px;
+  border-radius: 999px;
+  background: #fff3e0;
+  color: #e65100;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+  }
+}
+
+.context-boss-effect {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 6px 0 0;
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: var(--mat-sys-tertiary);
+  }
+}
+
+.context-notes {
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 4px 0 0;
+}
+
+.essence-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px 2px 5px;
+  border-radius: 999px;
+  white-space: nowrap;
+
+  &.rarity-uncommon  { background: #d8f0d8; color: #1b4520; }
+  &.rarity-rare      { background: #d0e4f4; color: #1a2f4a; }
+  &.rarity-very-rare { background: #e4d8f4; color: #3e1560; }
+  &.rarity-legendary { background: #fff3d8; color: #5a3800; }
+
+  mat-icon { font-size: 13px; width: 13px; height: 13px; }
+}
+
+// ── Step 2: slot component description ────────────────────────────────────
+
+.slot-component-desc {
+  font-size: 0.78rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: -4px 0 10px;
+  padding: 0 2px;
+  line-height: 1.4;
+}
+
+// ── Step 2: candidate detail (flavor + scaling) ────────────────────────────
+
+.effect-flavor-text {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+  line-height: 1.4;
+  text-align: left;
+}
+
+// ── Step 4: consume / results actions ─────────────────────────────────────
+
+.results-actions {
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+}

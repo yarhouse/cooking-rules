@@ -7,7 +7,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { CookingDataService } from '../../services/cooking-data.service';
 import { InventoryService } from '../../services/inventory.service';
 import { HarvestComponent } from '../../models/harvest-component.model';
-import { Monster } from '../../models/monster.model';
+import { Monster, MonsterRarity } from '../../models/monster.model';
 import { Ingredient } from '../../models/ingredient.model';
 
 @Component({
@@ -26,12 +26,22 @@ export class HarvestingComponent {
   private dataService = inject(CookingDataService);
   private inventory   = inject(InventoryService);
 
+  // Total across all rarities — used in the creature-type reference table
   getQty(id: string): number {
-    return this.inventory.getHarvestQuantity(id);
+    return this.inventory.getTotalHarvestQuantity(id);
+  }
+
+  // Qty for the currently selected monster's rarity — used in the monster-specific panel
+  getMonsterQty(id: string): number {
+    const rarity = this.selectedMonster()?.rarity;
+    if (!rarity) return 0;
+    return this.inventory.getHarvestQuantity(id, rarity);
   }
 
   adjust(id: string, delta: number): void {
-    this.inventory.updateHarvestQuantity(id, delta);
+    const rarity = this.selectedMonster()?.rarity;
+    if (!rarity) return;
+    this.inventory.updateHarvestQuantity(id, rarity, delta);
   }
 
 readonly creatureTypes = this.dataService.getCreatureTypes();

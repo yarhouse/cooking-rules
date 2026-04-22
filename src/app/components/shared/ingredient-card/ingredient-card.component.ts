@@ -61,7 +61,7 @@ export class IngredientCardComponent {
   adjust(delta: number): void {
     const hc = this.bestMatchHarvestComponent;
     if (hc) {
-      this.inventoryService.updateHarvestQuantity(hc.id, delta);
+      this.inventoryService.updateHarvestQuantity(hc.id, 'common', delta);
     } else {
       this.inventoryService.updateQuantity(this.ingredient.id, delta);
     }

@@ -222,9 +222,10 @@ export class HarvestSessionComponent {
   readonly startedVolatiles = computed(() => this.results().filter(r => r.started && r.isVolatile));
 
   addToInventory(): void {
+    const rarity = this.selectedMonster()?.rarity ?? 'common';
     for (const item of this.results().filter(r => r.harvested)) {
       if (item.harvestComponentId) {
-        this.inventoryService.updateHarvestQuantity(item.harvestComponentId, 1);
+        this.inventoryService.updateHarvestQuantity(item.harvestComponentId, rarity, 1);
       } else if (item.ingredientId) {
         this.inventoryService.updateQuantity(item.ingredientId, 1);
       }
@@ -253,5 +254,17 @@ export class HarvestSessionComponent {
 
   rarityDotClass(rarity: string): string {
     return `rarity-dot rarity-dot-${rarity}`;
+  }
+
+  harvestSkillIcon(skill: string): string {
+    const icons: Record<string, string> = {
+      arcana:        'auto_fix_high',
+      survival:      'hiking',
+      religion:      'volunteer_activism',
+      investigation: 'manage_search',
+      medicine:      'medical_services',
+      nature:        'eco',
+    };
+    return icons[skill.toLowerCase()] ?? 'psychology';
   }
 }

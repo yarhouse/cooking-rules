@@ -1,0 +1,485 @@
+<div class="cook-session-page">
+
+  <div class="page-header">
+    <h1>Cook Session</h1>
+  </div>
+
+  <mat-stepper #stepper linear class="cook-stepper">
+
+    <!-- ── Step 1: Choose Recipe ──────────────────────────────────────────── -->
+    <mat-step label="Choose Recipe" [completed]="!!selectedRecipe() && !!selectedEssence()">
+      <div class="step-content">
+
+        @if (craftableRecipes().length === 0) {
+          <div class="empty-state">
+            <mat-icon>no_meals</mat-icon>
+            @if (inventoryService.essence()['uncommon'] === 0 && inventoryService.essence()['rare'] === 0 && inventoryService.essence()['very-rare'] === 0 && inventoryService.essence()['legendary'] === 0) {
+              <p>No essence in stock — harvest some before cooking.</p>
+            } @else {
+              <p>No craftable recipes — add ingredients to your inventory first.</p>
+            }
+          </div>
+        } @else {
+          <p class="step-hint">Showing only recipes you have enough inventory to cook. Select one to begin.</p>
+
+          <div class="step1-layout">
+
+            <!-- Left: recipe list -->
+            <div class="step1-left">
+              <div class="recipe-list">
+                @for (recipe of craftableRecipes(); track recipe.id) {
+                  <button type="button" class="recipe-item"
+                          [class.selected]="selectedRecipe()?.id === recipe.id"
+                          (click)="selectRecipe(recipe)">
+                    <div class="recipe-item-header">
+                      <span class="recipe-name">{{ recipe.name }}</span>
+                      <span [class]="'tier-badge tier-' + recipe.tier">{{ tierLabel(recipe.tier) }}</span>
+                    </div>
+                    <div class="recipe-item-meta">
+                      <span class="dc-tag">DC {{ recipe.dc }}</span>
+                      <span class="ing-count">{{ recipe.ingredients.length }} ingredient{{ recipe.ingredients.length === 1 ? '' : 's' }}</span>
+                      @if (recipe.requiresHeat) {
+                        <span class="heat-tag" matTooltip="Requires a heat source">🔥 Heat</span>
+                      }
+                    </div>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Right: recipe detail panel -->
+            <div class="recipe-preview-panel">
+              @if (selectedRecipe(); as recipe) {
+                <div class="recipe-preview-card">
+                  <div class="preview-card-header">
+                    <span class="preview-recipe-name">{{ recipe.name }}</span>
+                    <span [class]="'tier-badge tier-' + recipe.tier">{{ tierLabel(recipe.tier) }}</span>
+                  </div>
+
+                  <div class="preview-meta">
+                    <span class="dc-tag">DC {{ recipe.dc }}</span>
+                    <span class="rarity-effect-badge">{{ selectedRecipeTierRarityLabel() }} effects</span>
+                    @if (recipe.requiresHeat) {
+                      <span class="heat-tag">🔥 Requires Heat</span>
+                    }
+                  </div>
+
+                  <div class="preview-section essence-picker">
+                    <p class="essence-picker-label">
+                      <mat-icon>auto_awesome</mat-icon> Choose Essence
+                    </p>
+                    <div class="essence-btn-row">
+                      @for (rarity of cookingEssenceRarities; track rarity) {
+                        <button type="button"
+                                [class]="'essence-btn rarity-' + rarity"
+                                [class.selected]="selectedEssence() === rarity"
+                                [disabled]="(inventoryService.essence()[rarity] ?? 0) === 0"
+                                (click)="selectedEssence.set(rarity)">
+                          <span class="essence-name">{{ essenceNames[rarity] }}</span>
+                          <span class="essence-qty">×{{ inventoryService.essence()[rarity] ?? 0 }}</span>
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="preview-section">
+                    <p class="preview-section-label">Ingredients</p>
+                    <div class="preview-ingredient-list">
+                      @for (slot of selectedRecipeIngredientDetails(); track slot.componentTypeId) {
+                        <div class="preview-ingredient-slot">
+
+                          <div class="slot-header-row">
+                            <span class="slot-type-name">{{ slot.componentTypeName }}</span>
+                            @if (slot.slotsNeeded > 1) {
+                              <span class="slots-needed-tag">needs {{ slot.slotsNeeded }}</span>
+                            }
+                            <span class="stock-count" [class.stock-ok]="slot.totalInStock >= slot.slotsNeeded"
+                                                      [class.stock-short]="slot.totalInStock < slot.slotsNeeded">
+                              ×{{ slot.totalInStock }}
+                            </span>
+                          </div>
+
+                          @if (slot.componentTypeDescription) {
+                            <p class="slot-effect-desc">{{ slot.componentTypeDescription }}</p>
+                          }
+
+                          @if (slot.items.length > 0) {
+                            <div class="slot-item-list">
+                              @for (item of slot.items; track item.name + item.rarity) {
+                                <div class="slot-item-row">
+                                  <div class="item-meta-row">
+                                    @if (item.rarity) {
+                                      <span [class]="'item-rarity-badge rarity-' + item.rarity">{{ item.rarity }}</span>
+                                    } @else {
+                                      <span class="item-rarity-badge rarity-named">Named</span>
+                                    }
+                                    <span class="item-creature">{{ item.creatureTypeName }}</span>
+                                    @if (item.qty > 1) {
+                                      <span class="item-qty">×{{ item.qty }}</span>
+                                    }
+                                  </div>
+                                  @if (item.effectDesc) {
+                                    <p class="item-effect-desc">{{ item.effectDesc }}</p>
+                                  }
+                                  @if (item.scalingText) {
+                                    <p class="item-scaling-text">{{ item.scalingText }}</p>
+                                  }
+                                </div>
+                              }
+                            </div>
+                          } @else {
+                            <p class="slot-none-in-stock">None in stock</p>
+                          }
+
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  @if (recipe.bossEffect) {
+                    <div class="preview-section">
+                      <p class="preview-section-label">Boss Effect</p>
+                      <p class="preview-boss-effect">{{ recipe.bossEffect }}</p>
+                    </div>
+                  }
+
+                  @if (recipe.notes) {
+                    <div class="preview-section">
+                      <p class="preview-section-label">Notes</p>
+                      <p class="preview-notes">{{ recipe.notes }}</p>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="preview-placeholder">
+                  <mat-icon>menu_book</mat-icon>
+                  <span>Select a recipe to preview</span>
+                </div>
+              }
+            </div>
+
+          </div>
+        }
+
+        <div class="step-actions">
+          <button mat-flat-button type="button" matStepperNext [disabled]="!selectedRecipe() || !selectedEssence()">
+            Assign Ingredients <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- ── Step 2: Assign Ingredients ───────────────────────────────────── -->
+    <mat-step label="Assign Ingredients" [completed]="slotsComplete()">
+      <div class="step-content">
+        <p class="step-hint">
+          For each slot, choose which ingredient to use. Harvested components scale by the rarity of
+          the creature they came from — named ingredients scale at chosen essence potency.
+        </p>
+
+        @if (selectedRecipe(); as recipe) {
+          <div class="recipe-context-bar">
+            <div class="recipe-context-name">
+              <span [class]="'tier-badge tier-' + recipe.tier">{{ recipe.tier }}</span>
+              <strong>{{ recipe.name }}</strong>
+              <span class="dc-chip">DC {{ recipe.dc }}</span>
+              @if (selectedEssence()) {
+                <span [class]="'essence-chip rarity-' + selectedEssence()">
+                  <mat-icon>auto_awesome</mat-icon>
+                  {{ essenceNames[selectedEssence()!] }} Essence
+                </span>
+              }
+              @if (recipe.requiresHeat) {
+                <span class="heat-chip">
+                  <mat-icon>local_fire_department</mat-icon> Heat required
+                </span>
+              }
+            </div>
+            @if (recipe.bossEffect) {
+              <p class="context-boss-effect">
+                <mat-icon class="inline-icon">stars</mat-icon>{{ recipe.bossEffect }}
+              </p>
+            }
+            @if (recipe.notes) {
+              <p class="context-notes">{{ recipe.notes }}</p>
+            }
+          </div>
+        }
+
+        <div class="slots-list">
+          @for (slot of resolvedSlots(); track slot.slotIndex) {
+            <div class="slot-row" [class.slot-filled]="!!slot.selectedId">
+              <div class="slot-header">
+                <span class="slot-label">
+                  <mat-icon class="slot-icon">restaurant</mat-icon>
+                  {{ slot.componentTypeName }}
+                </span>
+                @if (slot.selectedId) {
+                  <span class="slot-chosen-badge">
+                    <mat-icon>check_circle</mat-icon>
+                    Chosen
+                  </span>
+                }
+              </div>
+              @if (slot.componentTypeDescription) {
+                <p class="slot-component-desc">{{ slot.componentTypeDescription }}</p>
+              }
+
+              @if (slot.candidates.length === 0) {
+                <p class="empty-hint">No matching ingredients in inventory.</p>
+              } @else {
+                <div class="candidate-list">
+                  @for (c of slot.candidates; track c.id) {
+                    <button type="button" class="candidate-row"
+                            [class.selected]="c.isSelected"
+                            [class.unavailable]="!c.available && !c.isSelected"
+                            [disabled]="!c.available && !c.isSelected"
+                            (click)="selectIngredient(slot.slotIndex, c.id)"
+                            [matTooltip]="(!c.available && !c.isSelected) ? 'Not enough quantity — already used in another slot' : ''">
+                      <div class="candidate-info">
+                        <span class="candidate-name">{{ c.name }}</span>
+                        <span class="candidate-meta">
+                          <span class="creature-type-tag">{{ c.creatureTypeName }}</span>
+                          @if (c.rarity) {
+                            <span [class]="'rarity-tag rarity-' + c.rarity">{{ c.rarity }}</span>
+                          }
+                          <span class="qty-tag">×{{ c.qty }} in stock</span>
+                        </span>
+                      </div>
+                      @if (c.effectDescription) {
+                        <p class="effect-flavor-text">{{ c.effectDescription }}</p>
+                      }
+                      @if (c.effectText && c.effectText !== c.effectDescription) {
+                        <div class="candidate-effect">
+                          <mat-icon class="effect-icon">auto_awesome</mat-icon>
+                          <span>{{ c.effectText }}</span>
+                        </div>
+                      } @else if (!c.hasEffect) {
+                        <div class="candidate-effect no-effect">
+                          <span>No magical effect listed for this combination.</span>
+                        </div>
+                      }
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="step-actions">
+          <button mat-stroked-button type="button" matStepperPrevious>Back</button>
+          <button mat-flat-button type="button" matStepperNext [disabled]="!slotsComplete()">
+            Cook Check <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- ── Step 3: Cook Check ────────────────────────────────────────────── -->
+    <mat-step label="Cook Check" [completed]="cookRoll() > 0">
+      <div class="step-content">
+
+        <div class="skill-info-bar">
+          <mat-icon>soup_kitchen</mat-icon>
+          <div class="skill-info-text">
+            <span>Roll <strong>Constitution (Cook's Utensils)</strong> against
+              <strong>DC {{ recipeDc() }}</strong>.
+            </span>
+            @if (selectedRecipe()?.requiresHeat) {
+              <span class="heat-note">
+                <mat-icon class="inline-icon">local_fire_department</mat-icon>
+                This recipe requires a <strong>heat source</strong>.
+              </span>
+            }
+            <span class="sous-chef-note">
+              <mat-icon class="inline-icon">group</mat-icon>
+              Sous chef: one helper contributes their proficiency bonus (or half if unproficient).
+            </span>
+          </div>
+        </div>
+
+        <div class="roll-layout">
+
+          <div class="roll-block">
+            <div class="roll-block-header">
+              <mat-icon>casino</mat-icon>
+              <span class="roll-block-title">Cook Check</span>
+              <span class="roll-block-sub">CON (Cook's Utensils)</span>
+            </div>
+            <mat-form-field appearance="outline" class="roll-field">
+              <mat-label>Roll result</mat-label>
+              <input matInput type="number" min="0"
+                     [value]="cookRoll()"
+                     (input)="cookRoll.set(+$any($event.target).value)" />
+            </mat-form-field>
+          </div>
+
+          <span class="roll-operator">+</span>
+
+          <div class="roll-block">
+            <div class="roll-block-header">
+              <mat-icon>group</mat-icon>
+              <span class="roll-block-title">Sous Chef</span>
+              <span class="roll-block-sub">Proficiency bonus (optional)</span>
+            </div>
+            <mat-form-field appearance="outline" class="roll-field">
+              <mat-label>Bonus (0 if none)</mat-label>
+              <input matInput type="number" min="0"
+                     [value]="sousChefBonus()"
+                     (input)="sousChefBonus.set(+$any($event.target).value)" />
+            </mat-form-field>
+          </div>
+
+          <span class="roll-operator">=</span>
+
+          <div class="roll-total-block">
+            <span class="roll-total-label">Cook Check</span>
+            <div class="roll-total"
+                 [class.total-success]="cookRoll() > 0 && cookPassed()"
+                 [class.total-failure]="cookRoll() > 0 && !cookPassed()">
+              {{ cookTotal() }}
+            </div>
+            <span class="roll-total-target">vs DC {{ recipeDc() }}</span>
+          </div>
+
+        </div>
+
+        <div class="step-actions">
+          <button mat-stroked-button type="button" matStepperPrevious>Back</button>
+          <button mat-flat-button type="button"
+                  [disabled]="cookRoll() === 0"
+                  (click)="goToResults()">
+            See Results <mat-icon iconPositionEnd>emoji_events</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- ── Step 4: Results & Quirks ──────────────────────────────────────── -->
+    <mat-step label="Results">
+      <div class="step-content">
+
+        <!-- Pass / fail banner -->
+        <div class="result-banner" [class.banner-success]="cookPassed()" [class.banner-failure]="!cookPassed()">
+          <mat-icon>{{ cookPassed() ? 'check_circle' : 'cancel' }}</mat-icon>
+          <div class="banner-text">
+            <span class="banner-title">{{ cookPassed() ? 'Success!' : 'Failure' }}</span>
+            <span class="banner-sub">
+              {{ cookTotal() }} vs DC {{ recipeDc() }}
+              — margin
+              <strong>{{ cookMargin() >= 0 ? '+' : '' }}{{ cookMargin() }}</strong>
+            </span>
+          </div>
+          @if (cookPassed()) {
+            <span class="rarity-effect-badge large">{{ selectedRecipeTierRarityLabel() }} tier</span>
+          }
+        </div>
+
+        <!-- Ingredients & effects -->
+        @if (cookPassed()) {
+          <div class="results-section">
+            <p class="results-section-label">Meal Effects</p>
+            <div class="effect-rows">
+              @for (item of resultsIngredients(); track item.id) {
+                <div class="effect-row">
+                  <div class="effect-row-header">
+                    <span class="effect-ingredient-name">{{ item.name }}</span>
+                    <span class="creature-type-tag">{{ item.creatureTypeName }}</span>
+                    @if (item.rarity) {
+                      <span [class]="'rarity-tag rarity-' + item.rarity">{{ item.rarity }}</span>
+                    }
+                    <span class="component-type-tag">{{ item.componentTypeName }}</span>
+                  </div>
+                  @if (item.effectText) {
+                    <p class="effect-text">{{ item.effectText }}</p>
+                  } @else {
+                    <p class="effect-text no-effect">No magical effect listed for this combination.</p>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (selectedRecipe()?.bossEffect) {
+            <div class="boss-effect-banner">
+              <mat-icon>star</mat-icon>
+              <div>
+                <strong>Boss Effect</strong>
+                <p>{{ selectedRecipe()!.bossEffect }}</p>
+              </div>
+            </div>
+          }
+        }
+
+        <!-- Quirks section -->
+        @if (quirkOutcome(); as outcome) {
+          <div class="quirks-section" [class.quirks-flaws]="outcome.type === 'flaw'" [class.quirks-boons]="outcome.type === 'boon'">
+            <div class="quirks-header">
+              <mat-icon>{{ outcome.type === 'flaw' ? 'sentiment_dissatisfied' : 'sentiment_very_satisfied' }}</mat-icon>
+              <div>
+                <span class="quirks-title">
+                  {{ outcome.count }} {{ outcome.type === 'flaw' ? 'Flaw' : 'Boon' }}{{ outcome.count > 1 ? 's' : '' }}
+                </span>
+                <span class="quirks-sub">Roll d8 for each on the {{ outcome.type === 'flaw' ? 'Cooking Flaws' : 'Cooking Boons' }} table</span>
+              </div>
+            </div>
+
+            <div class="quirk-slots">
+              @for (i of quirkRange(outcome.count); track i) {
+                <div class="quirk-slot" [class.quirk-slot-rolled]="!!rolledQuirks()[i]">
+                  @if (rolledQuirks()[i]; as quirk) {
+                    <div class="quirk-result">
+                      <div class="quirk-result-header">
+                        <span class="quirk-roll-badge">{{ quirk.roll }}</span>
+                        <span class="quirk-name">{{ quirk.name }}</span>
+                        <button mat-icon-button type="button" class="reroll-btn"
+                                matTooltip="Re-roll this quirk"
+                                (click)="rollQuirk(i)">
+                          <mat-icon>refresh</mat-icon>
+                        </button>
+                      </div>
+                      <p class="quirk-effect">{{ quirk.effect }}</p>
+                    </div>
+                  } @else {
+                    <button type="button" mat-stroked-button class="roll-quirk-btn"
+                            (click)="rollQuirk(i)">
+                      <mat-icon>casino</mat-icon>
+                      Roll {{ outcome.type === 'flaw' ? 'Flaw' : 'Boon' }} {{ i + 1 }}
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        } @else if (cookPassed()) {
+          <div class="no-quirks-note">
+            <mat-icon>thumb_up</mat-icon>
+            <span>Clean cook — no quirks from this meal.</span>
+          </div>
+        }
+
+        <!-- Consume ingredients -->
+        @if (cookPassed()) {
+          <div class="results-actions">
+            <button mat-flat-button type="button"
+                    [disabled]="ingredientsConsumed()"
+                    (click)="deductIngredients()">
+              <mat-icon>{{ ingredientsConsumed() ? 'check' : 'remove_shopping_cart' }}</mat-icon>
+              {{ ingredientsConsumed() ? 'Ingredients Consumed' : 'Consume Ingredients from Inventory' }}
+            </button>
+          </div>
+        }
+
+        <div class="step-actions">
+          <button mat-stroked-button type="button" (click)="reset()">
+            <mat-icon>refresh</mat-icon>
+            Cook Again
+          </button>
+        </div>
+
+      </div>
+    </mat-step>
+
+  </mat-stepper>
+</div>

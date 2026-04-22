@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { InventoryEntry, HarvestStockEntry, EssenceStock } from '../models/inventory.model';
-import { Monster } from '../models/monster.model';
+import { Monster, MonsterRarity } from '../models/monster.model';
 import { Ingredient } from '../models/ingredient.model';
 import { Recipe } from '../models/recipe.model';
 import { Rarity } from '../models/component-type.model';
@@ -24,6 +24,12 @@ const DEFAULT_ESSENCE: EssenceStock = {
   legendary: 0,
   artifact: 0,
 };
+
+const HARVEST_RARITY_ORDER: MonsterRarity[] = ['common', 'uncommon', 'rare', 'very-rare', 'legendary'];
+
+function harvestKey(id: string, rarity: MonsterRarity): string {
+  return `${id}:${rarity}`;
+}
 
 const ESSENCE_RARITY_MAP: Record<string, Rarity> = {
   Frail: 'uncommon',
@@ -74,10 +80,19 @@ export class InventoryService {
     loadFromStorage(STORAGE_KEYS.harvestStock, [])
   );
 
-  // Derived
+  // Derived — keyed by "componentId:rarity"
   readonly harvestStockMap = computed(() =>
-    new Map(this.harvestStock().map(e => [e.harvestComponentId, e.quantity]))
+    new Map(this.harvestStock().map(e => [harvestKey(e.harvestComponentId, e.rarity), e.quantity]))
   );
+
+  // Total quantity across all rarities for a component
+  readonly harvestTotalMap = computed(() => {
+    const totals = new Map<string, number>();
+    for (const e of this.harvestStock()) {
+      totals.set(e.harvestComponentId, (totals.get(e.harvestComponentId) ?? 0) + e.quantity);
+    }
+    return totals;
+  });
 
   readonly inventoryMap = computed(() =>
     new Map(this.inventory().map(e => [e.ingredientId, e.quantity]))
@@ -138,17 +153,21 @@ export class InventoryService {
 
   // --- Harvest Stock ---
 
-  getHarvestQuantity(harvestComponentId: string): number {
-    return this.harvestStockMap().get(harvestComponentId) ?? 0;
+  getHarvestQuantity(harvestComponentId: string, rarity: MonsterRarity): number {
+    return this.harvestStockMap().get(harvestKey(harvestComponentId, rarity)) ?? 0;
   }
 
-  updateHarvestQuantity(harvestComponentId: string, delta: number): void {
+  getTotalHarvestQuantity(harvestComponentId: string): number {
+    return this.harvestTotalMap().get(harvestComponentId) ?? 0;
+  }
+
+  updateHarvestQuantity(harvestComponentId: string, rarity: MonsterRarity, delta: number): void {
     const current = this.harvestStock();
-    const idx = current.findIndex(e => e.harvestComponentId === harvestComponentId);
+    const idx = current.findIndex(e => e.harvestComponentId === harvestComponentId && e.rarity === rarity);
     let next: HarvestStockEntry[];
 
     if (idx === -1) {
-      next = delta > 0 ? [...current, { harvestComponentId, quantity: delta }] : current;
+      next = delta > 0 ? [...current, { harvestComponentId, rarity, quantity: delta }] : current;
     } else {
       const newQty = Math.max(0, current[idx].quantity + delta);
       next = newQty === 0
@@ -160,17 +179,17 @@ export class InventoryService {
     saveToStorage(STORAGE_KEYS.harvestStock, next);
   }
 
-  setHarvestQuantity(harvestComponentId: string, quantity: number): void {
+  setHarvestQuantity(harvestComponentId: string, rarity: MonsterRarity, quantity: number): void {
     const current = this.harvestStock();
     let next: HarvestStockEntry[];
 
     if (quantity <= 0) {
-      next = current.filter(e => e.harvestComponentId !== harvestComponentId);
+      next = current.filter(e => !(e.harvestComponentId === harvestComponentId && e.rarity === rarity));
     } else {
-      const idx = current.findIndex(e => e.harvestComponentId === harvestComponentId);
+      const idx = current.findIndex(e => e.harvestComponentId === harvestComponentId && e.rarity === rarity);
       next = idx === -1
-        ? [...current, { harvestComponentId, quantity }]
-        : current.map(e => e.harvestComponentId === harvestComponentId ? { ...e, quantity } : e);
+        ? [...current, { harvestComponentId, rarity, quantity }]
+        : current.map(e => e.harvestComponentId === harvestComponentId && e.rarity === rarity ? { ...e, quantity } : e);
     }
 
     this.harvestStock.set(next);
@@ -184,14 +203,18 @@ export class InventoryService {
               hc.name.toLowerCase() === req.componentName.toLowerCase()
       );
       let remaining = req.quantity;
+      // Deduct from lowest rarity first
       for (const hc of matching) {
-        if (remaining <= 0) break;
-        const available = this.getHarvestQuantity(hc.id);
-        const deduct = Math.min(available, remaining);
-        if (deduct > 0) {
-          this.updateHarvestQuantity(hc.id, -deduct);
-          remaining -= deduct;
+        for (const rarity of HARVEST_RARITY_ORDER) {
+          if (remaining <= 0) break;
+          const available = this.getHarvestQuantity(hc.id, rarity);
+          const deduct = Math.min(available, remaining);
+          if (deduct > 0) {
+            this.updateHarvestQuantity(hc.id, rarity, -deduct);
+            remaining -= deduct;
+          }
         }
+        if (remaining <= 0) break;
       }
     }
     if (item.essenceType) {

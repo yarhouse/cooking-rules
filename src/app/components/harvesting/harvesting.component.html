@@ -79,10 +79,10 @@
                     <div class="qty-controls">
                       <button mat-icon-button type="button"
                               (click)="adjust(comp.id, -1)"
-                              [disabled]="getQty(comp.id) === 0">
+                              [disabled]="getMonsterQty(comp.id) === 0">
                         <mat-icon>remove</mat-icon>
                       </button>
-                      <span class="qty" [class.has-qty]="getQty(comp.id) > 0">{{ getQty(comp.id) }}</span>
+                      <span class="qty" [class.has-qty]="getMonsterQty(comp.id) > 0">{{ getMonsterQty(comp.id) }}</span>
                       <button mat-icon-button type="button" (click)="adjust(comp.id, 1)">
                         <mat-icon>add</mat-icon>
                       </button>
@@ -98,7 +98,7 @@
               <div class="boss-drops-section">
                 <div class="panel-section-label boss-drops-label">
                   <mat-icon class="boss-icon">star</mat-icon>
-                  Unique Drops
+                  Unique Ingredients
                 </div>
                 <div class="component-list">
                   @for (ing of bossDropsForMonster(); track ing.id) {
@@ -185,11 +185,13 @@
                     <div class="qty-controls">
                       <button mat-icon-button type="button"
                               (click)="adjust(comp.id, -1)"
-                              [disabled]="getQty(comp.id) === 0">
+                              [disabled]="!selectedMonsterId() || getQty(comp.id) === 0">
                         <mat-icon>remove</mat-icon>
                       </button>
                       <span class="qty" [class.has-qty]="getQty(comp.id) > 0">{{ getQty(comp.id) }}</span>
-                      <button mat-icon-button type="button" (click)="adjust(comp.id, 1)">
+                      <button mat-icon-button type="button"
+                              (click)="adjust(comp.id, 1)"
+                              [disabled]="!selectedMonsterId()">
                         <mat-icon>add</mat-icon>
                       </button>
                     </div>
@@ -197,6 +199,10 @@
                 }
               </div>
             </div>
+          }
+
+          @if (!selectedMonsterId()) {
+            <p class="harvest-rarity-hint">Select a monster on the left to track harvested components by rarity.</p>
           }
         </div>
 

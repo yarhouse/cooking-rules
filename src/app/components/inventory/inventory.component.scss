@@ -172,6 +172,26 @@ mat-divider {
   color: var(--mat-sys-on-tertiary-container);
 }
 
+.rarity-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  text-transform: capitalize;
+
+  &.rarity-common     { background: #e8e8e8; color: #555; border: 1px solid #bbb; }
+  &.rarity-uncommon   { background: #d8f0d8; color: #1b4520; border: 1px solid #4caf50; }
+  &.rarity-rare       { background: #d0e4f4; color: #1a2f4a; border: 1px solid #2196f3; }
+  &.rarity-very-rare  { background: #e4d8f4; color: #3e1560; border: 1px solid #9c27b0; }
+  &.rarity-legendary  { background: #fff3d8; color: #5a3800; border: 1px solid #ff9800; }
+}
+
+.qty-total {
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+}
+
 .date-tag {
   font-size: 0.68rem;
   color: var(--mat-sys-on-surface-variant);

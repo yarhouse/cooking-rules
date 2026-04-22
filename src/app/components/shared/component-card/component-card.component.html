@@ -1,0 +1,34 @@
+<mat-card class="component-card" (click)="openDetails()">
+  <mat-card-header>
+    <mat-card-title>{{ component.name }}</mat-card-title>
+    <mat-card-subtitle>
+      <span class="creature-badge">{{ component.creatureTypeName }}</span>
+      <span class="dc-badge">DC {{ component.componentDc }}</span>
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="trait-chips">
+      @if (component.isEdible && component.edibleAs) {
+        <span class="type-badge">
+          <mat-icon class="chip-icon">restaurant</mat-icon>
+          {{ componentTypeName }}
+        </span>
+      }
+      @if (component.isVolatile) {
+        <span class="volatile-badge">
+          <mat-icon class="chip-icon">warning</mat-icon>
+          Volatile
+        </span>
+      }
+    </div>
+
+    @if (effect) {
+      <p class="effect-summary">{{ effect.description }}</p>
+    } @else if (component.isEdible) {
+      <p class="no-effect">No scaling effect for this combination.</p>
+    } @else {
+      <p class="no-effect">Crafting component — not edible.</p>
+    }
+  </mat-card-content>
+</mat-card>

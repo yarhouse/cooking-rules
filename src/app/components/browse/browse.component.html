@@ -75,31 +75,31 @@
       </div>
     </mat-tab>
 
-    <!-- Ingredients Tab -->
-    <mat-tab label="Ingredients">
+    <!-- Components Tab -->
+    <mat-tab label="Components">
       <div class="tab-content">
         <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Filter ingredients…</mat-label>
-          <input matInput [value]="ingredientQuery()" (input)="ingredientQuery.set($any($event.target).value)" />
+          <mat-label>Filter components…</mat-label>
+          <input matInput [value]="componentQuery()" (input)="componentQuery.set($any($event.target).value)" />
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
 
         <div class="chip-filters">
-          @for (ct of componentTypes; track ct.id) {
+          @for (ct of creatureTypes; track ct.id) {
             <button mat-stroked-button
-                    [class.active]="selectedComponentType() === ct.id"
-                    (click)="toggleComponentType(ct.id)">
+                    [class.active]="selectedComponentCreatureType() === ct.id"
+                    (click)="toggleComponentCreatureType(ct.id)">
               {{ ct.name }}
             </button>
           }
         </div>
 
         <div class="card-grid">
-          @for (ingredient of filteredIngredients(); track ingredient.id) {
-            <app-ingredient-card [ingredient]="ingredient" />
+          @for (comp of filteredComponents(); track comp.id) {
+            <app-component-card [component]="comp" />
           }
           @empty {
-            <p class="empty">No ingredients found.</p>
+            <p class="empty">No components found.</p>
           }
         </div>
       </div>

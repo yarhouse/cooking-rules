@@ -81,18 +81,11 @@
                 </div>
                 <div class="search-result-actions">
                   @if (getHarvestQty(comp.id) > 0) {
-                    <div class="qty-controls inline">
-                      <button mat-icon-button type="button" (click)="adjustHarvest(comp.id, -1)">
-                        <mat-icon>remove</mat-icon>
-                      </button>
-                      <span class="qty has-qty">{{ getHarvestQty(comp.id) }}</span>
-                      <button mat-icon-button type="button" (click)="adjustHarvest(comp.id, 1)">
-                        <mat-icon>add</mat-icon>
-                      </button>
-                    </div>
+                    <span class="qty-total">{{ getHarvestQty(comp.id) }} in stock</span>
                   } @else {
-                    <button mat-stroked-button type="button" (click)="addFromSearch(comp)">
-                      <mat-icon>add</mat-icon> Add
+                    <button mat-stroked-button type="button" (click)="addFromSearch(comp)"
+                            title="Adds as common — use the Harvesting page for rarity-tracked additions">
+                      <mat-icon>add</mat-icon> Add (common)
                     </button>
                   }
                 </div>
@@ -112,23 +105,24 @@
         @for (group of componentsGrouped(); track group.key) {
           <div class="ingredient-group">
             <h3 class="group-label">{{ group.label }}</h3>
-            @for (comp of group.items; track comp.id) {
+            @for (item of group.items; track item.comp.id + ':' + item.rarity) {
               <div class="ingredient-row">
                 <div class="ingredient-info">
-                  <span class="ingredient-name">{{ comp.name }}</span>
+                  <span class="ingredient-name">{{ item.comp.name }}</span>
                   @if (componentGroupBy() === 'metatype') {
-                    <span class="creature-tag">{{ getCreatureName(comp.creatureTypeId) }}</span>
+                    <span class="creature-tag">{{ getCreatureName(item.comp.creatureTypeId) }}</span>
                   }
-                  @if (comp.isEdible && comp.edibleAs) {
-                    <span class="edible-tag">{{ getComponentName(comp.edibleAs) }}</span>
+                  <span [class]="'rarity-tag rarity-' + item.rarity">{{ item.rarity }}</span>
+                  @if (item.comp.isEdible && item.comp.edibleAs) {
+                    <span class="edible-tag">{{ getComponentName(item.comp.edibleAs) }}</span>
                   }
                 </div>
                 <div class="qty-controls">
-                  <button mat-icon-button type="button" (click)="adjustHarvest(comp.id, -1)" [disabled]="getHarvestQty(comp.id) === 0">
+                  <button mat-icon-button type="button" (click)="adjustHarvest(item.comp.id, item.rarity, -1)" [disabled]="item.qty === 0">
                     <mat-icon>remove</mat-icon>
                   </button>
-                  <span class="qty" [class.has-qty]="getHarvestQty(comp.id) > 0">{{ getHarvestQty(comp.id) }}</span>
-                  <button mat-icon-button type="button" (click)="adjustHarvest(comp.id, 1)">
+                  <span class="qty" [class.has-qty]="item.qty > 0">{{ item.qty }}</span>
+                  <button mat-icon-button type="button" (click)="adjustHarvest(item.comp.id, item.rarity, 1)">
                     <mat-icon>add</mat-icon>
                   </button>
                 </div>
@@ -141,14 +135,14 @@
     </mat-tab>
 
     <!-- ── Named Drops Tab ──────────────────────────────────────────── -->
-    <mat-tab label="Named Drops">
+    <mat-tab label="Unique Ingredients">
       <div class="tab-content">
 
         @if (namedDropsInStock().length === 0) {
           <div class="empty-inventory">
             <mat-icon>star_border</mat-icon>
-            <p>No unique drops in stock.</p>
-            <p class="hint">Add unique boss drops from a monster's detail panel in Harvesting.</p>
+            <p>No unique ingredients in stock.</p>
+            <p class="hint">Add unique ingredients from a monster's detail panel in Harvesting.</p>
           </div>
         }
 

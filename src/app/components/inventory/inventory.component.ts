@@ -14,6 +14,7 @@ import { InventoryService } from '../../services/inventory.service';
 import { CookingDataService } from '../../services/cooking-data.service';
 import { Rarity, ComponentTypeName } from '../../models/component-type.model';
 import { HarvestComponent } from '../../models/harvest-component.model';
+import { MonsterRarity } from '../../models/monster.model';
 import { Ingredient } from '../../models/ingredient.model';
 
 type ComponentGroupBy = 'creature' | 'metatype';
@@ -73,12 +74,16 @@ export class InventoryComponent {
   harvestSearch = signal('');
 
   readonly componentsGrouped = computed(() => {
-    const stockMap = this.inventoryService.harvestStockMap();
+    const stock = this.inventoryService.harvestStock();
     const mode = this.componentGroupBy();
-    const groups = new Map<string, { label: string; items: HarvestComponent[] }>();
 
-    for (const comp of this.dataService.getHarvestComponents()) {
-      if ((stockMap.get(comp.id) ?? 0) <= 0) continue;
+    type HarvestRow = { comp: HarvestComponent; rarity: MonsterRarity; qty: number };
+    const groups = new Map<string, { label: string; items: HarvestRow[] }>();
+
+    for (const entry of stock) {
+      if (entry.quantity <= 0) continue;
+      const comp = this.dataService.getHarvestComponent(entry.harvestComponentId);
+      if (!comp) continue;
 
       let key: string;
       let label: string;
@@ -92,7 +97,7 @@ export class InventoryComponent {
       }
 
       if (!groups.has(key)) groups.set(key, { label, items: [] });
-      groups.get(key)!.items.push(comp);
+      groups.get(key)!.items.push({ comp, rarity: entry.rarity, qty: entry.quantity });
     }
 
     return Array.from(groups.entries())
@@ -122,7 +127,7 @@ export class InventoryComponent {
   });
 
   readonly craftableCount = computed(() => {
-    const stockMap = this.inventoryService.harvestStockMap();
+    const stockMap = this.inventoryService.harvestTotalMap();
     const essence = this.inventoryService.essence();
     return this.dataService.getMagicItems()
       .filter(item => this.dataService.isMagicItemCraftable(item, stockMap, essence))
@@ -130,15 +135,16 @@ export class InventoryComponent {
   });
 
   getHarvestQty(id: string): number {
-    return this.inventoryService.getHarvestQuantity(id);
+    return this.inventoryService.getTotalHarvestQuantity(id);
   }
 
-  adjustHarvest(id: string, delta: number): void {
-    this.inventoryService.updateHarvestQuantity(id, delta);
+  adjustHarvest(id: string, rarity: MonsterRarity, delta: number): void {
+    this.inventoryService.updateHarvestQuantity(id, rarity, delta);
   }
 
   addFromSearch(comp: HarvestComponent): void {
-    this.inventoryService.updateHarvestQuantity(comp.id, 1);
+    // Defaults to 'common' — use the Harvesting page for rarity-tracked additions
+    this.inventoryService.updateHarvestQuantity(comp.id, 'common', 1);
     this.harvestSearch.set('');
   }
 

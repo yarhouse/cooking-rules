@@ -393,6 +393,14 @@
   margin: 0;
 }
 
+.harvest-rarity-hint {
+  font-size: 0.78rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin: 12px 0 0;
+  text-align: center;
+}
+
 .rarity-badge {
   display: inline-block;
   padding: 2px 8px;

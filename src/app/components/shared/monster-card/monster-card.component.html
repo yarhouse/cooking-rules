@@ -22,7 +22,7 @@
     @if (bossDrop) {
       <mat-divider class="drop-divider" />
       <div class="boss-drop-row">
-        <span class="drop-label">Named drop:</span>
+        <span class="drop-label">Unique ingredient:</span>
         <span class="drop-name">{{ bossDrop.name }}</span>
         <div class="drop-counter" (click)="$event.stopPropagation()">
           <button mat-icon-button type="button" [disabled]="bossDropQuantity === 0" (click)="adjustBossDrop(-1, $event)">
