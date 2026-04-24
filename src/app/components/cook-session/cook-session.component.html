@@ -73,10 +73,10 @@
                         <button type="button"
                                 [class]="'essence-btn rarity-' + rarity"
                                 [class.selected]="selectedEssence() === rarity"
-                                [disabled]="(inventoryService.essence()[rarity] ?? 0) === 0"
+                                [disabled]="inventoryService.essence()[rarity] === 0"
                                 (click)="selectedEssence.set(rarity)">
                           <span class="essence-name">{{ essenceNames[rarity] }}</span>
-                          <span class="essence-qty">×{{ inventoryService.essence()[rarity] ?? 0 }}</span>
+                          <span class="essence-qty">×{{ inventoryService.essence()[rarity] }}</span>
                         </button>
                       }
                     </div>
