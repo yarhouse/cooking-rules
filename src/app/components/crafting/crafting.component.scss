@@ -102,20 +102,6 @@
   overflow-x: auto;
 }
 
-.rarity-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 8px;
-  font-size: 0.72rem;
-  font-weight: 600;
-
-  &.rarity-common     { background: #e8e8e8; color: #333; }
-  &.rarity-uncommon   { background: #cce5cc; color: #1b4520; }
-  &.rarity-rare       { background: #c5d8ea; color: #1a2f4a; }
-  &.rarity-very-rare  { background: #dfd0ea; color: #3e1560; }
-  &.rarity-legendary  { background: #f0e0a0; color: #5a3200; }
-  &.rarity-artifact   { background: #f0c8a0; color: #5a2000; }
-}
 
 .crafting-header {
   display: flex;

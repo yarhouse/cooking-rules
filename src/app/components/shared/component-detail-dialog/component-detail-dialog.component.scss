@@ -116,20 +116,6 @@
   &:last-child { border-bottom: none; }
 }
 
-.scale-rarity {
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 8px;
-  min-width: 76px;
-  text-align: center;
-  flex-shrink: 0;
-
-  &.uncommon  { background: #e8f5e9; color: #00695c; }
-  &.rare      { background: #e3f2fd; color: #1565c0; }
-  &.very-rare { background: #f3e5f5; color: #6a1b9a; }
-  &.legendary { background: #fff3e0; color: #e65100; }
-}
 
 .scale-value {
   font-size: 0.82rem;

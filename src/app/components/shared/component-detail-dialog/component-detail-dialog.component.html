@@ -40,19 +40,19 @@
         @if (effect.scaling) {
           <div class="scaling-table">
             <div class="scale-row">
-              <span class="scale-rarity uncommon">Uncommon</span>
+              <app-rarity-label rarity="uncommon" />
               <span class="scale-value">{{ effect.scaling.uncommon || '—' }}</span>
             </div>
             <div class="scale-row">
-              <span class="scale-rarity rare">Rare</span>
+              <app-rarity-label rarity="rare" />
               <span class="scale-value">{{ effect.scaling.rare || '—' }}</span>
             </div>
             <div class="scale-row">
-              <span class="scale-rarity very-rare">Very Rare</span>
+              <app-rarity-label rarity="very-rare" />
               <span class="scale-value">{{ effect.scaling.veryRare || '—' }}</span>
             </div>
             <div class="scale-row">
-              <span class="scale-rarity legendary">Legendary</span>
+              <app-rarity-label rarity="legendary" />
               <span class="scale-value">{{ effect.scaling.legendary || '—' }}</span>
             </div>
           </div>

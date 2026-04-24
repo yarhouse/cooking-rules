@@ -6,10 +6,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { HarvestComponent } from '../../../models/harvest-component.model';
 import { ComponentTypeName } from '../../../models/component-type.model';
 import { CookingDataService } from '../../../services/cooking-data.service';
+import { RarityLabelComponent } from '../rarity-label/rarity-label.component';
 
 @Component({
   selector: 'app-component-detail-dialog',
-  imports: [MatDialogModule, MatButtonModule, MatIconModule, MatDividerModule],
+  imports: [MatDialogModule, MatButtonModule, MatIconModule, MatDividerModule, RarityLabelComponent],
   templateUrl: './component-detail-dialog.component.html',
   styleUrl: './component-detail-dialog.component.scss',
 })

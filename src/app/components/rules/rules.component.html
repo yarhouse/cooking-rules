@@ -92,19 +92,19 @@
               <mat-card-content>
                 <div class="dispel-table">
                   <div class="dispel-row">
-                    <span class="rarity-label rarity-uncommon">Uncommon</span>
+                    <app-rarity-label rarity="uncommon" />
                     <span class="dispel-value">2nd-level spell</span>
                   </div>
                   <div class="dispel-row">
-                    <span class="rarity-label rarity-rare">Rare</span>
+                    <app-rarity-label rarity="rare" />
                     <span class="dispel-value">4th-level spell</span>
                   </div>
                   <div class="dispel-row">
-                    <span class="rarity-label rarity-very-rare">Very Rare</span>
+                    <app-rarity-label rarity="very-rare" />
                     <span class="dispel-value">6th-level spell</span>
                   </div>
                   <div class="dispel-row">
-                    <span class="rarity-label rarity-legendary">Legendary</span>
+                    <app-rarity-label rarity="legendary" />
                     <span class="dispel-value">8th-level spell</span>
                   </div>
                 </div>
@@ -462,7 +462,7 @@
                         <td>{{ row.cr }}</td>
                         <td>{{ row.dc }}</td>
                         <td>{{ row.essence }}</td>
-                        <td><span class="rarity-badge rarity-{{ row.rarity }}">{{ row.rarity }}</span></td>
+                        <td><app-rarity-label [rarity]="row.rarity" /></td>
                       </tr>
                     }
                   </tbody>
@@ -644,7 +644,7 @@
                   <tbody>
                     @for (row of enchantingTable; track row.rarity) {
                       <tr>
-                        <td><span class="rarity-badge rarity-{{ rarityClass(row.rarity) }}">{{ row.rarity }}</span></td>
+                        <td><app-rarity-label [rarity]="rarityClass(row.rarity)" /></td>
                         <td>{{ row.essence }}</td>
                         <td><strong>{{ row.dc }}</strong></td>
                         <td>{{ row.consumable }}</td>

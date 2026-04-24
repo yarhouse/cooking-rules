@@ -3,7 +3,7 @@
     <mat-card-title>{{ monster.name }}</mat-card-title>
     <mat-card-subtitle>
       <span class="type-badge">{{ creatureTypeName }}</span>
-      <span class="rarity-badge" [class]="rarityClass(monster.rarity)">{{ monster.rarity }}</span>
+      <app-rarity-label [rarity]="monster.rarity" />
       @if (monster.isCustom) {
         <span class="custom-badge">Custom</span>
       }

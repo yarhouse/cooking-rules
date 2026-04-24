@@ -109,7 +109,7 @@
               <td class="col-tags tags-cell">
                 <div class="item-badges">
                   <span class="category-badge">{{ CATEGORY_LABELS[item.category] }}</span>
-                  <span class="rarity-badge rarity-{{ item.rarity }}">{{ RARITY_LABELS[item.rarity] }}</span>
+                  <app-rarity-label [rarity]="item.rarity" />
                   @if (item.essenceType) {
                     <span class="essence-badge">{{ item.essenceType }}</span>
                   }

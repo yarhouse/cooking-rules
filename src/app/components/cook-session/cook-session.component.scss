@@ -334,12 +334,7 @@
   text-transform: capitalize;
   flex-shrink: 0;
 
-  &.rarity-common     { background: #e8e8e8; color: #555; border: 1px solid #bbb; }
-  &.rarity-uncommon   { background: #d8f0d8; color: #1b4520; border: 1px solid #4caf50; }
-  &.rarity-rare       { background: #d0e4f4; color: #1a2f4a; border: 1px solid #2196f3; }
-  &.rarity-very-rare  { background: #e4d8f4; color: #3e1560; border: 1px solid #9c27b0; }
-  &.rarity-legendary  { background: #fff3d8; color: #5a3800; border: 1px solid #ff9800; }
-  &.rarity-named      { background: var(--mat-sys-primary-container); color: var(--mat-sys-on-primary-container); border: 1px solid var(--mat-sys-outline-variant); }
+  &.rarity-named { background: var(--mat-sys-primary-container); color: var(--mat-sys-on-primary-container); border: 1px solid var(--mat-sys-outline-variant); }
 }
 
 .item-creature {
@@ -366,6 +361,27 @@
   font-weight: 600;
   color: var(--mat-sys-on-surface);
   line-height: 1.4;
+}
+
+.item-boss-effect {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  line-height: 1.4;
+  padding: 4px 8px;
+  background: #f0e0a015;
+  border-left: 2px solid #c8971a;
+  border-radius: 0 4px 4px 0;
+}
+
+.item-notes {
+  margin: 3px 0 0;
+  font-size: 0.72rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  line-height: 1.4;
+  opacity: 0.75;
 }
 
 .slot-none-in-stock {
@@ -486,19 +502,6 @@
   border: 1px solid var(--mat-sys-outline-variant);
 }
 
-.rarity-tag {
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 1px 7px;
-  border-radius: 999px;
-  text-transform: capitalize;
-
-  &.rarity-common     { background: #e8e8e8; color: #555; border: 1px solid #bbb; }
-  &.rarity-uncommon   { background: #d8f0d8; color: #1b4520; border: 1px solid #4caf50; }
-  &.rarity-rare       { background: #d0e4f4; color: #1a2f4a; border: 1px solid #2196f3; }
-  &.rarity-very-rare  { background: #e4d8f4; color: #3e1560; border: 1px solid #9c27b0; }
-  &.rarity-legendary  { background: #fff3d8; color: #5a3800; border: 1px solid #ff9800; }
-}
 
 .qty-tag {
   font-size: 0.7rem;
@@ -651,6 +654,58 @@
   flex-shrink: 0;
   margin-top: 1px;
   color: var(--mat-sys-secondary);
+}
+
+// ── Step 3: boon thresholds ────────────────────────────────────────────────
+
+.boon-thresholds {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px;
+  background: var(--mat-sys-surface-container);
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.boon-thresholds-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mat-sys-on-surface-variant);
+  margin-bottom: 4px;
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; color: #2e7d32; }
+}
+
+.boon-threshold-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.82rem;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  &:last-child { border-bottom: none; }
+}
+
+.boon-count {
+  font-weight: 600;
+  min-width: 60px;
+}
+
+.boon-margin {
+  color: var(--mat-sys-on-surface-variant);
+  flex: 1;
+}
+
+.boon-target {
+  font-weight: 700;
+  color: var(--mat-sys-primary);
 }
 
 // ── Step 3: skill info bar ─────────────────────────────────────────────────

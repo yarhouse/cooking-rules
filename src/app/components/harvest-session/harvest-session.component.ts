@@ -9,16 +9,20 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { CookingDataService } from '../../services/cooking-data.service';
+import { RarityLabelComponent } from '../shared/rarity-label/rarity-label.component';
 import { InventoryService } from '../../services/inventory.service';
 import { Monster, MonsterRarity } from '../../models/monster.model';
+import { ComponentTypeName } from '../../models/component-type.model';
 
 export interface HarvestListItem {
   id: string;
   name: string;
   componentDc: number;
   isVolatile: boolean;
+  volatileNote: string | null;
   isBossDrop: boolean;
   isEssence: boolean;
+  edibleAsLabel: string | null;
   harvestComponentId?: string;
   ingredientId?: string;
 }
@@ -53,6 +57,7 @@ const RARITY_ORDER: Record<MonsterRarity, number> = {
     MatChipsModule,
     MatTooltipModule,
     MatDividerModule,
+    RarityLabelComponent,
   ],
   templateUrl: './harvest-session.component.html',
   styleUrl: './harvest-session.component.scss',
@@ -95,18 +100,27 @@ export class HarvestSessionComponent {
   readonly availableComponents = computed((): HarvestListItem[] => {
     const monster = this.selectedMonster();
     if (!monster) return [];
-    const metatypes = new Set(monster.harvestableComponents);
+    const cookingMetatypes = new Set(monster.harvestableComponents);
+    const COOKING_TYPES = new Set(['blood','bone','brain','egg','eye','fat','flesh','heart','liver','spice']);
     return this.dataService
       .getHarvestComponentsByCreatureType(monster.creatureTypeId)
-      .filter(hc => hc.componentMetatype != null && metatypes.has(hc.componentMetatype as never))
+      .filter(hc => {
+        if (hc.componentMetatype == null) return true;
+        if (COOKING_TYPES.has(hc.componentMetatype)) return cookingMetatypes.has(hc.componentMetatype as never);
+        return true;
+      })
       .sort((a, b) => a.componentDc - b.componentDc || a.name.localeCompare(b.name))
       .map(hc => ({
         id: hc.id,
         name: hc.name,
         componentDc: hc.componentDc,
         isVolatile: hc.isVolatile,
+        volatileNote: hc.notes,
         isBossDrop: false,
         isEssence: false,
+        edibleAsLabel: hc.isEdible && hc.edibleAs
+          ? (this.dataService.getComponentType(hc.edibleAs as ComponentTypeName)?.name ?? hc.edibleAs)
+          : null,
         harvestComponentId: hc.id,
       }));
   });
@@ -123,8 +137,10 @@ export class HarvestSessionComponent {
       name: ingredient.name,
       componentDc: 20,
       isVolatile: false,
+      volatileNote: null,
       isBossDrop: true,
       isEssence: false,
+      edibleAsLabel: null,
       ingredientId: ingredient.id,
     };
   });
@@ -139,8 +155,10 @@ export class HarvestSessionComponent {
       name: essence.name,
       componentDc: essence.dc,
       isVolatile: false,
+      volatileNote: null,
       isBossDrop: false,
       isEssence: true,
+      edibleAsLabel: null,
     };
   });
 
@@ -250,10 +268,6 @@ export class HarvestSessionComponent {
   selectMonster(monster: Monster): void {
     this.selectedMonster.set(monster);
     this.harvestList.set([]);
-  }
-
-  rarityDotClass(rarity: string): string {
-    return `rarity-dot rarity-dot-${rarity}`;
   }
 
   harvestSkillIcon(skill: string): string {

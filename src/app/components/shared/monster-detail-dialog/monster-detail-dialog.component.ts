@@ -5,13 +5,14 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { Monster } from '../../../models/monster.model';
+import { RarityLabelComponent } from '../rarity-label/rarity-label.component';
 import { Recipe } from '../../../models/recipe.model';
 import { CookingDataService } from '../../../services/cooking-data.service';
 import { RecipeDetailDialogComponent } from '../recipe-detail-dialog/recipe-detail-dialog.component';
 
 @Component({
   selector: 'app-monster-detail-dialog',
-  imports: [MatDialogModule, MatButtonModule, MatChipsModule, MatIconModule, MatDividerModule],
+  imports: [MatDialogModule, MatButtonModule, MatChipsModule, MatIconModule, MatDividerModule, RarityLabelComponent],
   templateUrl: './monster-detail-dialog.component.html',
   styleUrl: './monster-detail-dialog.component.scss',
 })
@@ -45,10 +46,6 @@ export class MonsterDetailDialogComponent {
       }
     }
     return recipes;
-  }
-
-  rarityClass(rarity: string): string {
-    return `rarity-${rarity}`;
   }
 
   openRecipe(recipe: Recipe): void {

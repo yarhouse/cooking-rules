@@ -32,7 +32,7 @@
                       [class.is-legendary]="m.rarity === 'legendary'"
                       (click)="selectMonster(m.id)"
                       [matTooltip]="m.notes ?? ''">
-                <span class="rarity-dot rarity-dot-{{ m.rarity }}"></span>
+                <app-rarity-label [rarity]="m.rarity" variant="dot" />
                 <span class="monster-name">{{ m.name }}</span>
                 <span class="monster-rarity">{{ m.rarity }}</span>
               </button>
@@ -49,7 +49,7 @@
                 <mat-icon>inventory_2</mat-icon>
                 {{ monster.name }}
               </h3>
-              <span class="rarity-badge rarity-{{ monster.rarity }}">{{ monster.rarity }}</span>
+              <app-rarity-label [rarity]="monster.rarity" />
             </div>
 
             @if (harvestComponentsForMonster().length) {

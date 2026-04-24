@@ -205,19 +205,6 @@ mat-card {
   }
 }
 
-.rarity-label {
-  padding: 2px 8px;
-  border-radius: 8px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  min-width: 76px;
-  text-align: center;
-
-  &.rarity-uncommon  { background: #cce5cc; color: #1b4520; }
-  &.rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
-  &.rarity-very-rare { background: #dfd0ea; color: #3e1560; }
-  &.rarity-legendary { background: #f0e0a0; color: #5a3200; }
-}
 
 .dispel-value {
   font-size: 0.875rem;

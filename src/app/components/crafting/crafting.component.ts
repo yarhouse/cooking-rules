@@ -15,6 +15,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CookingDataService } from '../../services/cooking-data.service';
+import { RarityLabelComponent } from '../shared/rarity-label/rarity-label.component';
 import { InventoryService } from '../../services/inventory.service';
 import { MagicItem, MagicItemCategory, MAGIC_ITEM_CATEGORY_LABELS } from '../../models/magic-item.model';
 import { CraftConfirmDialogComponent, CraftConfirmData } from './craft-confirm-dialog.component';
@@ -35,6 +36,7 @@ import { CraftConfirmDialogComponent, CraftConfirmData } from './craft-confirm-d
     MatTooltipModule,
     MatExpansionModule,
     MatPaginatorModule,
+    RarityLabelComponent,
   ],
   templateUrl: './crafting.component.html',
   styleUrl: './crafting.component.scss',

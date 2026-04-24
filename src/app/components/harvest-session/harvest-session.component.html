@@ -33,7 +33,7 @@
                     <button type="button" class="monster-item"
                             [class.selected]="selectedMonster()?.id === m.id"
                             (click)="selectMonster(m)">
-                      <span [class]="rarityDotClass(m.rarity)"></span>
+                      <app-rarity-label [rarity]="m.rarity" variant="dot" />
                       <span class="monster-name">{{ m.name }}</span>
                       @if (m.isBoss) {
                         <mat-icon class="boss-star" matTooltip="Boss monster — has a unique ingredient">star</mat-icon>
@@ -54,7 +54,7 @@
                     @if (m.isBoss) {
                       <mat-icon class="preview-boss-star" matTooltip="Boss monster — has a unique ingredient">star</mat-icon>
                     }
-                    <span [class]="'rarity-badge rarity-' + m.rarity">{{ m.rarity }}</span>
+                    <app-rarity-label [rarity]="m.rarity" />
                   </div>
 
                   <div class="preview-meta">
@@ -141,8 +141,11 @@
                   <span class="comp-option-name">{{ item.name }}</span>
                   <div class="comp-option-badges">
                     <span [class]="'dc-tag dc-' + item.componentDc">DC {{ item.componentDc }}</span>
+                    @if (item.edibleAsLabel) {
+                      <span class="edible-as-tag" matTooltip="Counts as {{ item.edibleAsLabel }} for cooking">{{ item.edibleAsLabel }}</span>
+                    }
                     @if (item.isVolatile) {
-                      <span class="volatile-tag" matTooltip="Volatile — consequences if started but not finished">⚡</span>
+                      <span class="volatile-tag" [matTooltip]="item.volatileNote ?? 'Volatile — consequences if started but not finished'">⚡ Volatile</span>
                     }
                   </div>
                   <div class="comp-qty-controls">
@@ -302,9 +305,12 @@
               <tr [class.volatile-row]="item.isVolatile" [class.boss-row]="item.isBossDrop" [class.essence-row]="item.isEssence">
                 <td class="col-num">{{ i + 1 }}</td>
                 <td class="comp-name-cell">
-                  {{ item.name }}
+                  {{ item.name }} TEST
+                  @if (item.edibleAsLabel) {
+                    <span class="edible-as-inline" matTooltip="Counts as {{ item.edibleAsLabel }} for cooking">{{ item.edibleAsLabel }}</span>
+                  }
                   @if (item.isVolatile) {
-                    <span class="volatile-inline" matTooltip="Volatile — consequences if started but not finished">⚡</span>
+                    <span class="volatile-inline" [matTooltip]="item.volatileNote ?? 'Volatile — consequences if started but not finished'">⚡ Volatile</span>
                   }
                   @if (item.isBossDrop) {
                     <span class="boss-inline">Unique</span>
@@ -416,7 +422,10 @@
             <div>
               <strong>Volatile component consequence!</strong>
               @for (v of startedVolatiles(); track v.id) {
-                <span> {{ v.name }} was started but not finished — trigger the creature's volatile effect (GM's discretion).</span>
+                <div class="volatile-consequence">
+                  <span class="volatile-consequence-name">{{ v.name }}:</span>
+                  <span>{{ v.volatileNote ?? 'Trigger the creature\'s volatile effect (GM\'s discretion).' }}</span>
+                </div>
               }
             </div>
           </div>

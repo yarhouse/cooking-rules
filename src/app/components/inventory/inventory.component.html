@@ -18,7 +18,7 @@
             <div class="essence-rows">
               @for (rarity of rarities; track rarity) {
                 <div class="essence-row">
-                  <span class="rarity-label" [class]="'rarity-' + rarity">{{ rarityLabels[rarity] }}</span>
+                  <app-rarity-label [rarity]="rarity" />
                   <div class="qty-controls">
                     <button mat-icon-button type="button" (click)="adjustEssence(rarity, -1)" [disabled]="getEssence(rarity) === 0">
                       <mat-icon>remove</mat-icon>
@@ -112,7 +112,7 @@
                   @if (componentGroupBy() === 'metatype') {
                     <span class="creature-tag">{{ getCreatureName(item.comp.creatureTypeId) }}</span>
                   }
-                  <span [class]="'rarity-tag rarity-' + item.rarity">{{ item.rarity }}</span>
+                  <app-rarity-label [rarity]="item.rarity" variant="tag" />
                   @if (item.comp.isEdible && item.comp.edibleAs) {
                     <span class="edible-tag">{{ getComponentName(item.comp.edibleAs) }}</span>
                   }

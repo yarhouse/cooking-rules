@@ -12,6 +12,7 @@ import { InventoryService } from '../../services/inventory.service';
 import { Recipe, RecipeTier } from '../../models/recipe.model';
 import { ComponentTypeName, Rarity, RarityScaling } from '../../models/component-type.model';
 import { MonsterRarity } from '../../models/monster.model';
+import { RarityLabelComponent } from '../shared/rarity-label/rarity-label.component';
 
 type TierRarityKey = keyof RarityScaling;
 
@@ -34,6 +35,10 @@ function rarityToScalingKey(rarity: string): TierRarityKey | null {
 const COOKING_ESSENCE_RARITIES: Rarity[] = ['uncommon', 'rare', 'very-rare', 'legendary'];
 const ESSENCE_NAMES: Record<string, string> = {
   uncommon: 'Frail', rare: 'Robust', 'very-rare': 'Potent', legendary: 'Mythic',
+};
+
+const ESSENCE_MAX_BOONS: Record<string, number> = {
+  uncommon: 0, rare: 1, 'very-rare': 2, legendary: 3,
 };
 
 const TIER_ORDER: Record<RecipeTier, number> = {
@@ -120,6 +125,7 @@ interface ResultIngredient {
     MatInputModule,
     MatTooltipModule,
     MatDividerModule,
+    RarityLabelComponent,
   ],
   templateUrl: './cook-session.component.html',
   styleUrl: './cook-session.component.scss',
@@ -202,6 +208,11 @@ export class CookSessionComponent {
     return labels[TIER_RARITY[tier as RecipeTier]];
   });
 
+  readonly essenceMaxBoons = computed((): number => {
+    const essence = this.selectedEssence();
+    return essence ? (ESSENCE_MAX_BOONS[essence] ?? 0) : 0;
+  });
+
   readonly selectedRecipeIngredientNames = computed((): string[] => {
     const recipe = this.selectedRecipe();
     if (!recipe) return [];
@@ -232,6 +243,7 @@ export class CookSessionComponent {
       slotsNeeded: number;
       totalInStock: number;
       items: StockItem[];
+      ingredientId?: string;
     }
 
     const byType = new Map<ComponentTypeName, SlotDetail>();
@@ -248,6 +260,7 @@ export class CookSessionComponent {
         slotsNeeded: 1,
         totalInStock: 0,
         items: [],
+        ingredientId: ri.ingredientId,
       };
 
       const essenceRarity = this.selectedEssence();
@@ -255,38 +268,58 @@ export class CookSessionComponent {
         ? (rarityToScalingKey(essenceRarity) ?? TIER_RARITY[recipe.tier])
         : TIER_RARITY[recipe.tier];
 
-      // Named ingredients (specific items)
-      for (const ing of this.dataService.getIngredientsByComponentType(ri.componentTypeId)) {
-        const qty = inventoryMap.get(ing.id) ?? 0;
-        if (qty <= 0) continue;
-        const effect = this.dataService.getEffectFor(ri.componentTypeId, ing.creatureTypeId);
-        detail.items.push({
-          name: ing.name,
-          creatureTypeName: this.dataService.getCreatureType(ing.creatureTypeId)?.name ?? ing.creatureTypeId,
-          rarity: null,
-          effectDesc: effect?.description ?? '',
-          scalingText: effect?.scaling?.[tierRarityKey] ?? '',
-          qty,
-        });
-        detail.totalInStock += qty;
-      }
-
-      // Harvest components — one row per (componentId × rarity) in stock
-      for (const hc of this.dataService.getEdibleHarvestComponents()) {
-        if (hc.edibleAs !== ri.componentTypeId) continue;
-        for (const entry of harvestStock) {
-          if (entry.harvestComponentId !== hc.id || entry.quantity <= 0) continue;
-          const effect = this.dataService.getEffectFor(ri.componentTypeId, hc.creatureTypeId);
-          const scalingKey = rarityToScalingKey(entry.rarity);
+      if (detail.ingredientId) {
+        // Boss/unique slot — show only the mandated ingredient
+        const ing = this.dataService.getIngredient(detail.ingredientId);
+        if (ing) {
+          const qty = inventoryMap.get(ing.id) ?? 0;
+          if (qty > 0) {
+            const effect = this.dataService.getEffectFor(ri.componentTypeId, ing.creatureTypeId);
+            detail.items.push({
+              name: ing.name,
+              creatureTypeName: this.dataService.getCreatureType(ing.creatureTypeId)?.name ?? ing.creatureTypeId,
+              rarity: null,
+              effectDesc: effect?.description ?? '',
+              scalingText: effect?.scaling?.[tierRarityKey] ?? '',
+              qty,
+            });
+            detail.totalInStock += qty;
+          }
+        }
+      } else {
+        // Named ingredients (specific items)
+        for (const ing of this.dataService.getIngredientsByComponentType(ri.componentTypeId)) {
+          const qty = inventoryMap.get(ing.id) ?? 0;
+          if (qty <= 0) continue;
+          const effect = this.dataService.getEffectFor(ri.componentTypeId, ing.creatureTypeId);
           detail.items.push({
-            name: hc.name,
-            creatureTypeName: hc.creatureTypeName,
-            rarity: entry.rarity,
+            name: ing.name,
+            creatureTypeName: this.dataService.getCreatureType(ing.creatureTypeId)?.name ?? ing.creatureTypeId,
+            rarity: null,
             effectDesc: effect?.description ?? '',
-            scalingText: (scalingKey ? (effect?.scaling?.[scalingKey] ?? '') : ''),
-            qty: entry.quantity,
+            scalingText: effect?.scaling?.[tierRarityKey] ?? '',
+            qty,
           });
-          detail.totalInStock += entry.quantity;
+          detail.totalInStock += qty;
+        }
+
+        // Harvest components — one row per (componentId × rarity) in stock
+        for (const hc of this.dataService.getEdibleHarvestComponents()) {
+          if (hc.edibleAs !== ri.componentTypeId) continue;
+          for (const entry of harvestStock) {
+            if (entry.harvestComponentId !== hc.id || entry.quantity <= 0) continue;
+            const effect = this.dataService.getEffectFor(ri.componentTypeId, hc.creatureTypeId);
+            const scalingKey = rarityToScalingKey(entry.rarity);
+            detail.items.push({
+              name: hc.name,
+              creatureTypeName: hc.creatureTypeName,
+              rarity: entry.rarity,
+              effectDesc: effect?.description ?? '',
+              scalingText: (scalingKey ? (effect?.scaling?.[scalingKey] ?? '') : ''),
+              qty: entry.quantity,
+            });
+            detail.totalInStock += entry.quantity;
+          }
         }
       }
 

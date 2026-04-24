@@ -7,6 +7,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog } from '@angular/material/dialog';
 import { Monster } from '../../../models/monster.model';
+import { RarityLabelComponent } from '../rarity-label/rarity-label.component';
 import { Ingredient } from '../../../models/ingredient.model';
 import { CookingDataService } from '../../../services/cooking-data.service';
 import { InventoryService } from '../../../services/inventory.service';
@@ -14,7 +15,7 @@ import { MonsterDetailDialogComponent } from '../monster-detail-dialog/monster-d
 
 @Component({
   selector: 'app-monster-card',
-  imports: [MatCardModule, MatChipsModule, MatIconModule, MatButtonModule, MatTooltipModule, MatDividerModule],
+  imports: [MatCardModule, MatChipsModule, MatIconModule, MatButtonModule, MatTooltipModule, MatDividerModule, RarityLabelComponent],
   templateUrl: './monster-card.component.html',
   styleUrl: './monster-card.component.scss',
 })
@@ -60,7 +61,5 @@ export class MonsterCardComponent {
     if (this.bossDrop) this.inventoryService.updateQuantity(this.bossDrop.id, delta);
   }
 
-  rarityClass(rarity: string): string {
-    return `rarity-${rarity}`;
-  }
+
 }

@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CookingDataService } from '../../services/cooking-data.service';
+import { RarityLabelComponent } from '../shared/rarity-label/rarity-label.component';
 import { InventoryService } from '../../services/inventory.service';
 import { ComponentEffect, ComponentTypeName, Rarity } from '../../models/component-type.model';
 
@@ -45,6 +46,7 @@ interface EffectRow {
     MatFormFieldModule,
     MatDividerModule,
     MatTooltipModule,
+    RarityLabelComponent,
   ],
   templateUrl: './rules.component.html',
   styleUrl: './rules.component.scss',

@@ -136,18 +136,6 @@
   text-transform: capitalize;
 }
 
-.rarity-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-
-  &.rarity-dot-common     { background: #aaa; }
-  &.rarity-dot-uncommon   { background: #4caf50; }
-  &.rarity-dot-rare       { background: #2196f3; }
-  &.rarity-dot-very-rare  { background: #9c27b0; }
-  &.rarity-dot-legendary  { background: #ff9800; }
-}
 
 .no-monsters-note {
   font-size: 0.82rem;
@@ -401,19 +389,6 @@
   text-align: center;
 }
 
-.rarity-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 8px;
-  font-size: 0.72rem;
-  font-weight: 600;
-
-  &.rarity-uncommon  { background: #cce5cc; color: #1b4520; }
-  &.rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
-  &.rarity-very-rare { background: #dfd0ea; color: #3e1560; }
-  &.rarity-legendary { background: #f0e0a0; color: #5a3200; }
-  &.rarity-artifact  { background: #f0c8a0; color: #5a2000; }
-}
 
 // ── Empty state ────────────────────────────────────────────────────────
 

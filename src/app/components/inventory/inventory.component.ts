@@ -11,6 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../../services/inventory.service';
+import { RarityLabelComponent } from '../shared/rarity-label/rarity-label.component';
 import { CookingDataService } from '../../services/cooking-data.service';
 import { Rarity, ComponentTypeName } from '../../models/component-type.model';
 import { HarvestComponent } from '../../models/harvest-component.model';
@@ -33,6 +34,7 @@ type ComponentGroupBy = 'creature' | 'metatype';
     MatButtonToggleModule,
     MatFormFieldModule,
     MatInputModule,
+    RarityLabelComponent,
   ],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.scss',
@@ -44,14 +46,6 @@ export class InventoryComponent {
   componentGroupBy = signal<ComponentGroupBy>('creature');
 
   readonly rarities: Rarity[] = ['uncommon', 'rare', 'very-rare', 'legendary', 'artifact'];
-
-  readonly rarityLabels: Record<Rarity, string> = {
-    uncommon: 'Uncommon',
-    rare: 'Rare',
-    'very-rare': 'Very Rare',
-    legendary: 'Legendary',
-    artifact: 'Artifact',
-  };
 
   adjustEssence(rarity: Rarity, delta: number): void {
     this.inventoryService.adjustEssence(rarity, delta);

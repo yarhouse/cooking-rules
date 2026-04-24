@@ -1,0 +1,51 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+
+  // ── Badge variant (default) ──────────────────────────────────────────────
+  &.rarity-label--badge {
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    line-height: 1;
+
+    &.rarity-common     { background: #e0e0e0; color: #424242; }
+    &.rarity-uncommon   { background: #cce5cc; color: #1b4520; }
+    &.rarity-rare       { background: #c5d8ea; color: #1a2f4a; }
+    &.rarity-very-rare  { background: #dfd0ea; color: #3e1560; }
+    &.rarity-legendary  { background: #f0e0a0; color: #5a3200; }
+    &.rarity-artifact   { background: #f0c8a0; color: #5a2000; }
+  }
+
+  // ── Tag variant (bordered, used in tight table/list contexts) ────────────
+  &.rarity-label--tag {
+    font-size: 0.7rem;
+    padding: 1px 7px;
+    border-radius: 999px;
+    line-height: 1;
+    text-transform: capitalize;
+
+    &.rarity-common     { background: #e8e8e8; color: #555;    border: 1px solid #bbb;    }
+    &.rarity-uncommon   { background: #d8f0d8; color: #1b4520; border: 1px solid #4caf50; }
+    &.rarity-rare       { background: #d0e4f4; color: #1a2f4a; border: 1px solid #2196f3; }
+    &.rarity-very-rare  { background: #e4d8f4; color: #3e1560; border: 1px solid #9c27b0; }
+    &.rarity-legendary  { background: #fff3d8; color: #5a3800; border: 1px solid #ff9800; }
+    &.rarity-artifact   { background: #fce8d0; color: #5a2000; border: 1px solid #e65100; }
+  }
+
+  // ── Dot variant (small colored circle, no text) ──────────────────────────
+  &.rarity-label--dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &.rarity-common     { background: #aaa;    }
+    &.rarity-uncommon   { background: #4caf50; }
+    &.rarity-rare       { background: #2196f3; }
+    &.rarity-very-rare  { background: #9c27b0; }
+    &.rarity-legendary  { background: #ff9800; }
+    &.rarity-artifact   { background: #e65100; }
+  }
+}

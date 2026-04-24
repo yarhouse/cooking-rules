@@ -178,7 +178,41 @@ h1, h2, h3 {
 // ── Rarity badge palette — manuscript ink tones ───────────────────────────────
 // Fallback for any future components that don't define rarity variants locally.
 // Individual components own their own rarity colour blocks.
+.rarity-common    { background: #e0e0e0; color: #424242; }
 .rarity-uncommon  { background: #cce5cc; color: #1b4520; }
 .rarity-rare      { background: #c5d8ea; color: #1a2f4a; }
 .rarity-very-rare { background: #dfd0ea; color: #3e1560; }
 .rarity-legendary { background: #f0e0a0; color: #5a3200; }
+.rarity-artifact  { background: #f0c8a0; color: #5a2000; }
+
+
+
+.two-column-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+  height: calc(100dvh - 280px);
+  overflow: hidden;
+  margin-bottom: 4px;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+}
+
+.layout-left {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.layout-right {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
