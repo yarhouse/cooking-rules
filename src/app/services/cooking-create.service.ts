@@ -7,6 +7,7 @@ import { Ingredient } from '../models/ingredient.model';
 import { Recipe } from '../models/recipe.model';
 import {
   CreateMonsterPayload,
+  UpdateMonsterPayload,
   CreateIngredientPayload,
   CreateRecipePayload,
 } from '../models/create-payloads.model';
@@ -64,6 +65,18 @@ export class CookingCreateService {
     );
   }
 
+  /** Updates a custom monster's fields and harvestable components.
+   *  Removes stale session entry and re-fetches both monsters and ingredients. */
+  updateMonster(id: string, payload: UpdateMonsterPayload): Observable<UpdateMonsterResult> {
+    return this.api.put<UpdateMonsterResult>(`/monsters/${id}`, payload).pipe(
+      tap(() => this.zone.run(() => {
+        this.newMonsters.update(list => list.filter(m => m.id !== id));
+        this.dataService.refreshMonsters();
+        this.dataService.refreshIngredients();
+      })),
+    );
+  }
+
   // ── Delete methods ───────────────────────────────────────────────────────────
 
   /** Deletes a monster and its junction rows.
@@ -100,6 +113,12 @@ export class CookingCreateService {
 /** The monster POST returns both the created monster and any ingredients
  *  created alongside it so the client can add them all to its signals. */
 export interface CreateMonsterResult {
+  monster: Monster;
+  ingredients: Ingredient[];
+}
+
+/** The monster PUT returns the updated monster and its current ingredient list. */
+export interface UpdateMonsterResult {
   monster: Monster;
   ingredients: Ingredient[];
 }

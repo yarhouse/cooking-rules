@@ -12,18 +12,36 @@ export interface CreateMonsterPayload {
   isBoss: boolean;
   notes: string | null;
   harvestableComponents: ComponentTypeName[];
+  /** All selected harvest_component IDs (edible and non-edible). */
+  selectedHarvestComponentIds: string[];
   /** One entry per harvestable component — named and annotated by the user. */
   ingredients: CreateMonsterIngredientPayload[];
 }
 
 export interface CreateMonsterIngredientPayload {
   name: string;
-  componentTypeId: ComponentTypeName;
+  componentTypeId: ComponentTypeName | null;
   notes: string | null;
+}
+
+/** Payload for PUT /api/monsters/:id.
+ *  Server diffs selectedHarvestComponentIds to determine removals and cascades ingredient deletion. */
+export interface UpdateMonsterPayload {
+  name: string;
+  rarity: MonsterRarity;
+  isBoss: boolean;
+  notes: string | null;
+  /** Complete new set of edible component types. */
+  harvestableComponents: ComponentTypeName[];
+  /** Complete new set of all selected harvest_component IDs (edible + non-edible). */
+  selectedHarvestComponentIds: string[];
+  /** Ingredients to create for newly added edible components. */
+  newIngredients: CreateMonsterIngredientPayload[];
 }
 
 /** Payload for POST /api/ingredients.
  *  Creates a standalone ingredient, optionally linked to existing sources. */
+
 export interface CreateIngredientPayload {
   name: string;
   componentTypeId: ComponentTypeName;

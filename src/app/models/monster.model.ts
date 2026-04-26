@@ -9,6 +9,7 @@ export interface Monster {
   rarity: MonsterRarity;
   isBoss?: boolean;
   harvestableComponents: ComponentTypeName[];
+  selectedHarvestComponentIds?: string[];
   notes?: string;
   isCustom?: boolean;
   createdAt?: string;
