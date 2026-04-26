@@ -32,3 +32,16 @@ ingredientsRouter.get('/', (_req, res, next) => {
     next(err);
   }
 });
+
+// DELETE /api/ingredients/:id — delete a custom ingredient
+ingredientsRouter.delete('/:id', (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const ingredient = db.prepare(
+      `SELECT * FROM ingredients WHERE id = ? AND is_custom = 1`
+    ).get(id) as Record<string, unknown> | undefined;
+    if (!ingredient) return res.status(404).json({ error: 'Custom ingredient not found' });
+    db.prepare(`DELETE FROM ingredients WHERE id = ?`).run(id);
+    res.json({ id, name: ingredient['name'] });
+  } catch (err) { next(err); }
+});

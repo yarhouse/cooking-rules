@@ -34,7 +34,7 @@ if (userVersion === 0) {
   db.exec(seed);
   db.exec(seed2);
   db.exec(seed3);
-  db.pragma('user_version = 4');
+  db.pragma('user_version = 5');
   console.log('[db] SQLite database initialised at', dbPath);
 } else {
   if (userVersion < 2) {
@@ -59,6 +59,13 @@ if (userVersion === 0) {
     db.exec(migration4);
     db.pragma('user_version = 4');
     console.log('[db] Migration v4 applied — component_metatype column added');
+  }
+  if (userVersion < 5) {
+    // Migration: add monster_harvest_component_selections table + backfill (v4 → v5)
+    const migration5 = fs.readFileSync(path.join(resourcesPath, 'db/migrations/005_harvest_component_selections.sql'), 'utf8');
+    db.exec(migration5);
+    db.pragma('user_version = 5');
+    console.log('[db] Migration v5 applied — monster_harvest_component_selections table added');
   }
   console.log('[db] Connected to', dbPath);
 }

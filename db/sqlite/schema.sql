@@ -101,6 +101,12 @@ CREATE TABLE harvest_components (
   component_metatype  TEXT                         -- groups identical parts across creature types
 );
 
+CREATE TABLE monster_harvest_component_selections (
+  monster_id           TEXT NOT NULL REFERENCES monsters(id) ON DELETE CASCADE,
+  harvest_component_id TEXT NOT NULL REFERENCES harvest_components(id),
+  PRIMARY KEY (monster_id, harvest_component_id)
+);
+
 CREATE TABLE magic_item_recipes (
   id                TEXT PRIMARY KEY,
   name              TEXT NOT NULL,
