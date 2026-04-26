@@ -10,13 +10,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-interface NavItem {
+export interface NavItem {
   label: string;
   route: string;
   icon: string;
 }
 
-interface NavGroup {
+export interface NavGroup {
   header: string | null;
   items: NavItem[];
 }

@@ -21,7 +21,10 @@ import { Ingredient } from '../../models/ingredient.model';
 /** Controls how the harvest stock section groups components.
  *  `'creature'` groups by source creature type; `'metatype'` groups by
  *  `HarvestComponent.componentMetatype` (e.g. organ, integument). */
-type ComponentGroupBy = 'creature' | 'metatype';
+export type ComponentGroupBy = 'creature' | 'metatype';
+
+/** One harvest stock row within a `componentsGrouped` group. */
+export type HarvestRow = { comp: HarvestComponent; rarity: MonsterRarity; qty: number };
 
 /**
  * Inventory page — tracks harvested components (with rarity), named ingredients,
@@ -94,7 +97,6 @@ export class InventoryComponent {
     const stock = this.inventoryService.harvestStock();
     const mode = this.componentGroupBy();
 
-    type HarvestRow = { comp: HarvestComponent; rarity: MonsterRarity; qty: number };
     const groups = new Map<string, { label: string; items: HarvestRow[] }>();
 
     for (const entry of stock) {

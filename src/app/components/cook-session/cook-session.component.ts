@@ -13,6 +13,14 @@ import { Recipe, RecipeTier } from '../../models/recipe.model';
 import { ComponentTypeName, Rarity, RarityScaling } from '../../models/component-type.model';
 import { MonsterRarity } from '../../models/monster.model';
 import { RarityLabelComponent } from '../shared/rarity-label/rarity-label.component';
+import {
+  CookingCandidate,
+  CookingQuirk,
+  ResolvedSlot,
+  ResultIngredient,
+  SlotDetail,
+  StockItem,
+} from '../../models/cooking-session.model';
 
 type TierRarityKey = keyof RarityScaling;
 
@@ -45,13 +53,6 @@ const TIER_ORDER: Record<RecipeTier, number> = {
   novice: 0, journeyman: 1, expert: 2, artisan: 3, boss: 4,
 };
 
-interface CookingQuirk {
-  roll: number;
-  name: string;
-  type: 'flaw' | 'boon';
-  effect: string;
-}
-
 const COOKING_FLAWS: CookingQuirk[] = [
   { roll: 1, name: "Rottworth's Revenge",  type: 'flaw', effect: "Explosive emissions leave you poisoned and unable to benefit from short or long rests. Spells or magical effects that remove the poisoned condition suppress this effect for 1 hour only." },
   { roll: 2, name: "Nauseating Nightmare", type: 'flaw', effect: "Visual and audible hallucinations. Disadvantage on Intelligence, Wisdom, and Charisma checks, and on initiative rolls." },
@@ -73,46 +74,6 @@ const COOKING_BOONS: CookingQuirk[] = [
   { roll: 7, name: "Peaceful Digestion",  type: 'boon', effect: "Next short rest: +1 HP per Hit Die rolled. Next long rest: recover extra Hit Dice equal to your proficiency bonus." },
   { roll: 8, name: "Fast Food",           type: 'boon', effect: "Meal leaves you energised. Speed increases by 5 feet." },
 ];
-
-// A unified cooking candidate — either a direct inventory ingredient or an edible harvest component.
-// isUnique: true  → id is ingredientId, deduct via updateQuantity
-// isUnique: false → id is "componentId:rarity" (compound key), deduct via updateHarvestQuantity
-interface CookingCandidate {
-  id: string;           // compound "componentId:rarity" for harvest; ingredientId for unique
-  componentId: string;  // the underlying component/ingredient id
-  name: string;
-  componentTypeId: ComponentTypeName;
-  creatureTypeId: string;
-  creatureTypeName: string;
-  isUnique: boolean;
-  rarity: MonsterRarity | null; // null for named ingredients (use recipe-tier scaling)
-  qty: number;
-  effectText: string;
-  effectDescription: string;
-  hasEffect: boolean;
-  isSelected: boolean;
-  available: boolean;
-}
-
-interface ResolvedSlot {
-  slotIndex: number;
-  componentTypeId: ComponentTypeName;
-  componentTypeName: string;
-  componentTypeDescription: string;       // rulebook description for the slot
-  specificIngredientId?: string;
-  selectedId: string | null;
-  candidates: CookingCandidate[];
-}
-
-interface ResultIngredient {
-  id: string;
-  name: string;
-  effectText: string;
-  creatureTypeName: string;
-  componentTypeName: string;
-  rarity: MonsterRarity | null;
-  hasEffect: boolean;
-}
 
 @Component({
   selector: 'app-cook-session',
@@ -227,24 +188,6 @@ export class CookSessionComponent {
 
     const inventoryMap  = this.inventoryService.inventoryMap();
     const harvestStock  = this.inventoryService.harvestStock();
-
-    interface StockItem {
-      name: string;
-      creatureTypeName: string;
-      rarity: MonsterRarity | null;
-      effectDesc: string;    // flavor: effect.description
-      scalingText: string;   // technical: effect.scaling[rarityKey]
-      qty: number;
-    }
-    interface SlotDetail {
-      componentTypeId: ComponentTypeName;
-      componentTypeName: string;
-      componentTypeDescription: string;
-      slotsNeeded: number;
-      totalInStock: number;
-      items: StockItem[];
-      ingredientId?: string;
-    }
 
     const byType = new Map<ComponentTypeName, SlotDetail>();
 

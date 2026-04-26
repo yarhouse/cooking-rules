@@ -19,7 +19,7 @@ import { RecipeDetailDialogComponent } from '../shared/recipe-detail-dialog/reci
 
 /** Controls which search/browse mode is active in the builder's left panel.
  *  `'ingredient'` shows the ingredient list; `'effect'` shows effect keyword search. */
-type BuilderMode = 'ingredient' | 'effect';
+export type BuilderMode = 'ingredient' | 'effect';
 
 /** Unified representation of a selectable cooking ingredient.
  *  Merges `HarvestComponent` (edible only) and `Ingredient` into one shape
@@ -27,7 +27,7 @@ type BuilderMode = 'ingredient' | 'effect';
  *
  *  `isUnique = true` → named `Ingredient` tracked in `InventoryService.inventory`
  *  `isUnique = false` → `HarvestComponent` tracked in `InventoryService.harvestStock` */
-interface CookingItem {
+export interface CookingItem {
   id: string;
   name: string;
   /** The component type this item counts as in a recipe slot. */

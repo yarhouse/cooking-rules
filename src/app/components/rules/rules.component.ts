@@ -13,19 +13,13 @@ import { CookingDataService } from '../../services/cooking-data.service';
 import { RarityLabelComponent } from '../shared/rarity-label/rarity-label.component';
 import { InventoryService } from '../../services/inventory.service';
 import { ComponentEffect, ComponentTypeName, Rarity } from '../../models/component-type.model';
+import { CookingQuirk } from '../../models/cooking-session.model';
 
-type EffectMode = 'component' | 'creature';
-type QuirkFilter = 'all' | 'flaw' | 'boon';
-type CraftingQuirkSection = 'all' | 'manufacturing' | 'enchanting';
+export type EffectMode = 'component' | 'creature';
+export type QuirkFilter = 'all' | 'flaw' | 'boon';
+export type CraftingQuirkSection = 'all' | 'manufacturing' | 'enchanting';
 
-interface Quirk {
-  roll: number;
-  name: string;
-  effect: string;
-  type: 'flaw' | 'boon';
-}
-
-interface EffectRow {
+export interface EffectRow {
   key: string;
   label: string;
   description: string;
@@ -183,7 +177,7 @@ export class RulesComponent {
     { tier: 'Artisan',     dc: 24, ingredients: 4 },
   ];
 
-  readonly cookingFlaws: Quirk[] = [
+  readonly cookingFlaws: CookingQuirk[] = [
     { roll: 1, name: "Rottworth's Revenge",  type: 'flaw', effect: "Explosive emissions leave you poisoned and unable to benefit from short or long rests. Spells or magical effects that remove the poisoned condition suppress this effect for 1 hour only." },
     { roll: 2, name: "Nauseating Nightmare", type: 'flaw', effect: "Visual and audible hallucinations. Disadvantage on Intelligence, Wisdom, and Charisma checks, and on initiative rolls." },
     { roll: 3, name: "Tongue Tied",          type: 'flaw', effect: "Tongue becomes enchanted; you can speak only in a language associated with one of the creature types whose component you ingested (GM's choice)." },
@@ -194,7 +188,7 @@ export class RulesComponent {
     { roll: 8, name: "Food Baby",            type: 'flaw', effect: "Meal leaves you bloated. Speed reduced by 5 feet." },
   ];
 
-  readonly cookingBoons: Quirk[] = [
+  readonly cookingBoons: CookingQuirk[] = [
     { roll: 1, name: "Iron Gut",              type: 'boon', effect: "Resistance to poison damage and advantage on saving throws against the poisoned condition." },
     { roll: 2, name: "Sweet Breath",          type: 'boon', effect: "Aroma perfumes your breath. Advantage on Charisma checks against creatures within 30 feet that can smell." },
     { roll: 3, name: "Linguistic Learning",   type: 'boon', effect: "Gain the ability to speak one language associated with the creature type of each magical component consumed (GM's choice)." },
@@ -205,7 +199,7 @@ export class RulesComponent {
     { roll: 8, name: "Fast Food",             type: 'boon', effect: "Meal leaves you energised. Speed increases by 5 feet." },
   ];
 
-  readonly filteredCookingQuirks = computed((): Quirk[] => {
+  readonly filteredCookingQuirks = computed((): CookingQuirk[] => {
     const filter = this.cookingQuirkFilter();
     if (filter === 'flaw') return this.cookingFlaws;
     if (filter === 'boon') return this.cookingBoons;
