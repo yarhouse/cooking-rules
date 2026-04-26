@@ -19,6 +19,10 @@ server/.env
 # Server build output
 /server/dist
 
+# TypeDoc generated documentation
+/docs
+/server/docs
+
 # Packaged Electron installers (built with npm run dist:mac / dist:win)
 /release
 

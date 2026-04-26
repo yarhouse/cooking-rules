@@ -1,0 +1,10 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPointStrategy": "expand",
+  "entryPoints": ["src/app"],
+  "exclude": ["**/*.spec.ts", "src/app/data/*.data.ts"],
+  "tsconfig": "./tsconfig.app.json",
+  "out": "docs",
+  "name": "Aratus Cookbook — Frontend",
+  "readme": "README.md"
+}
