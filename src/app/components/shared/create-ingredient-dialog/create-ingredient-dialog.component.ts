@@ -11,6 +11,13 @@ import { CookingCreateService } from '../../../services/cooking-create.service';
 import { ComponentTypeName } from '../../../models/component-type.model';
 import { CreateIngredientPayload } from '../../../models/create-payloads.model';
 
+/**
+ * Dialog for creating a standalone named ingredient not tied to a monster creation
+ * flow. Submits a `CreateIngredientPayload` via `CookingCreateService.createIngredient`
+ * and closes with the created `Ingredient` on success.
+ *
+ * Opened from the Browse page's ingredient controls.
+ */
 @Component({
   selector: 'app-create-ingredient-dialog',
   imports: [
@@ -39,12 +46,17 @@ export class CreateIngredientDialogComponent {
     componentTypeId: new FormControl<ComponentTypeName | ''>('', Validators.required),
     creatureTypeId:  new FormControl('',  Validators.required),
     notes:           new FormControl(''),
+    // Optional: link this ingredient to existing monsters as sources.
     sourceMonsterIds: new FormControl<string[]>([]),
   });
 
+  /** `true` while the POST request is in flight. Disables the submit button. */
   readonly submitting    = signal(false);
+  /** Error text shown below the form on API failure. */
   readonly errorMessage  = signal<string | null>(null);
 
+  /** Validates, builds `CreateIngredientPayload`, and submits. Closes with the
+   *  created ingredient on success. */
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();

@@ -1,5 +1,13 @@
 import { Component, Input } from '@angular/core';
 
+/**
+ * Presentational component that renders a rarity indicator in one of three
+ * visual styles controlled by the `variant` input. CSS classes are applied
+ * via host bindings so no wrapper element is needed.
+ *
+ * Used throughout the app wherever a rarity value needs to be displayed
+ * (monster cards, recipe cards, crafting table, harvesting page).
+ */
 @Component({
   selector: 'app-rarity-label',
   standalone: true,
@@ -19,9 +27,17 @@ import { Component, Input } from '@angular/core';
   },
 })
 export class RarityLabelComponent {
+  /** The rarity string to display (e.g. `'common'`, `'very-rare'`, `'legendary'`). */
   @Input({ required: true }) rarity!: string;
+  /**
+   * Visual style:
+   * - `'badge'` (default) — filled pill
+   * - `'dot'` — small coloured dot only
+   * - `'tag'` — outlined pill
+   */
   @Input() variant: 'badge' | 'dot' | 'tag' = 'badge';
 
+  /** Title-cases the rarity string for display (e.g. `'very-rare'` → `'Very Rare'`). */
   get label(): string {
     return this.rarity.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
   }

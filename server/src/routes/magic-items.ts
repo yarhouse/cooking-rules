@@ -3,8 +3,31 @@ import { db } from '../db.js';
 
 export const magicItemsRouter = Router();
 
-// GET /api/magic-items
-// Optional query params: ?category=potion, ?rarity=rare, ?creatureTypeId=dragon
+/**
+ * GET /api/magic-items
+ *
+ * Returns magic item crafting recipes, ordered by category → rarity → name.
+ * Each item includes its component requirements as a nested array.
+ * All three query params are optional and can be combined.
+ *
+ * @param category - (optional query param) Filter by `MagicItemCategory` (e.g. `potion`)
+ * @param rarity - (optional query param) Filter by rarity string (e.g. `rare`, `very rare`)
+ * @param creatureTypeId - (optional query param) Filter to items that require at least
+ *   one component from the given creature type
+ *
+ * @returns `MagicItem[]` — shape:
+ * ```json
+ * [{
+ *   "id": "...", "name": "Potion of Healing", "category": "potion", "rarity": "common",
+ *   "itemValueGp": 50, "craftingDc": 10, "craftingTimeHrs": 1,
+ *   "essenceType": "Frail", "notes": null,
+ *   "components": [{ "creatureTypeId": "beast", "componentName": "Hide", "metatag": null, "quantity": 2 }]
+ * }]
+ * ```
+ *
+ * `components` is assembled via `json_group_array` + `json_object` from the
+ * `magic_item_components` junction table. Produces `[]` when no components are linked.
+ */
 magicItemsRouter.get('/', (req, res, next) => {
   try {
     const { category, rarity, creatureTypeId } = req.query;

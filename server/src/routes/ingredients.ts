@@ -3,7 +3,27 @@ import { db } from '../db.js';
 
 export const ingredientsRouter = Router();
 
-// GET /api/ingredients
+/**
+ * GET /api/ingredients
+ *
+ * Returns all ingredients ordered alphabetically.
+ *
+ * @returns `Ingredient[]` — shape:
+ * ```json
+ * [{
+ *   "id": "...", "name": "Zombie Flesh", "componentTypeId": "flesh",
+ *   "creatureTypeId": "undead", "sourceMonsterIds": ["monster-id"],
+ *   "notes": null, "isCustom": false, "createdAt": "..."
+ * }]
+ * ```
+ *
+ * `sourceMonsterIds` is an array in the client model but stored as a single
+ * `source_monster_id` FK in the DB (one ingredient → one source monster).
+ * The field is wrapped in `[value]` here so the client doesn't need to know
+ * about the storage difference.
+ *
+ * SQLite INTEGER `is_custom` is converted to JS `boolean` before responding.
+ */
 ingredientsRouter.get('/', (_req, res, next) => {
   try {
     const rows = db.prepare(`
@@ -33,7 +53,15 @@ ingredientsRouter.get('/', (_req, res, next) => {
   }
 });
 
-// DELETE /api/ingredients/:id — delete a custom ingredient
+/**
+ * DELETE /api/ingredients/:id
+ *
+ * Deletes a custom ingredient by ID. Returns 404 if the ingredient does not
+ * exist or is not marked `is_custom = 1` (rulebook ingredients cannot be deleted).
+ *
+ * @param id - (path param) `Ingredient.id`
+ * @returns `{ id: string, name: string }` on success
+ */
 ingredientsRouter.delete('/:id', (req, res, next) => {
   const { id } = req.params;
   try {

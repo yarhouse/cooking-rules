@@ -24,6 +24,10 @@ const TIER_TEXT_COLORS: Record<RecipeTier, string> = {
   boss: '#880e4f',
 };
 
+/**
+ * Card component for a recipe showing its tier badge, DC, ingredient list,
+ * and an optional "no heat" note. Clicking opens `RecipeDetailDialogComponent`.
+ */
 @Component({
   selector: 'app-recipe-card',
   imports: [MatCardModule, MatChipsModule, MatIconModule, MatButtonModule, MatTooltipModule],
@@ -31,11 +35,13 @@ const TIER_TEXT_COLORS: Record<RecipeTier, string> = {
   styleUrl: './recipe-card.component.scss',
 })
 export class RecipeCardComponent {
+  /** The recipe to display. Required. */
   @Input({ required: true }) recipe!: Recipe;
 
   private dataService = inject(CookingDataService);
   private dialog = inject(MatDialog);
 
+  /** Opens the recipe detail dialog with this recipe as dialog data. */
   openDetails(): void {
     this.dialog.open(RecipeDetailDialogComponent, {
       data: this.recipe,
@@ -44,14 +50,18 @@ export class RecipeCardComponent {
     });
   }
 
+  /** Background colour for the tier badge (from `TIER_COLORS`). */
   get tierColor(): string {
     return TIER_COLORS[this.recipe.tier];
   }
 
+  /** Text colour for the tier badge (from `TIER_TEXT_COLORS`). */
   get tierTextColor(): string {
     return TIER_TEXT_COLORS[this.recipe.tier];
   }
 
+  /** Ingredient slots enriched with display names. For slots with a specific
+   *  `ingredientId`, also includes the named ingredient's name for display. */
   get ingredientDetails() {
     return this.recipe.ingredients.map(ri => {
       const ct = this.dataService.getComponentType(ri.componentTypeId);
@@ -63,6 +73,8 @@ export class RecipeCardComponent {
     });
   }
 
+  /** Returns a note string when the recipe does not require a heat source,
+   *  or `null` otherwise. Only Bloody Gazpacho triggers this. */
   get noHeatNote(): string | null {
     return this.recipe.requiresHeat === false ? 'No heat source required' : null;
   }

@@ -146,8 +146,9 @@ db/
 
 First-run initialisation is handled in `server/src/db.ts` using `PRAGMA user_version`:
 
-- `0` → apply schema + seed, set `user_version = 1`
-- `1` → skip init, log "Connected to …"
+- `0` → fresh database; apply full schema + all seed files, set `user_version = 5`
+- `1–4` → run incremental migrations in order, advancing the version
+- `5` → up to date; skip all init
 
 To reset: delete the `.db` file and restart the server.
 

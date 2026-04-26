@@ -17,6 +17,31 @@ const dbPath = process.env['DB_PATH'] ?? path.join(resourcesPath, 'data/cooking-
 
 fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 
+/**
+ * Shared better-sqlite3 database connection. All route handlers import this
+ * directly — there is no connection pool because better-sqlite3 is synchronous
+ * and single-connection by design.
+ *
+ * ## WAL mode
+ * `PRAGMA journal_mode = WAL` is set on every connection. WAL allows concurrent
+ * readers while a write is in progress, which matters in dev when the Angular
+ * dev server and Electron both hit the API simultaneously.
+ *
+ * ## Version-based migration strategy
+ * `PRAGMA user_version` tracks the schema generation:
+ * - `0` → fresh database; apply full schema + all seed files, then set version to 5.
+ * - `1–4` → run any missing incremental migrations in order, advancing the version.
+ * - `5` → up to date; skip all init logic.
+ *
+ * To reset: delete the `.db` file and restart the server.
+ *
+ * ## File locations
+ * | Context | Path |
+ * |---|---|
+ * | Dev | `data/cooking-rules.db` (project root) |
+ * | Packaged macOS | `~/Library/Application Support/Cooking Rules/cooking-rules.db` |
+ * | Packaged Windows | `%APPDATA%\Cooking Rules\cooking-rules.db` |
+ */
 export const db = new Database(dbPath);
 
 db.pragma('journal_mode = WAL');
@@ -24,7 +49,6 @@ db.pragma('foreign_keys = ON');
 
 const userVersion = db.pragma('user_version', { simple: true }) as number;
 
-// user_version === 0 means this is a fresh database — run schema + all seeds.
 if (userVersion === 0) {
   const schema = fs.readFileSync(path.join(resourcesPath, 'db/sqlite/schema.sql'), 'utf8');
   const seed   = fs.readFileSync(path.join(resourcesPath, 'db/seeds/001_reference_data.sql'), 'utf8');

@@ -18,8 +18,22 @@ import { HarvestComponent } from '../../models/harvest-component.model';
 import { MonsterRarity } from '../../models/monster.model';
 import { Ingredient } from '../../models/ingredient.model';
 
+/** Controls how the harvest stock section groups components.
+ *  `'creature'` groups by source creature type; `'metatype'` groups by
+ *  `HarvestComponent.componentMetatype` (e.g. organ, integument). */
 type ComponentGroupBy = 'creature' | 'metatype';
 
+/**
+ * Inventory page — tracks harvested components (with rarity), named ingredients,
+ * and loose essence. Also shows a live count of craftable magic items.
+ *
+ * ## Sections
+ * - **Essence** — adjust rarity-keyed essence counts (Frail, Robust, etc.)
+ * - **Harvest Components** — all `HarvestStockEntry` rows, grouped and searched;
+ *   `componentsGrouped` drives the display and respects `componentGroupBy`
+ * - **Named Drops** — `Ingredient` items with stock > 0
+ * - **Craftable Items** — `craftableCount` shows how many magic items can be crafted
+ */
 @Component({
   selector: 'app-inventory',
   imports: [
@@ -43,30 +57,39 @@ export class InventoryComponent {
   readonly inventoryService = inject(InventoryService);
   private dataService = inject(CookingDataService);
 
+  /** Controls how the harvest stock list is grouped. Toggled by the button-toggle. */
   componentGroupBy = signal<ComponentGroupBy>('creature');
 
   readonly rarities: Rarity[] = ['uncommon', 'rare', 'very-rare', 'legendary', 'artifact'];
 
+  /** Adjusts essence for a rarity tier by a delta. */
   adjustEssence(rarity: Rarity, delta: number): void {
     this.inventoryService.adjustEssence(rarity, delta);
   }
 
+  /** @returns Current essence count for a rarity tier. */
   getEssence(rarity: Rarity): number {
     return this.inventoryService.essence()[rarity] ?? 0;
   }
 
+  /** @returns Display name for a component type ID. Falls back to the raw ID. */
   getComponentName(id: string): string {
     return this.dataService.getComponentType(id as ComponentTypeName)?.name ?? id;
   }
 
+  /** @returns Display name for a creature type ID. Falls back to the raw ID. */
   getCreatureName(id: string): string {
     return this.dataService.getCreatureType(id)?.name ?? id;
   }
 
   // ── Components (Harvest Stock) ───────────────────────────────────────
 
+  /** Text query for the harvest component quick-add search. Shows up to 10 results. */
   harvestSearch = signal('');
 
+  /** Harvest stock items grouped by creature type or metatype (depending on
+   *  `componentGroupBy`), sorted alphabetically with a "Unique" group last.
+   *  Re-evaluated when `harvestStock` or `componentGroupBy` changes. */
   readonly componentsGrouped = computed(() => {
     const stock = this.inventoryService.harvestStock();
     const mode = this.componentGroupBy();
@@ -109,6 +132,8 @@ export class InventoryComponent {
     return metatype.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   }
 
+  /** Quick-add search results: harvest components matching `harvestSearch`, capped at 10.
+   *  Empty when the query is blank. */
   readonly harvestSearchResults = computed(() => {
     const q = this.harvestSearch().toLowerCase().trim();
     if (!q) return [];
@@ -120,6 +145,8 @@ export class InventoryComponent {
       .slice(0, 10);
   });
 
+  /** Number of magic items the player can currently craft with their stock.
+   *  Shown in the Crafting page link badge. Re-evaluated when stock or essence changes. */
   readonly craftableCount = computed(() => {
     const stockMap = this.inventoryService.harvestTotalMap();
     const essence = this.inventoryService.essence();
@@ -128,22 +155,27 @@ export class InventoryComponent {
       .length;
   });
 
+  /** @returns Total harvest quantity across all rarities for a component. */
   getHarvestQty(id: string): number {
     return this.inventoryService.getTotalHarvestQuantity(id);
   }
 
+  /** Adjusts harvest stock for a specific component × rarity combination. */
   adjustHarvest(id: string, rarity: MonsterRarity, delta: number): void {
     this.inventoryService.updateHarvestQuantity(id, rarity, delta);
   }
 
+  /** Adds 1 unit of a component at 'common' rarity from the quick-add search.
+   *  Use the Harvesting page to add with a specific monster rarity. */
   addFromSearch(comp: HarvestComponent): void {
-    // Defaults to 'common' — use the Harvesting page for rarity-tracked additions
     this.inventoryService.updateHarvestQuantity(comp.id, 'common', 1);
     this.harvestSearch.set('');
   }
 
   // ── Named Drops (boss / unique ingredients) ──────────────────────────
 
+  /** All named ingredients with stock > 0, sorted alphabetically.
+   *  Drives the Named Drops section. */
   readonly namedDropsInStock = computed((): Array<{ ingredient: Ingredient; qty: number }> => {
     const stockMap = this.inventoryService.inventoryMap();
     return this.dataService.getIngredients()
@@ -152,15 +184,14 @@ export class InventoryComponent {
       .sort((a, b) => a.ingredient.name.localeCompare(b.ingredient.name));
   });
 
+  /** @returns Named ingredient stock quantity. */
   getIngredientQty(id: string): number {
     return this.inventoryService.getQuantity(id);
   }
 
+  /** Adjusts a named ingredient's stock quantity. */
   adjustIngredient(id: string, delta: number): void {
     this.inventoryService.updateQuantity(id, delta);
   }
 
-  getComponentTypeName(id: string): string {
-    return this.dataService.getComponentType(id as ComponentTypeName)?.name ?? id;
-  }
 }

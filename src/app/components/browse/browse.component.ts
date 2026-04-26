@@ -16,6 +16,13 @@ import { RecipeTier } from '../../models/recipe.model';
 import { CreateIngredientSourceDialogComponent } from '../shared/create-ingredient-source-dialog/create-ingredient-source-dialog.component';
 import { CreateRecipeDialogComponent } from '../shared/create-recipe-dialog/create-recipe-dialog.component';
 
+/**
+ * Browse page — tabbed view to browse monsters, recipes, and harvest components
+ * with independent filters for each tab.
+ *
+ * Each tab has its own search query and filter signals that independently
+ * drive a computed filtered list. The three filter streams do not interact.
+ */
 @Component({
   selector: 'app-browse',
   imports: [
@@ -38,17 +45,25 @@ export class BrowseComponent {
   private dataService = inject(CookingDataService);
   private dialog = inject(MatDialog);
 
+  /** Text search query for the Monsters tab. */
   monsterQuery = signal('');
+  /** Text search query for the Recipes tab. */
   recipeQuery = signal('');
+  /** Text search query for the Components tab. */
   componentQuery = signal('');
 
+  /** Active creature type filter on the Monsters tab. `null` = all types. */
   selectedCreatureType = signal<string | null>(null);
+  /** Active tier filter on the Recipes tab. `null` = all tiers. */
   selectedRecipeTier = signal<RecipeTier | null>(null);
+  /** Active creature type filter on the Components tab. `null` = all types. */
   selectedComponentCreatureType = signal<string | null>(null);
 
+  /** All creature types; used for filter chips on Monsters and Components tabs. */
   readonly creatureTypes = this.dataService.getCreatureTypes();
   readonly recipeTiers: RecipeTier[] = ['novice', 'journeyman', 'expert', 'artisan', 'boss'];
 
+  /** Monsters matching `monsterQuery` and `selectedCreatureType`. */
   filteredMonsters = computed(() => {
     let monsters = this.dataService.getMonsters(this.monsterQuery() || undefined);
     if (this.selectedCreatureType()) {
@@ -57,6 +72,7 @@ export class BrowseComponent {
     return monsters;
   });
 
+  /** Recipes matching `recipeQuery` and `selectedRecipeTier`. */
   filteredRecipes = computed(() => {
     let recipes = this.dataService.getRecipes(this.recipeQuery() || undefined);
     if (this.selectedRecipeTier()) {
@@ -65,6 +81,7 @@ export class BrowseComponent {
     return recipes;
   });
 
+  /** Harvest components matching `componentQuery` and `selectedComponentCreatureType`. */
   filteredComponents = computed(() => {
     let components = this.dataService.getHarvestComponents();
     const q = this.componentQuery().toLowerCase();
@@ -80,22 +97,27 @@ export class BrowseComponent {
     return components;
   });
 
+  /** Toggles the creature type filter on the Monsters tab. */
   toggleCreatureType(id: string): void {
     this.selectedCreatureType.set(this.selectedCreatureType() === id ? null : id);
   }
 
+  /** Toggles the tier filter on the Recipes tab. */
   toggleRecipeTier(tier: RecipeTier): void {
     this.selectedRecipeTier.set(this.selectedRecipeTier() === tier ? null : tier);
   }
 
+  /** Toggles the creature type filter on the Components tab. */
   toggleComponentCreatureType(id: string): void {
     this.selectedComponentCreatureType.set(this.selectedComponentCreatureType() === id ? null : id);
   }
 
+  /** Opens the create-monster wizard dialog (API builds only). */
   openAddMonster(): void {
     this.dialog.open(CreateIngredientSourceDialogComponent, { width: '900px', maxWidth: '95vw', disableClose: true });
   }
 
+  /** Opens the create-recipe dialog (API builds only). */
   openAddRecipe(): void {
     this.dialog.open(CreateRecipeDialogComponent, { width: '900px', maxWidth: '95vw' });
   }

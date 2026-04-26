@@ -3,7 +3,22 @@ import { db } from '../db.js';
 
 export const creatureTypesRouter = Router();
 
-// GET /api/creature-types
+/**
+ * GET /api/creature-types
+ *
+ * Returns all creature types ordered alphabetically, each with the list
+ * of component types that can be harvested from that category.
+ *
+ * @returns `CreatureType[]` — shape:
+ * ```json
+ * [{ "id": "undead", "name": "Undead", "harvestSkill": "Medicine",
+ *    "availableComponents": ["blood", "bone", "flesh"] }]
+ * ```
+ *
+ * The `availableComponents` array is assembled via `json_group_array` from the
+ * `creature_type_components` junction table, then parsed from the SQLite JSON
+ * string before responding. Empty junction tables produce `[]`.
+ */
 creatureTypesRouter.get('/', (_req, res, next) => {
   try {
     const rows = db.prepare(`

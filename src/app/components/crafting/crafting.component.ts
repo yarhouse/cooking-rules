@@ -20,6 +20,19 @@ import { InventoryService } from '../../services/inventory.service';
 import { MagicItem, MagicItemCategory, MAGIC_ITEM_CATEGORY_LABELS } from '../../models/magic-item.model';
 import { CraftConfirmDialogComponent, CraftConfirmData } from './craft-confirm-dialog.component';
 
+/**
+ * Magic Item Crafting page — browse, filter, sort, and craft magic items.
+ *
+ * ## Data flow
+ * 1. `craftableItemIds` evaluates craftability for every magic item against the
+ *    current `harvestTotalMap` and `essence`, producing a `Set<string>` of IDs.
+ * 2. `filteredMagicItems` applies search text, category, rarity, and the
+ *    "craftable only" toggle to the full item list.
+ * 3. `sortedItems` sorts the filtered list by the active column and direction.
+ * 4. `pagedItems` slices the sorted list to the current page (20 items per page).
+ * 5. `confirmCraft` opens the confirmation dialog; on confirm, calls
+ *    `InventoryService.craftMagicItem` to deduct components and shows a snackbar.
+ */
 @Component({
   selector: 'app-crafting',
   imports: [
@@ -57,19 +70,31 @@ export class CraftingComponent {
     'very-rare': 'Very Rare', legendary: 'Legendary', artifact: 'Artifact',
   };
 
+  /** Current text filter. Passed to `CookingDataService.getMagicItems` as a search query. */
   searchQuery      = signal('');
+  /** Active category filter chip. `null` = all categories. */
   selectedCategory = signal<MagicItemCategory | null>(null);
+  /** Active rarity filter chip. `null` = all rarities. */
   selectedRarity   = signal<string | null>(null);
+  /** When `true`, `filteredMagicItems` shows only items in `craftableItemIds`. */
   craftableOnly    = signal(false);
+  /** Current zero-based page index for the paginator. Reset to 0 on filter/sort changes. */
   pageIndex        = signal(0);
+  /** Active sort column. */
   sortColumn       = signal<'name' | 'cost' | 'rarity'>('name');
+  /** Active sort direction. Toggled by clicking the same column header twice. */
   sortDir          = signal<'asc' | 'desc'>('asc');
+  /** Page size is fixed at 20 items. */
   readonly pageSize = 20;
 
   private readonly RARITY_ORDER: Record<string, number> = {
     common: 0, uncommon: 1, rare: 2, 'very-rare': 3, legendary: 4, artifact: 5,
   };
 
+  /** Set of magic item IDs the player can currently craft.
+   *  Recomputed whenever `harvestTotalMap` or `essence` changes.
+   *  Used by `filteredMagicItems` (craftable-only toggle) and the template
+   *  to show/hide the Craft button on each row. */
   readonly craftableItemIds = computed((): Set<string> => {
     const stockMap = this.inventory.harvestTotalMap();
     const essence  = this.inventory.essence();
@@ -82,6 +107,8 @@ export class CraftingComponent {
     return ids;
   });
 
+  /** Magic items passing all active filters (search, category, rarity, craftable toggle).
+   *  Input to `sortedItems`. */
   readonly filteredMagicItems = computed(() => {
     const q    = this.searchQuery().toLowerCase().trim();
     const cat  = this.selectedCategory();
@@ -95,6 +122,7 @@ export class CraftingComponent {
     });
   });
 
+  /** `filteredMagicItems` sorted by `sortColumn` / `sortDir`. Input to `pagedItems`. */
   readonly sortedItems = computed(() => {
     const col = this.sortColumn();
     const dir = this.sortDir() === 'asc' ? 1 : -1;
@@ -109,30 +137,39 @@ export class CraftingComponent {
     });
   });
 
+  /** The slice of `sortedItems` for the current page. Bound to the item table. */
   readonly pagedItems = computed(() => {
     const start = this.pageIndex() * this.pageSize;
     return this.sortedItems().slice(start, start + this.pageSize);
   });
 
+  /** Toggles the category filter; resets page to 0. */
   selectCategory(cat: MagicItemCategory): void {
     this.selectedCategory.set(this.selectedCategory() === cat ? null : cat);
     this.pageIndex.set(0);
   }
 
+  /** Toggles the rarity filter; resets page to 0. */
   selectRarity(rar: string): void {
     this.selectedRarity.set(this.selectedRarity() === rar ? null : rar);
     this.pageIndex.set(0);
   }
 
+  /** Updates the search query and resets to page 0. */
   onSearchChange(q: string): void {
     this.searchQuery.set(q);
     this.pageIndex.set(0);
   }
 
+  /** Syncs `pageIndex` from the Material paginator event. */
   onPage(event: PageEvent): void {
     this.pageIndex.set(event.pageIndex);
   }
 
+  /**
+   * Sets the sort column; toggles direction if the same column is clicked again.
+   * Resets to page 0.
+   */
   sortBy(col: 'name' | 'cost' | 'rarity'): void {
     if (this.sortColumn() === col) {
       this.sortDir.set(this.sortDir() === 'asc' ? 'desc' : 'asc');
@@ -143,6 +180,12 @@ export class CraftingComponent {
     this.pageIndex.set(0);
   }
 
+  /**
+   * Opens the craft confirmation dialog for the given magic item.
+   * If the player confirms, calls `InventoryService.craftMagicItem` to deduct
+   * components and shows a snackbar.
+   * @param event - Stops propagation to prevent the row's expansion panel from toggling
+   */
   confirmCraft(item: MagicItem, event: Event): void {
     event.stopPropagation();
     const lines: CraftConfirmData['lines'] = item.components

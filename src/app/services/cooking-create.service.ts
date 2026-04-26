@@ -12,15 +12,25 @@ import {
   CreateRecipePayload,
 } from '../models/create-payloads.model';
 
-/** Holds entities created this session via the API.
+/**
+ * Handles all create/update/delete mutations against the API.
  *
- *  These are WritableSignals — unlike the toSignal() HTTP signals in
- *  CookingDataService (which are readonly), these can be updated after a
- *  successful POST. CookingDataService merges them into its public getters
- *  so newly created items appear everywhere immediately without a page reload.
+ * ## Relationship to `CookingDataService`
+ * `CookingDataService` owns the read signals. This service owns writes.
+ * After a successful mutation, this service calls the appropriate
+ * `CookingDataService.refresh*()` method so the shared signals pick up
+ * the new state without a page reload.
  *
- *  In static builds (environment.staticData === true) the API is unavailable —
- *  the create form should be hidden and these signals will remain empty.
+ * ## Session signals (`newMonsters`, `newIngredients`, `newRecipes`)
+ * These writable signals hold entities created in the current browser session.
+ * They are merged into `CookingDataService` getters so freshly created items
+ * appear in the UI immediately (before the next API refresh completes).
+ * On refresh, `CookingDataService` re-fetches from the API and these session
+ * lists become redundant — stale entries are pruned after update/delete.
+ *
+ * ## Static builds
+ * In `environment.staticData === true` builds the API is unavailable. The
+ * create/edit UI should be hidden and these methods should not be called.
  */
 @Injectable({ providedIn: 'root' })
 export class CookingCreateService {
@@ -28,16 +38,32 @@ export class CookingCreateService {
   private zone        = inject(NgZone);
   private dataService = inject(CookingDataService);
 
-  // ── Freshly created entities for this session ───────────────────────────
+  // ── Session signals ──────────────────────────────────────────────────────
+
+  /** Monsters created this session via `createMonster`. Merged into
+   *  `CookingDataService.getMonsters()`. Pruned on `updateMonster`/`deleteMonster`. */
   readonly newMonsters    = signal<Monster[]>([]);
+
+  /** Ingredients created this session (both via `createMonster` and
+   *  `createIngredient`). Merged into `CookingDataService.getIngredients()`. */
   readonly newIngredients = signal<Ingredient[]>([]);
+
+  /** Recipes created this session via `createRecipe`. Merged into
+   *  `CookingDataService.getRecipes()`. */
   readonly newRecipes     = signal<Recipe[]>([]);
 
-  // ── Create methods ───────────────────────────────────────────────────────
+  // ── Create ───────────────────────────────────────────────────────────────
 
-  /** Creates an ingredient source and its harvested ingredients in one transaction.
-   *  On success, adds the monster to newMonsters and all created ingredients
-   *  to newIngredients so they surface immediately in the UI. */
+  /**
+   * Posts to `POST /api/monsters`. The server creates the monster and all
+   * listed ingredients in a single transaction.
+   *
+   * On success, adds the returned monster to `newMonsters` and all returned
+   * ingredients to `newIngredients` so they surface immediately in the UI.
+   *
+   * @param payload - See `CreateMonsterPayload`
+   * @returns Observable of `CreateMonsterResult` (the created monster + ingredients)
+   */
   createMonster(payload: CreateMonsterPayload): Observable<CreateMonsterResult> {
     return this.api.post<CreateMonsterResult>('/monsters', payload).pipe(
       tap(result => this.zone.run(() => {
@@ -47,7 +73,15 @@ export class CookingCreateService {
     );
   }
 
-  /** Creates a standalone ingredient, optionally linked to existing sources. */
+  /**
+   * Posts to `POST /api/ingredients`. Creates a standalone ingredient,
+   * optionally linked to existing monster sources.
+   *
+   * On success, adds the ingredient to `newIngredients`.
+   *
+   * @param payload - See `CreateIngredientPayload`
+   * @returns Observable of the created `Ingredient`
+   */
   createIngredient(payload: CreateIngredientPayload): Observable<Ingredient> {
     return this.api.post<Ingredient>('/ingredients', payload).pipe(
       tap(ingredient => this.zone.run(() => {
@@ -56,7 +90,14 @@ export class CookingCreateService {
     );
   }
 
-  /** Creates a recipe. */
+  /**
+   * Posts to `POST /api/recipes`. Creates a recipe with its ingredient slots.
+   *
+   * On success, adds the recipe to `newRecipes`.
+   *
+   * @param payload - See `CreateRecipePayload`
+   * @returns Observable of the created `Recipe`
+   */
   createRecipe(payload: CreateRecipePayload): Observable<Recipe> {
     return this.api.post<Recipe>('/recipes', payload).pipe(
       tap(recipe => this.zone.run(() => {
@@ -65,8 +106,21 @@ export class CookingCreateService {
     );
   }
 
-  /** Updates a custom monster's fields and harvestable components.
-   *  Removes stale session entry and re-fetches both monsters and ingredients. */
+  // ── Update ───────────────────────────────────────────────────────────────
+
+  /**
+   * Puts to `PUT /api/monsters/:id`. The server diffs
+   * `selectedHarvestComponentIds` to determine which ingredients to delete
+   * (removed edible components) and which to insert (`newIngredients`).
+   *
+   * On success, removes the stale session entry from `newMonsters` and
+   * triggers a full refresh of monsters and ingredients so the UI reflects
+   * the server state.
+   *
+   * @param id - ID of the monster to update
+   * @param payload - See `UpdateMonsterPayload`
+   * @returns Observable of `UpdateMonsterResult` (updated monster + current ingredients)
+   */
   updateMonster(id: string, payload: UpdateMonsterPayload): Observable<UpdateMonsterResult> {
     return this.api.put<UpdateMonsterResult>(`/monsters/${id}`, payload).pipe(
       tap(() => this.zone.run(() => {
@@ -77,10 +131,20 @@ export class CookingCreateService {
     );
   }
 
-  // ── Delete methods ───────────────────────────────────────────────────────────
+  // ── Delete ───────────────────────────────────────────────────────────────
 
-  /** Deletes a monster and its junction rows.
-   *  Pass withIngredients=true to also delete all linked ingredients. */
+  /**
+   * Deletes to `DELETE /api/monsters/:id`. Removes the monster's junction rows.
+   *
+   * Pass `withIngredients = true` to also delete all linked ingredients
+   * (sends `?withIngredients=true` query param to the API).
+   *
+   * On success, triggers a full refresh of monsters and ingredients.
+   *
+   * @param id - ID of the monster to delete
+   * @param withIngredients - When `true`, cascade-deletes linked ingredients (default `false`)
+   * @returns Observable of `DeleteMonsterResult`
+   */
   deleteMonster(id: string, withIngredients = false): Observable<DeleteMonsterResult> {
     const params = withIngredients ? { withIngredients: 'true' } : undefined;
     return this.api.delete<DeleteMonsterResult>(`/monsters/${id}`, params).pipe(
@@ -91,7 +155,15 @@ export class CookingCreateService {
     );
   }
 
-  /** Deletes a standalone ingredient and its junction rows. */
+  /**
+   * Deletes to `DELETE /api/ingredients/:id`. Removes the ingredient and its
+   * `ingredient_source_monsters` junction rows.
+   *
+   * On success, triggers a refresh of ingredients.
+   *
+   * @param id - ID of the ingredient to delete
+   * @returns Observable of `DeleteResult`
+   */
   deleteIngredient(id: string): Observable<DeleteResult> {
     return this.api.delete<DeleteResult>(`/ingredients/${id}`).pipe(
       tap(() => this.zone.run(() => {
@@ -100,7 +172,15 @@ export class CookingCreateService {
     );
   }
 
-  /** Deletes a recipe and its ingredient junction rows. */
+  /**
+   * Deletes to `DELETE /api/recipes/:id`. Removes the recipe and its
+   * `recipe_ingredients` junction rows.
+   *
+   * On success, triggers a refresh of recipes.
+   *
+   * @param id - ID of the recipe to delete
+   * @returns Observable of `DeleteResult`
+   */
   deleteRecipe(id: string): Observable<DeleteResult> {
     return this.api.delete<DeleteResult>(`/recipes/${id}`).pipe(
       tap(() => this.zone.run(() => {
@@ -110,25 +190,33 @@ export class CookingCreateService {
   }
 }
 
-/** The monster POST returns both the created monster and any ingredients
- *  created alongside it so the client can add them all to its signals. */
+/** Response from `POST /api/monsters`. The server returns the created monster
+ *  and all ingredients created in the same transaction, so the client can
+ *  append them all to `newMonsters` / `newIngredients` in one shot. */
 export interface CreateMonsterResult {
   monster: Monster;
   ingredients: Ingredient[];
 }
 
-/** The monster PUT returns the updated monster and its current ingredient list. */
+/** Response from `PUT /api/monsters/:id`. Returns the updated monster and
+ *  its current (post-diff) ingredient list. */
 export interface UpdateMonsterResult {
   monster: Monster;
   ingredients: Ingredient[];
 }
 
+/** Minimal response body for a delete operation. */
 export interface DeleteResult {
   id: string;
   name: string;
 }
 
+/** Extended delete response for monster deletion, reporting how many linked
+ *  ingredients were removed vs. unlinked (junction row deleted but ingredient kept). */
 export interface DeleteMonsterResult extends DeleteResult {
+  /** Ingredients whose `ingredient_source_monsters` junction row was removed
+   *  but the ingredient itself was kept (because other monsters still source it). */
   unlinkedIngredientCount: number;
+  /** Ingredients that were fully deleted (only sourced by this monster). */
   deletedIngredientCount:  number;
 }

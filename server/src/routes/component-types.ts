@@ -3,7 +3,32 @@ import { db } from '../db.js';
 
 export const componentTypesRouter = Router();
 
-// GET /api/component-types
+/**
+ * GET /api/component-types
+ *
+ * Returns all component types, each with the full list of per-creature-type
+ * cooking effects (including optional rarity scaling).
+ *
+ * @returns `ComponentType[]` — shape:
+ * ```json
+ * [{
+ *   "id": "flesh", "name": "Flesh", "description": "...",
+ *   "effects": [{
+ *     "creatureTypeId": "undead",
+ *     "description": "...",
+ *     "scaling": { "uncommon": "...", "rare": "...", "veryRare": "...", "legendary": "..." }
+ *   }]
+ * }]
+ * ```
+ *
+ * `scaling` is included as a nested JSON object only when at least one of the
+ * four `scaling_*` columns in `component_effects` is non-null; otherwise the
+ * CASE expression returns NULL and the field is omitted from the effect object
+ * after `JSON.parse`.
+ *
+ * The `effects` array is assembled via `json_group_array` + `json_object` from
+ * `component_effects`. Empty junction rows produce `[]`.
+ */
 componentTypesRouter.get('/', (_req, res, next) => {
   try {
     const rows = db.prepare(`

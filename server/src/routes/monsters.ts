@@ -4,7 +4,31 @@ import { db } from '../db.js';
 
 export const monstersRouter = Router();
 
-// GET /api/monsters
+/**
+ * GET /api/monsters
+ *
+ * Returns all monsters (rulebook + custom) ordered alphabetically, each with
+ * their harvestable component types and selected harvest component IDs
+ * pre-joined as JSON arrays.
+ *
+ * @returns `Monster[]` — shape:
+ * ```json
+ * [{
+ *   "id": "...", "name": "Zombie", "creatureTypeId": "undead",
+ *   "rarity": "common", "isBoss": false, "notes": null,
+ *   "isCustom": false, "createdAt": "...",
+ *   "harvestableComponents": ["flesh", "bone"],
+ *   "selectedHarvestComponentIds": ["hc-id-1", "hc-id-2"]
+ * }]
+ * ```
+ *
+ * `harvestableComponents` comes from `monster_harvestable_components` (edible
+ * component types). `selectedHarvestComponentIds` comes from
+ * `monster_harvest_component_selections` (all selected parts, edible or not).
+ * Both are assembled with `json_group_array FILTER` and parsed before responding.
+ *
+ * SQLite INTEGER booleans are converted to JS `boolean` before responding.
+ */
 monstersRouter.get('/', (_req, res, next) => {
   try {
     const rows = db.prepare(`
@@ -46,7 +70,21 @@ monstersRouter.get('/', (_req, res, next) => {
   }
 });
 
-// POST /api/monsters — create a custom monster + named ingredients in one transaction
+/**
+ * POST /api/monsters
+ *
+ * Creates a custom monster and all of its named ingredients in a single
+ * SQLite transaction. If any step fails the whole transaction rolls back.
+ *
+ * @body `CreateMonsterPayload` — see `src/app/models/create-payloads.model.ts`
+ * @returns HTTP 201 with `CreateMonsterResult`:
+ * ```json
+ * { "monster": { ...Monster }, "ingredients": [ ...Ingredient[] ] }
+ * ```
+ *
+ * Ingredients without a `componentTypeId` are skipped (the user left the
+ * component classification blank).
+ */
 monstersRouter.post('/', (req, res, next) => {
   const {
     name, creatureTypeId, rarity, isBoss, notes,
@@ -106,7 +144,25 @@ monstersRouter.post('/', (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// PUT /api/monsters/:id — update a monster's fields and harvestable components
+/**
+ * PUT /api/monsters/:id
+ *
+ * Updates a monster's scalar fields and its harvestable component selections.
+ *
+ * The server diffs the incoming `selectedHarvestComponentIds` against the
+ * existing DB rows to determine:
+ * - **Removed IDs** → their edible component types are looked up; linked
+ *   `monster_harvestable_components` rows and `ingredients` rows are deleted.
+ * - **Unchanged/new IDs** → inserted with `INSERT OR IGNORE` (idempotent).
+ * - **New ingredients** in `newIngredients` → inserted for newly added edible parts.
+ *
+ * Returns the updated monster and its current ingredient list so the client
+ * can update both signals in one round-trip.
+ *
+ * @param id - (path param) Monster ID
+ * @body `UpdateMonsterPayload` — see `src/app/models/create-payloads.model.ts`
+ * @returns HTTP 200 with `UpdateMonsterResult` or 404 if not found
+ */
 monstersRouter.put('/:id', (req, res, next) => {
   const { id } = req.params;
   const {
@@ -218,7 +274,22 @@ monstersRouter.put('/:id', (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// DELETE /api/monsters/:id — delete a custom monster, optionally cascade to ingredients
+/**
+ * DELETE /api/monsters/:id
+ *
+ * Deletes a custom monster. Returns 404 if the monster does not exist or is
+ * not marked `is_custom = 1` (rulebook monsters cannot be deleted).
+ *
+ * @param id - (path param) Monster ID
+ * @param withIngredients - (optional query param `?withIngredients=true`)
+ *   When present, also deletes all `ingredients` rows where `source_monster_id`
+ *   matches. Otherwise those ingredients are unlinked (source FK kept, monster gone).
+ *
+ * @returns `DeleteMonsterResult`:
+ * ```json
+ * { "id": "...", "name": "Zombie", "deletedIngredientCount": 2, "unlinkedIngredientCount": 0 }
+ * ```
+ */
 monstersRouter.delete('/:id', (req, res, next) => {
   const { id } = req.params;
   const withIngredients = req.query['withIngredients'] === 'true';

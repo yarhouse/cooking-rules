@@ -15,6 +15,14 @@ import { ComponentTypeName } from '../../../models/component-type.model';
 import { RecipeTier, TIER_DC } from '../../../models/recipe.model';
 import { CreateRecipePayload } from '../../../models/create-payloads.model';
 
+/**
+ * Dialog for creating a custom recipe with a dynamic ingredient slot list.
+ *
+ * `dc` auto-updates when the user changes `tier` (wired in the constructor via
+ * `valueChanges`). Boss recipes show a `bossEffect` field.
+ *
+ * Closes with the created `Recipe` on success; `null` on cancel.
+ */
 @Component({
   selector: 'app-create-recipe-dialog',
   imports: [
@@ -43,46 +51,56 @@ export class CreateRecipeDialogComponent {
   readonly form = new FormGroup({
     name:         new FormControl('', [Validators.required, Validators.maxLength(200)]),
     tier:         new FormControl<RecipeTier>('novice', Validators.required),
+    // Auto-filled from `TIER_DC[tier]` when tier changes.
     dc:           new FormControl<number>(TIER_DC['novice'], [Validators.required, Validators.min(0)]),
     requiresHeat: new FormControl(true),
     bossEffect:   new FormControl(''),
     notes:        new FormControl(''),
+    // Dynamic list of ingredient slots; at least 1 required.
     ingredients:  new FormArray<FormGroup>([], Validators.minLength(1)),
   });
 
+  /** Typed accessor for the `ingredients` FormArray. */
   get ingredientRows(): FormArray<FormGroup> {
     return this.form.get('ingredients') as FormArray<FormGroup>;
   }
 
+  /** `true` when the selected tier is `'boss'` — shows the `bossEffect` field. */
   get isBoss(): boolean {
     return this.form.get('tier')?.value === 'boss';
   }
 
+  /** `true` while the POST request is in flight. */
   readonly submitting   = signal(false);
+  /** Error text shown on API failure. */
   readonly errorMessage = signal<string | null>(null);
 
   constructor() {
-    // Auto-fill DC when tier changes
+    // Auto-fill DC from TIER_DC when tier changes
     this.form.get('tier')!.valueChanges.subscribe(tier => {
       if (tier) this.form.patchValue({ dc: TIER_DC[tier] });
     });
-    // Add one ingredient row by default
     this.addIngredientRow();
   }
 
+  /** Appends a new blank ingredient slot row to the form. */
   addIngredientRow(): void {
     this.ingredientRows.push(new FormGroup({
       componentTypeId: new FormControl<ComponentTypeName | ''>('', Validators.required),
+      /** Optional: restrict this slot to a specific named ingredient. */
       ingredientId:    new FormControl(''),
     }));
   }
 
+  /** Removes the ingredient row at `index`. Minimum 1 row enforced. */
   removeIngredientRow(index: number): void {
     if (this.ingredientRows.length > 1) {
       this.ingredientRows.removeAt(index);
     }
   }
 
+  /** Validates, builds `CreateRecipePayload`, and submits. Closes with the
+   *  created recipe on success. */
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();

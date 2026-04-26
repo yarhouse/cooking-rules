@@ -23,6 +23,25 @@ import { Monster, MonsterRarity } from '../../../models/monster.model';
 import { UpdateMonsterPayload } from '../../../models/create-payloads.model';
 import { ComponentTypeName } from '../../../models/component-type.model';
 
+/**
+ * Monster edit page — a 3-step stepper for updating an existing custom monster's
+ * scalar fields, harvestable component selections, and linked ingredient names.
+ *
+ * ## Stepper flow
+ * 1. **Step 1 (Source details)** — name, rarity, boss flag, notes.
+ *    `creatureTypeId` is disabled; changing the creature type of an existing
+ *    monster would orphan all its linked data.
+ * 2. **Step 2 (Harvest components)** — a selection list of all `HarvestComponent`
+ *    rows for this creature type. The user picks which parts this specific monster
+ *    has. `selectedComponents` holds the live selection.
+ * 3. **Step 3 (Name ingredients)** — for each *newly added* edible component
+ *    (not in `originalSelectedIds`), the user names the resulting ingredient.
+ *    Removed components' ingredients are listed as deletions.
+ *
+ * ## Submit
+ * `submit()` builds an `UpdateMonsterPayload` from the form state and dispatches
+ * it via `CookingCreateService.updateMonster`. On success, navigates to `/browse`.
+ */
 @Component({
   selector: 'app-monster-edit-page',
   imports: [
@@ -47,13 +66,13 @@ export class MonsterEditPageComponent implements OnInit {
   private dataService   = inject(CookingDataService);
   private createService = inject(CookingCreateService);
 
-  // ── Resolved monster ───────────────────────────────────────────────────────
+  /** The monster being edited. Resolved from the `monsterId` route param in `ngOnInit`.
+   *  `null` before resolution; redirects to `/browse` if not found. */
   readonly monster = signal<Monster | null>(null);
 
-  // ── Reference data ─────────────────────────────────────────────────────────
   readonly rarities: MonsterRarity[] = ['common', 'uncommon', 'rare', 'very-rare', 'legendary'];
 
-  // ── Step 1: Source details ─────────────────────────────────────────────────
+  /** Step 1 form — scalar monster fields. `creatureTypeId` is disabled after init. */
   readonly step1 = new FormGroup({
     name:           new FormControl('',       [Validators.required, Validators.maxLength(200)]),
     creatureTypeId: new FormControl('',       Validators.required),
@@ -62,28 +81,38 @@ export class MonsterEditPageComponent implements OnInit {
     notes:          new FormControl(''),
   });
 
-  // ── Step 2: Harvestable components ─────────────────────────────────────────
+  /** All harvest components available for this monster's creature type.
+   *  Loaded in `ngOnInit` and sorted alphabetically. */
   readonly availableHarvestComponents = signal<HarvestComponent[]>([]);
+  /** IDs of harvest components currently checked in Step 2's selection list. */
   readonly selectedComponents         = signal<Set<string>>(new Set());
-  readonly step2Error                 = signal<string | null>(null);
+  step2Error                          = signal<string | null>(null);
+  /** The component IDs that were already selected when the page loaded.
+   *  Used by `buildIngredientRows` to diff added vs. removed components. */
   readonly originalSelectedIds        = signal<Set<string>>(new Set());
+  /** Components removed in Step 2 whose linked ingredients will be deleted on submit. */
   readonly removedComponents          = signal<{ id: string; name: string }[]>([]);
 
-  // ── Step 3: Name each ingredient ───────────────────────────────────────────
+  /** Step 3 form — one row per *newly added* edible component.
+   *  Row order matches `ingredientRowMeta`. */
   readonly step3 = new FormGroup({
     ingredients: new FormArray<FormGroup>([]),
   });
 
+  /** Typed accessor for the `ingredients` FormArray in Step 3. */
   get ingredientRows(): FormArray<FormGroup> {
     return this.step3.get('ingredients') as FormArray<FormGroup>;
   }
 
+  /** Parallel metadata array for Step 3 rows.
+   *  `ingredientRowMeta[i]` is the `HarvestComponent` that `ingredientRows[i]` names. */
   ingredientRowMeta: HarvestComponent[] = [];
 
   @ViewChild('stepper') stepper!: MatStepper;
 
-  // ── UI state ───────────────────────────────────────────────────────────────
+  /** `true` while the PUT request is in flight. Disables the submit button. */
   readonly submitting   = signal(false);
+  /** Error text displayed below the submit button on API failure. */
   readonly errorMessage = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -123,6 +152,7 @@ export class MonsterEditPageComponent implements OnInit {
     this.selectedComponents.set(new Set(originalIds));
   }
 
+  /** Syncs `selectedComponents` from the Material selection list and clears `step2Error`. */
   onHarvestSelectionChange(event: MatSelectionListChange): void {
     const selected = new Set<string>(
       event.source.selectedOptions.selected.map(opt => opt.value as string),
@@ -131,16 +161,26 @@ export class MonsterEditPageComponent implements OnInit {
     this.step2Error.set(null);
   }
 
+  /** @returns `true` if the given harvest component ID is currently selected. */
   isSelected(id: string): boolean {
     return this.selectedComponents().has(id);
   }
 
+  /** When advancing to Step 3 (index 2), rebuilds the ingredient name rows. */
   onStepChange(event: StepperSelectionEvent): void {
     if (event.selectedIndex === 2) {
       this.buildIngredientRows();
     }
   }
 
+  /**
+   * Rebuilds the Step 3 `ingredientRows` FormArray based on the diff between
+   * `originalSelectedIds` and the current `selectedComponents`:
+   * - Components in the original set that are no longer selected → `removedComponents`
+   * - Components newly added (not in original) → one `FormGroup` row each
+   *
+   * Default ingredient name = `"{monsterName} {componentName}"`.
+   */
   private buildIngredientRows(): void {
     while (this.ingredientRows.length) this.ingredientRows.removeAt(0);
     this.ingredientRowMeta = [];
@@ -169,6 +209,10 @@ export class MonsterEditPageComponent implements OnInit {
     }
   }
 
+  /**
+   * Validates both form groups, builds an `UpdateMonsterPayload`, and dispatches
+   * it via `CookingCreateService.updateMonster`. Navigates to `/browse` on success.
+   */
   submit(): void {
     if (this.step1.invalid || this.step3.invalid) return;
     const m = this.monster();

@@ -3,8 +3,29 @@ import { db } from '../db.js';
 
 export const harvestComponentsRouter = Router();
 
-// GET /api/harvest-components
-// Optional query param: ?creatureTypeId=dragon
+/**
+ * GET /api/harvest-components
+ *
+ * Returns harvestable components ordered by creature type, DC, then name.
+ * Denormalises `creature_types.name` and `harvest_skill` via a JOIN so the
+ * client has everything it needs without a second request.
+ *
+ * @param creatureTypeId - (optional query param) Filter to a single creature type.
+ *   Example: `GET /api/harvest-components?creatureTypeId=undead`
+ *
+ * @returns `HarvestComponent[]` — shape:
+ * ```json
+ * [{
+ *   "id": "...", "creatureTypeId": "undead", "creatureTypeName": "Undead",
+ *   "harvestSkill": "Medicine", "name": "Bone Shard", "componentDc": 10,
+ *   "isEdible": true, "edibleAs": "bone",
+ *   "isVolatile": false, "notes": null, "componentMetatype": "structural"
+ * }]
+ * ```
+ *
+ * SQLite INTEGER booleans (`is_edible`, `is_volatile`) are converted to JS
+ * `boolean` before responding.
+ */
 harvestComponentsRouter.get('/', (req, res, next) => {
   try {
     const { creatureTypeId } = req.query;

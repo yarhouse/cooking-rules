@@ -25,6 +25,25 @@ import {
 } from '../../../models/create-payloads.model';
 import { ComponentTypeName } from '../../../models/component-type.model';
 
+/**
+ * 3-step stepper dialog for creating or editing a custom monster and its ingredients.
+ *
+ * ## Modes
+ * - **Create** (no `dialogData`): all 3 steps; user names every selected component.
+ * - **Edit** (`dialogData.monster` provided): pre-fills Step 1 from the existing monster;
+ *   Step 3 only shows rows for *newly added* components; removed components are listed
+ *   as a deletion warning. Delegates to `CookingCreateService.updateMonster`.
+ *
+ * ## Stepper flow
+ * 1. **Step 1** — name, creature type, rarity, boss flag, notes.
+ *    Creature type is locked in edit mode.
+ * 2. **Step 2** — harvest component selection list. Components load lazily when the
+ *    user advances to this step (`onStepChange` at index 1).
+ * 3. **Step 3** — ingredient naming. Rows are built by `buildIngredientRows` when the
+ *    user advances to this step (index 2). Each row maps to a newly selected component.
+ *
+ * Closed with `CreateMonsterResult` / `UpdateMonsterResult` on success, or `null` on cancel.
+ */
 @Component({
   selector: 'app-create-ingredient-source-dialog',
   imports: [
@@ -44,19 +63,20 @@ import { ComponentTypeName } from '../../../models/component-type.model';
 })
 export class CreateIngredientSourceDialogComponent implements OnInit {
   private dialogRef    = inject(MatDialogRef<CreateIngredientSourceDialogComponent>);
+  /** Optional: when provided, the dialog runs in edit mode for this monster. */
   private dialogData   = inject<{ monster?: Monster } | null>(MAT_DIALOG_DATA, { optional: true });
   private dataService  = inject(CookingDataService);
   private createService = inject(CookingCreateService);
 
-  // ── Edit mode ──────────────────────────────────────────────────────────────
+  /** The monster being edited, or `null` in create mode. */
   get editMonster(): Monster | null { return this.dialogData?.monster ?? null; }
+  /** `true` when `dialogData.monster` is present. */
   get isEditMode(): boolean { return !!this.dialogData?.monster; }
 
-  // ── Reference data ─────────────────────────────────────────────────────────
   readonly creatureTypes = this.dataService.getCreatureTypes();
   readonly rarities: MonsterRarity[] = ['common', 'uncommon', 'rare', 'very-rare', 'legendary'];
 
-  // ── Step 1: Source details ─────────────────────────────────────────────────
+  /** Step 1 form — monster scalar fields. `creatureTypeId` is disabled in edit mode. */
   readonly step1 = new FormGroup({
     name:           new FormControl('',  [Validators.required, Validators.maxLength(200)]),
     creatureTypeId: new FormControl('',  Validators.required),
@@ -65,31 +85,37 @@ export class CreateIngredientSourceDialogComponent implements OnInit {
     notes:          new FormControl(''),
   });
 
-  // ── Step 2: Harvestable components ─────────────────────────────────────────
+  /** Harvest components for the selected creature type. Loaded lazily in `onStepChange`. */
   readonly availableHarvestComponents = signal<HarvestComponent[]>([]);
+  /** IDs currently checked in the Step 2 selection list. */
   readonly selectedComponents         = signal<Set<string>>(new Set());
   step2Error = signal<string | null>(null);
 
-  // Edit mode: harvest_component IDs that were originally on the monster
+  /** Original component IDs from the existing monster (edit mode only).
+   *  Used to diff additions vs. removals in `buildIngredientRows`. */
   readonly originalSelectedIds = signal<Set<string>>(new Set());
-  // Components removed in this edit session (for step 3 warning + server diff)
+  /** Components removed in this session — shown as a deletion warning in Step 3. */
   readonly removedComponents   = signal<{ id: string; name: string }[]>([]);
 
-  // ── Step 3: Name each ingredient ───────────────────────────────────────────
+  /** Step 3 form — one row per newly added edible component. */
   readonly step3 = new FormGroup({
     ingredients: new FormArray<FormGroup>([]),
   });
 
+  /** Typed accessor for the Step 3 ingredients `FormArray`. */
   get ingredientRows(): FormArray<FormGroup> {
     return this.step3.get('ingredients') as FormArray<FormGroup>;
   }
 
+  /** Metadata parallel to `ingredientRows` — `ingredientRowMeta[i]` is the
+   *  `HarvestComponent` that `ingredientRows.at(i)` names. */
   ingredientRowMeta: HarvestComponent[] = [];
 
   @ViewChild('stepper') stepper!: MatStepper;
 
-  // ── UI state ───────────────────────────────────────────────────────────────
+  /** `true` while the API request is in flight. Disables the submit button. */
   readonly submitting   = signal(false);
+  /** Error text shown below the submit button on API failure. */
   readonly errorMessage = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -109,6 +135,7 @@ export class CreateIngredientSourceDialogComponent implements OnInit {
     }
   }
 
+  /** Syncs `selectedComponents` from the Material selection list. */
   onHarvestSelectionChange(event: MatSelectionListChange): void {
     const selected = new Set<string>(
       event.source.selectedOptions.selected.map(opt => opt.value as string),
@@ -117,6 +144,7 @@ export class CreateIngredientSourceDialogComponent implements OnInit {
     this.step2Error.set(null);
   }
 
+  /** @returns `true` if the harvest component ID is currently selected. */
   isSelected(id: string): boolean {
     return this.selectedComponents().has(id);
   }
@@ -202,6 +230,10 @@ export class CreateIngredientSourceDialogComponent implements OnInit {
     }
   }
 
+  /**
+   * Validates both forms, builds the appropriate payload (create or update),
+   * and dispatches via `CookingCreateService`. Closes with the result on success.
+   */
   submit(): void {
     if (this.step1.invalid || this.step3.invalid) return;
 

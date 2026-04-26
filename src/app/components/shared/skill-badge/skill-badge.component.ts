@@ -1,6 +1,14 @@
 import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
+/**
+ * Presentational component that renders a D&D ability/tool check skill as a
+ * labelled badge with a contextual icon. Applies a skill-specific CSS class
+ * via host bindings for colour coding.
+ *
+ * Used by `MonsterCardComponent` and the Harvesting page to show which check
+ * is used to harvest from a creature type.
+ */
 @Component({
   selector: 'app-skill-badge',
   standalone: true,
@@ -18,8 +26,11 @@ import { MatIconModule } from '@angular/material/icon';
   },
 })
 export class SkillBadgeComponent {
+  /** The skill name to display (e.g. `'Medicine'`, `'Survival'`). Case-insensitive. */
   @Input({ required: true }) skill!: string;
 
+  /** Maps the skill name to a Material icon identifier.
+   *  Falls back to `'psychology'` for unrecognised skills. */
   get icon(): string {
     const icons: Record<string, string> = {
       arcana:        'auto_fix_high',

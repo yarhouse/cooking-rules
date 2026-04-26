@@ -18,6 +18,20 @@ import { MonsterDetailDialogComponent } from '../monster-detail-dialog/monster-d
 
 const COOKING_METATYPES = new Set(['blood','bone','brain','egg','eye','fat','flesh','heart','liver','spice']);
 
+/**
+ * Card component that summarises a monster and its harvestable components.
+ * Clicking opens `MonsterDetailDialogComponent` for the full monster sheet.
+ *
+ * ## Component resolution
+ * `filteredHarvestComponents` selects which harvest parts to show:
+ * - When `monster.selectedHarvestComponentIds` has entries, only those exact
+ *   IDs are shown (precise selection from the edit page).
+ * - Otherwise falls back to showing edible components filtered by
+ *   `monster.harvestableComponents` plus all non-edible parts (legacy data).
+ *
+ * `cookingComponents` further filters to only edible parts and pairs each with
+ * its `ComponentEffect` for display.
+ */
 @Component({
   selector: 'app-monster-card',
   imports: [MatCardModule, MatChipsModule, MatIconModule, MatButtonModule, MatTooltipModule, MatDividerModule, RarityLabelComponent, SkillBadgeComponent],
@@ -25,12 +39,14 @@ const COOKING_METATYPES = new Set(['blood','bone','brain','egg','eye','fat','fle
   styleUrl: './monster-card.component.scss',
 })
 export class MonsterCardComponent {
+  /** The monster to display. Required. */
   @Input({ required: true }) monster!: Monster;
 
   private dataService = inject(CookingDataService);
   private inventoryService = inject(InventoryService);
   private dialog = inject(MatDialog);
 
+  /** Opens the monster detail dialog with this monster as dialog data. */
   openDetails(): void {
     this.dialog.open(MonsterDetailDialogComponent, {
       data: this.monster,
@@ -39,14 +55,19 @@ export class MonsterCardComponent {
     });
   }
 
+  /** Display name of the monster's creature type. Falls back to the raw ID. */
   get creatureTypeName(): string {
     return this.dataService.getCreatureType(this.monster.creatureTypeId)?.name ?? this.monster.creatureTypeId;
   }
 
+  /** The ability/tool check used to harvest this creature type, or `null`. */
   get harvestSkill(): string | null {
     return this.dataService.getCreatureType(this.monster.creatureTypeId)?.harvestSkill ?? null;
   }
 
+  /** Harvest components relevant to this specific monster.
+   *  Prefers `selectedHarvestComponentIds` when present; falls back to
+   *  type-level filtering by `harvestableComponents`. */
   private get filteredHarvestComponents(): HarvestComponent[] {
     const allForType = this.dataService.getHarvestComponentsByCreatureType(this.monster.creatureTypeId);
     const selectedIds = new Set(this.monster.selectedHarvestComponentIds ?? []);
@@ -55,7 +76,6 @@ export class MonsterCardComponent {
       return allForType.filter(hc => selectedIds.has(hc.id));
     }
 
-    // Fallback: edible components filtered by harvestableComponents; all non-edible included
     const cookingTypes = new Set(this.monster.harvestableComponents);
     return allForType.filter(hc =>
       (!hc.isEdible || !hc.edibleAs) ||
@@ -63,6 +83,7 @@ export class MonsterCardComponent {
     );
   }
 
+  /** Edible harvest components for this monster, each paired with its `ComponentEffect`. */
   get cookingComponents() {
     return this.filteredHarvestComponents
       .filter(hc => hc.isEdible && hc.edibleAs)
@@ -72,24 +93,28 @@ export class MonsterCardComponent {
       }));
   }
 
+  /** Non-edible harvest components for this monster (used in magic item crafting). */
   get craftingComponents(): HarvestComponent[] {
     return this.filteredHarvestComponents.filter(hc => !hc.isEdible || !hc.edibleAs);
   }
 
+  /** The first named ingredient linked to this monster, or `null`.
+   *  Boss monsters typically have a unique named ingredient drop. */
   get bossDrop(): Ingredient | null {
     return this.dataService.getIngredients().find(
       i => i.sourceMonsterIds?.includes(this.monster.id)
     ) ?? null;
   }
 
+  /** Current inventory quantity of the boss drop ingredient. */
   get bossDropQuantity(): number {
     return this.bossDrop ? this.inventoryService.getQuantity(this.bossDrop.id) : 0;
   }
 
+  /** Adjusts boss drop inventory by `delta`. Stops event propagation to prevent
+   *  the card click from opening the detail dialog. */
   adjustBossDrop(delta: number, event: MouseEvent): void {
     event.stopPropagation();
     if (this.bossDrop) this.inventoryService.updateQuantity(this.bossDrop.id, delta);
   }
-
-
 }
