@@ -123,21 +123,6 @@
   padding: 2px 0;
 }
 
-.recipe-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.recipe-chip {
-  background: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 0.78rem;
-  font-weight: 500;
-}
-
 .link-chip {
   min-width: unset !important;
   height: unset !important;

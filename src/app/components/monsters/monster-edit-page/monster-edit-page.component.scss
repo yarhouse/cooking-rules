@@ -1,9 +1,33 @@
+.edit-monster-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+}
+
+.stepper-container {
+  width: 100%;
+}
+
+// ── Step layout ──────────────────────────────────────────────────────────────
+
 .step-form {
   display: flex;
   flex-direction: column;
   gap: 14px;
   padding-top: 20px;
-  min-width: 480px;
+  width: 100%;
 }
 
 .full-width {
@@ -33,10 +57,9 @@
   }
 }
 
-// ── Harvest component selection list ────────────────────────────────────────
+// ── Harvest component selection list ─────────────────────────────────────────
 
 .harvest-component-list {
-  max-height: 340px;
   overflow-y: auto;
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 8px;
@@ -119,7 +142,7 @@
   color: var(--mat-sys-error);
 }
 
-// ── Edit mode ────────────────────────────────────────────────────────────────
+// ── Removed components warning ───────────────────────────────────────────────
 
 .removed-warning {
   padding: 10px 14px;

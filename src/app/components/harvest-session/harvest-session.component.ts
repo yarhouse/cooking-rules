@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { CookingDataService } from '../../services/cooking-data.service';
 import { RarityLabelComponent } from '../shared/rarity-label/rarity-label.component';
+import { MonsterCardComponent } from '../shared/monster-card/monster-card.component';
 import { InventoryService } from '../../services/inventory.service';
 import { Monster, MonsterRarity } from '../../models/monster.model';
 import { ComponentTypeName } from '../../models/component-type.model';
@@ -58,6 +59,7 @@ const RARITY_ORDER: Record<MonsterRarity, number> = {
     MatTooltipModule,
     MatDividerModule,
     RarityLabelComponent,
+    MonsterCardComponent,
   ],
   templateUrl: './harvest-session.component.html',
   styleUrl: './harvest-session.component.scss',
@@ -71,7 +73,7 @@ export class HarvestSessionComponent {
   // ── Step 1 ──────────────────────────────────────────────────────────────
   readonly creatureTypes = this.dataService.getCreatureTypes();
   selectedCreatureTypeId = signal<string | null>(null);
-  selectedMonster = signal<Monster | null>(null);
+  selectedMonsterId = signal<string | null>(null);
 
   readonly monstersForType = computed((): Monster[] => {
     const id = this.selectedCreatureTypeId();
@@ -79,6 +81,12 @@ export class HarvestSessionComponent {
     return this.dataService.getMonstersByType(id).sort(
       (a, b) => (RARITY_ORDER[a.rarity] ?? 0) - (RARITY_ORDER[b.rarity] ?? 0) || a.name.localeCompare(b.name)
     );
+  });
+
+  readonly selectedMonster = computed((): Monster | null => {
+    const id = this.selectedMonsterId();
+    if (!id) return null;
+    return this.monstersForType().find(m => m.id === id) ?? null;
   });
 
   readonly selectedMonsterTypeName = computed((): string => {
@@ -252,7 +260,7 @@ export class HarvestSessionComponent {
 
   reset(): void {
     this.selectedCreatureTypeId.set(null);
-    this.selectedMonster.set(null);
+    this.selectedMonsterId.set(null);
     this.harvestList.set([]);
     this.assessmentRoll.set(0);
     this.carvingRoll.set(0);
@@ -261,24 +269,12 @@ export class HarvestSessionComponent {
 
   selectCreatureType(id: string): void {
     this.selectedCreatureTypeId.set(this.selectedCreatureTypeId() === id ? null : id);
-    this.selectedMonster.set(null);
+    this.selectedMonsterId.set(null);
     this.harvestList.set([]);
   }
 
   selectMonster(monster: Monster): void {
-    this.selectedMonster.set(monster);
+    this.selectedMonsterId.set(monster.id);
     this.harvestList.set([]);
-  }
-
-  harvestSkillIcon(skill: string): string {
-    const icons: Record<string, string> = {
-      arcana:        'auto_fix_high',
-      survival:      'hiking',
-      religion:      'volunteer_activism',
-      investigation: 'manage_search',
-      medicine:      'medical_services',
-      nature:        'eco',
-    };
-    return icons[skill.toLowerCase()] ?? 'psychology';
   }
 }

@@ -138,75 +138,11 @@
   flex-direction: column;
 }
 
-.monster-preview-card {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 16px;
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 12px;
-  background: var(--mat-sys-surface-container-low);
-}
-
-.preview-card-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.preview-monster-name {
-  font-size: 1.05rem;
-  font-weight: 600;
-  flex: 1;
-  min-width: 0;
-}
-
-.preview-boss-star {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-  color: #c8971a;
-  flex-shrink: 0;
-}
-
-.preview-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.preview-type-label {
-  font-size: 0.82rem;
-  color: var(--mat-sys-on-surface-variant);
-  text-transform: capitalize;
-}
-
-.preview-skill-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 2px 9px 2px 6px;
-  border-radius: 999px;
-  background: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
-  border: 1.5px solid var(--mat-sys-outline);
-}
-
-.preview-skill-icon {
-  font-size: 14px;
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
 .preview-section {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin-top: 8px;
 }
 
 .preview-section-label {
@@ -216,49 +152,6 @@
   letter-spacing: 0.06em;
   color: var(--mat-sys-on-surface-variant);
   margin: 0;
-}
-
-.preview-comp-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.preview-comp-chip {
-  font-size: 0.78rem;
-  font-weight: 500;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
-  border: 1.5px solid var(--mat-sys-outline);
-}
-
-.preview-boss-drop {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.preview-named-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  padding: 3px 10px 3px 7px;
-  border-radius: 999px;
-  border: 1px solid #c8971a;
-  color: #7a5500;
-  background: #f0e0a020;
-}
-
-.preview-boss-icon {
-  font-size: 14px;
-  width: 14px;
-  height: 14px;
-  color: #c8971a;
-  flex-shrink: 0;
 }
 
 .preview-essence-row {

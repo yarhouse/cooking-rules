@@ -139,10 +139,9 @@
         <div class="harvest-table-container">
           <div class="harvest-header">
             <h3>{{ ct.name }} Harvest Components</h3>
-            <mat-chip class="skill-chip">
-              <mat-icon matChipAvatar>psychology</mat-icon>
-              Harvesting Skill: {{ ct.harvestSkill ?? 'Unknown' }}
-            </mat-chip>
+            @if (ct.harvestSkill) {
+              <app-skill-badge [skill]="ct.harvestSkill" />
+            }
             <span class="harvest-formula">
               Assessment: INT ({{ ct.harvestSkill }}) + Carving: DEX ({{ ct.harvestSkill }})
             </span>

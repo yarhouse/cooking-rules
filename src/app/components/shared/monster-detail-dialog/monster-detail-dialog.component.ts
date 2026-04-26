@@ -1,14 +1,14 @@
 import { Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { Monster } from '../../../models/monster.model';
+import { Router } from '@angular/router';
+import { Monster, MonsterRarity } from '../../../models/monster.model';
+import { RarityScaling } from '../../../models/component-type.model';
 import { RarityLabelComponent } from '../rarity-label/rarity-label.component';
-import { Recipe } from '../../../models/recipe.model';
 import { CookingDataService } from '../../../services/cooking-data.service';
-import { RecipeDetailDialogComponent } from '../recipe-detail-dialog/recipe-detail-dialog.component';
 
 @Component({
   selector: 'app-monster-detail-dialog',
@@ -17,13 +17,23 @@ import { RecipeDetailDialogComponent } from '../recipe-detail-dialog/recipe-deta
   styleUrl: './monster-detail-dialog.component.scss',
 })
 export class MonsterDetailDialogComponent {
-  readonly monster = inject<Monster>(MAT_DIALOG_DATA);
+  readonly monster    = inject<Monster>(MAT_DIALOG_DATA);
   private dataService = inject(CookingDataService);
-  private dialog = inject(MatDialog);
-  private dialogRef = inject(MatDialogRef<MonsterDetailDialogComponent>);
+  private dialogRef   = inject(MatDialogRef<MonsterDetailDialogComponent>);
+  private router      = inject(Router);
 
   get creatureTypeName(): string {
     return this.dataService.getCreatureType(this.monster.creatureTypeId)?.name ?? this.monster.creatureTypeId;
+  }
+
+  get monsterScalingKey(): keyof RarityScaling | null {
+    const map: Partial<Record<MonsterRarity, keyof RarityScaling>> = {
+      uncommon:    'uncommon',
+      rare:        'rare',
+      'very-rare': 'veryRare',
+      legendary:   'legendary',
+    };
+    return map[this.monster.rarity] ?? null;
   }
 
   get ingredients() {
@@ -34,22 +44,8 @@ export class MonsterDetailDialogComponent {
     });
   }
 
-  get relatedRecipes() {
-    const seen = new Set<string>();
-    const recipes = [];
-    for (const ct of this.monster.harvestableComponents) {
-      for (const r of this.dataService.getRecipesContaining(ct)) {
-        if (!seen.has(r.id)) {
-          seen.add(r.id);
-          recipes.push(r);
-        }
-      }
-    }
-    return recipes;
-  }
-
-  openRecipe(recipe: Recipe): void {
-    const newRef = this.dialog.open(RecipeDetailDialogComponent, { data: recipe, width: '560px', maxWidth: '95vw' });
-    newRef.afterOpened().subscribe(() => this.dialogRef.close());
+  openEdit(): void {
+    this.dialogRef.close();
+    this.router.navigate(['/monsters', this.monster.id, 'edit']);
   }
 }

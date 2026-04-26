@@ -6,6 +6,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { CookingDataService } from '../../services/cooking-data.service';
 import { RarityLabelComponent } from '../shared/rarity-label/rarity-label.component';
+import { SkillBadgeComponent } from '../shared/skill-badge/skill-badge.component';
 import { InventoryService } from '../../services/inventory.service';
 import { HarvestComponent } from '../../models/harvest-component.model';
 import { Monster, MonsterRarity } from '../../models/monster.model';
@@ -20,6 +21,7 @@ import { Ingredient } from '../../models/ingredient.model';
     MatTooltipModule,
     MatChipsModule,
     RarityLabelComponent,
+    SkillBadgeComponent,
   ],
   templateUrl: './harvesting.component.html',
   styleUrl: './harvesting.component.scss',

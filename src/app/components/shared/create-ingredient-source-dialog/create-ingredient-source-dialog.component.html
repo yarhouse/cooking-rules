@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>New Ingredient Source</h2>
+<h2 mat-dialog-title>{{ isEditMode ? 'Edit Ingredient Source' : 'New Ingredient Source' }}</h2>
 
 <mat-dialog-content>
   <mat-stepper linear (selectionChange)="onStepChange($event)" #stepper>
@@ -51,7 +51,7 @@
 
         <div class="step-actions">
           <button mat-button type="button" (click)="cancel()">Cancel</button>
-          <button mat-flat-button matStepperNext [disabled]="step1.invalid">Next</button>
+          <button mat-flat-button type="button" matStepperNext [disabled]="step1.invalid">Next</button>
         </div>
       </form>
     </mat-step>
@@ -59,17 +59,25 @@
     <!-- ── Step 2: Harvestable Components ───────────────────────────────── -->
     <mat-step label="Harvestable components">
       <div class="step-form">
-        <p class="step-hint">Which component types can be harvested from this source?</p>
+        <p class="step-hint">
+          Which components can be harvested from this source?
+          <span class="step-hint-sub">Filtered to the selected creature type. Edible components are labelled.</span>
+        </p>
 
-        <div class="component-grid">
-          @for (ct of componentTypes; track ct.id) {
-            <button mat-stroked-button type="button"
-                    [class.selected]="isSelected(ct.id)"
-                    (click)="toggleComponent(ct.id)">
-              {{ ct.name }}
-            </button>
+        <mat-selection-list class="harvest-component-list"
+                            (selectionChange)="onHarvestSelectionChange($event)">
+          @for (hc of availableHarvestComponents(); track hc.id) {
+            <mat-list-option [value]="hc.id" [selected]="isSelected(hc.id)">
+              <span matListItemTitle>{{ hc.name }}</span>
+              <span matListItemLine class="hc-meta">
+                <span class="hc-dc">DC {{ hc.componentDc }}</span>
+                @if (hc.isEdible) {
+                  <span class="edible-badge">edible</span>
+                }
+              </span>
+            </mat-list-option>
           }
-        </div>
+        </mat-selection-list>
 
         @if (step2Error()) {
           <p class="field-error">{{ step2Error() }}</p>
@@ -77,8 +85,8 @@
 
         <div class="step-actions">
           <button mat-button type="button" matStepperPrevious>Back</button>
-          <button mat-flat-button matStepperNext
-                  [disabled]="selectedComponents().size === 0">
+          <button mat-flat-button type="button" matStepperNext
+                  [disabled]="selectedComponents().size === 0 && !isEditMode">
             Next
           </button>
         </div>
@@ -88,7 +96,24 @@
     <!-- ── Step 3: Name Ingredients ─────────────────────────────────────── -->
     <mat-step [stepControl]="step3" label="Name ingredients">
       <form [formGroup]="step3" class="step-form">
-        <p class="step-hint">Name each ingredient this source yields.</p>
+        <p class="step-hint">
+          {{ isEditMode ? 'Name each new ingredient this source will yield.' : 'Name each ingredient this source yields.' }}
+        </p>
+
+        @if (isEditMode && removedComponents().length) {
+          <div class="removed-warning">
+            <span class="warning-label">⚠ Will be removed:</span>
+            <ul class="removed-list">
+              @for (c of removedComponents(); track c.id) {
+                <li>{{ c.name }} — ingredient will be deleted</li>
+              }
+            </ul>
+          </div>
+        }
+
+        @if (ingredientRows.length === 0 && isEditMode) {
+          <p class="no-new-ingredients">No new ingredients to name.</p>
+        }
 
         <div class="ingredient-rows" formArrayName="ingredients">
           @for (row of ingredientRows.controls; track $index) {
@@ -97,7 +122,7 @@
 
               <mat-form-field appearance="outline" class="ingredient-name-field">
                 <mat-label>Ingredient name</mat-label>
-                <input matInput formControlName="name"
+                <input matInput formControlName="name" title="Ingredient name"
                        [placeholder]="'e.g. ' + ingredientRowMeta[$index]?.name + ' extract'"
                        autocomplete="off" />
                 @if (row.get('name')?.hasError('required') && row.get('name')?.touched) {
@@ -107,7 +132,7 @@
 
               <mat-form-field appearance="outline" class="ingredient-notes-field">
                 <mat-label>Notes (optional)</mat-label>
-                <input matInput formControlName="notes" autocomplete="off" />
+                <input matInput formControlName="notes" title="Notes" autocomplete="off" />
               </mat-form-field>
             </div>
           }
@@ -125,7 +150,7 @@
             @if (submitting()) {
               <mat-spinner diameter="18" />
             } @else {
-              Create
+              {{ isEditMode ? 'Save changes' : 'Create' }}
             }
           </button>
         </div>

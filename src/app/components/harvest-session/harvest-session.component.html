@@ -48,58 +48,16 @@
             <!-- Right: selected monster preview -->
             <div class="monster-preview-panel">
               @if (selectedMonster(); as m) {
-                <div class="monster-preview-card">
-                  <div class="preview-card-header">
-                    <span class="preview-monster-name">{{ m.name }}</span>
-                    @if (m.isBoss) {
-                      <mat-icon class="preview-boss-star" matTooltip="Boss monster — has a unique ingredient">star</mat-icon>
-                    }
-                    <app-rarity-label [rarity]="m.rarity" />
+                <app-monster-card [monster]="m" />
+                @if (essenceEntry(); as ess) {
+                  <div class="preview-section">
+                    <p class="preview-section-label">Essence</p>
+                    <div class="preview-essence-row">
+                      <span class="preview-essence-pill">{{ ess.name }}</span>
+                      <span class="dc-tag dc-tag--essence">DC {{ ess.componentDc }}</span>
+                    </div>
                   </div>
-
-                  <div class="preview-meta">
-                    <span class="preview-type-label">{{ selectedMonsterTypeName() }}</span>
-                    @if (harvestSkill()) {
-                      <span class="preview-skill-badge">
-                        <mat-icon class="preview-skill-icon">{{ harvestSkillIcon(harvestSkill()) }}</mat-icon>
-                        {{ harvestSkill() }}
-                      </span>
-                    }
-                  </div>
-
-                  @if (selectedMonsterComponentTypes().length) {
-                    <div class="preview-section">
-                      <p class="preview-section-label">Component types</p>
-                      <div class="preview-comp-chips">
-                        @for (name of selectedMonsterComponentTypes(); track name) {
-                          <span class="preview-comp-chip">{{ name }}</span>
-                        }
-                      </div>
-                    </div>
-                  }
-
-                  @if (bossDrop(); as drop) {
-                    <div class="preview-section">
-                      <p class="preview-section-label">Unique ingredient</p>
-                      <div class="preview-boss-drop">
-                        <span class="preview-named-pill">
-                          <mat-icon class="preview-boss-icon">star</mat-icon>
-                          {{ drop.name }}
-                        </span>
-                      </div>
-                    </div>
-                  }
-
-                  @if (essenceEntry(); as ess) {
-                    <div class="preview-section">
-                      <p class="preview-section-label">Essence</p>
-                      <div class="preview-essence-row">
-                        <span class="preview-essence-pill">{{ ess.name }}</span>
-                        <span class="dc-tag dc-tag--essence">DC {{ ess.componentDc }}</span>
-                      </div>
-                    </div>
-                  }
-                </div>
+                }
               } @else {
                 <div class="preview-placeholder">
                   <mat-icon>touch_app</mat-icon>
