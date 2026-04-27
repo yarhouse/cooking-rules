@@ -23,10 +23,12 @@ See [db/sqlite/schema.sql](db/sqlite/schema.sql) for the full database schema an
 - **Search** — federated search across recipes, monsters, and ingredients
 - **Browse** — filter by creature type, component type, or recipe tier
 - **Recipe Builder** — select the components you have and see which recipes you can craft
-- **Inventory** — track ingredient quantities and loose essence stock by rarity
-- **Harvesting** — browse all 208 harvestable components by creature type, with DC, required skill, edibility, and volatility
+- **Cook Session** — guided step-by-step cook session: pick a recipe, roll the cook check, assign ingredients, roll for quirks, and spend from inventory
+- **Harvest Session** — guided harvest session stepper: select a monster, roll harvest DCs per component, and record what was collected
+- **Inventory** — track ingredient quantities, harvest component stock, and loose essence by rarity
 - **Crafting** — browse magic item recipes by category and rarity; craft directly from your inventory with a confirm dialog
 - **Rules Reference** — full component effect tables with rarity scaling, and rules quirks
+- **Monster Editor** — create and edit custom monsters, assign harvestable components, and manage their named ingredients
 
 ---
 
@@ -90,7 +92,7 @@ ng serve
 
 Open `http://localhost:4200`.
 
-The SQLite database is created automatically at `data/aratus-cookbook.db` on first API server start.
+The SQLite database is created automatically at `data/cooking-rules.db` on first API server start.
 
 ---
 
@@ -146,6 +148,7 @@ All scripts are run from the **project root** unless noted.
 | `npm run watch` | Angular build in watch mode (development config) |
 | `npm test` | Run unit tests via Vitest |
 | `ng lint` | ESLint across `src/**/*.ts` and `src/**/*.html` |
+| `npm run docs` | Generate TypeDoc for the Angular app and the API server |
 
 ### Building
 
@@ -183,13 +186,19 @@ aratus-cookbook/
 │   └── main.js                 # Electron main process — spawns server, manages lifecycle
 ├── src/                        # Angular app
 │   ├── app/
-│   │   ├── components/         # Page and shared UI components
-│   │   │   └── shared/         # Cards, detail dialogs, edit dialog
+│   │   ├── components/
+│   │   │   ├── cooking/        # Recipe builder page
+│   │   │   ├── cook-session/   # Guided cook session stepper
+│   │   │   ├── harvest-session/ # Guided harvest session stepper
+│   │   │   ├── monsters/       # Monster edit page
+│   │   │   │   └── monster-edit-page/
+│   │   │   └── shared/         # Cards, detail dialogs, create dialogs, rarity-label, skill-badge
 │   │   ├── data/               # Static TypeScript data (used by static build; not committed)
-│   │   ├── models/             # TypeScript interfaces matching API shapes
+│   │   ├── models/             # TypeScript interfaces matching API shapes + session/payload models
 │   │   └── services/
-│   │       ├── cooking-data.service.ts   # Central data layer (signals + HTTP caching)
-│   │       ├── inventory.service.ts      # Per-session state, localStorage persistence
+│   │       ├── cooking-data.service.ts   # Central read-only data layer (signals + HTTP caching)
+│   │       ├── cooking-create.service.ts # All write operations (create/update/delete via API)
+│   │       ├── inventory.service.ts      # Per-session inventory state, localStorage persistence
 │   │       └── api.service.ts            # Thin HTTP wrapper
 │   └── environments/
 │       ├── environment.ts              # Dev — API at localhost:3000
@@ -229,8 +238,12 @@ aratus-cookbook/
 | --- | --- | --- |
 | `GET` | `/api/creature-types` | All creature types with available component IDs |
 | `GET` | `/api/component-types` | All component types with full effect tables and rarity scaling |
-| `GET` | `/api/monsters` | All monsters with harvestable component IDs |
+| `GET` | `/api/monsters` | All monsters with harvestable component types and selected harvest component IDs |
+| `POST` | `/api/monsters` | Create a custom monster + its named ingredients atomically |
+| `PUT` | `/api/monsters/:id` | Update a custom monster; diffs harvest selections to cascade-create/delete ingredients |
+| `DELETE` | `/api/monsters/:id` | Delete a custom monster and cascade to its ingredients |
 | `GET` | `/api/ingredients` | All ingredients with source monster IDs |
+| `DELETE` | `/api/ingredients/:id` | Delete a custom ingredient |
 | `GET` | `/api/recipes` | All recipes with nested ingredient slots |
 | `GET` | `/api/harvest-components` | All 208 harvest components — optional `?creatureTypeId=` filter |
 | `GET` | `/api/magic-items` | All magic item recipes — optional `?category=`, `?rarity=`, `?creatureTypeId=` filters |
@@ -246,9 +259,9 @@ SQLite via `better-sqlite3`. The database file is created automatically on first
 
 | Context | Database location |
 | --- | --- |
-| Dev server | `data/aratus-cookbook.db` (project root) |
-| Packaged Electron (macOS) | `~/Library/Application Support/Chef Aratus Cookbook/aratus-cookbook.db` |
-| Packaged Electron (Windows) | `%APPDATA%\Chef Aratus Cookbook\aratus-cookbook.db` |
+| Dev server | `data/cooking-rules.db` (project root) |
+| Packaged Electron (macOS) | `~/Library/Application Support/Chef Aratus Cookbook/cooking-rules.db` |
+| Packaged Electron (Windows) | `%APPDATA%\Chef Aratus Cookbook\cooking-rules.db` |
 
 Override the path with the `DB_PATH` environment variable.
 

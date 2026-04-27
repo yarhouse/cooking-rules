@@ -111,14 +111,20 @@ server/
     └── routes/
         ├── creature-types.ts       GET /api/creature-types
         ├── component-types.ts      GET /api/component-types
-        ├── monsters.ts             GET /api/monsters
-        ├── ingredients.ts          GET /api/ingredients
+        ├── monsters.ts             GET /api/monsters, POST /api/monsters, PUT /api/monsters/:id, DELETE /api/monsters/:id
+        ├── ingredients.ts          GET /api/ingredients, DELETE /api/ingredients/:id
         ├── recipes.ts              GET /api/recipes
         ├── harvest-components.ts   GET /api/harvest-components[?creatureTypeId=]
         └── magic-items.ts          GET /api/magic-items[?category=][&rarity=][&creatureTypeId=]
 ```
 
-All routes are synchronous (better-sqlite3 is sync). Each runs a single SQL query using `json_group_array` + `json_object` for junction table aggregation, returning nested camelCase JSON. Results include `JSON.parse()` for SQLite's JSON string columns.
+All routes are synchronous (better-sqlite3 is sync). Each GET runs a single SQL query using `json_group_array` + `json_object` for junction table aggregation, returning nested camelCase JSON. Results include `JSON.parse()` for SQLite's JSON string columns.
+
+Mutation routes:
+
+- `POST /api/monsters` — creates a monster and all its named ingredients atomically in one transaction (rolls back on failure)
+- `PUT /api/monsters/:id` — diffs `selectedHarvestComponentIds` to cascade-delete removed ingredients; creates new ingredients for added edible components
+- `DELETE /api/monsters/:id` — deletes a custom monster and cascades to its ingredients
 
 The two harvesting/crafting routes support optional query params for filtering:
 
@@ -171,7 +177,8 @@ Override with the `DB_PATH` environment variable.
 | `creature_type_components` | Junction: which components each creature type yields |
 | `component_effects` | Per-(component × creature type) effect with 4 rarity scaling columns |
 | `monsters` | ~55 monsters with `is_boss` flag |
-| `monster_harvestable_components` | Junction: harvestable components per monster |
+| `monster_harvestable_components` | Junction: edible component types per monster (drives recipe matching) |
+| `monster_harvest_component_selections` | Junction: exact `harvest_component` IDs selected per monster (drives monster card display) |
 | `ingredients` | ~109 ingredients |
 | `ingredient_source_monsters` | Junction: which monsters drop each ingredient |
 | `recipes` | 32 recipes across 5 tiers (novice → boss) |
@@ -192,28 +199,39 @@ Campaign/inventory tables (`campaigns`, `inventory_entries`, `essence_stock`) ex
 | --- | --- | --- |
 | `/#/search` | `SearchComponent` | Federated search across monsters, recipes, ingredients |
 | `/#/browse` | `BrowseComponent` | Filter/browse by creature type, component type, tier |
-| `/#/builder` | `RecipeBuilderComponent` | Select ingredients, see which recipes are craftable |
+| `/#/cooking` | `CookingComponent` | Recipe builder — select ingredients, see which recipes are craftable |
+| `/#/cook-session` | `CookSessionComponent` | Guided step-by-step cook session with DC entry, ingredient selection, quirk rolls |
 | `/#/inventory` | `InventoryComponent` | Track ingredient stock and loose essence |
-| `/#/harvesting` | `HarvestingComponent` | Browse harvest components by creature type — DC, skill, edibility, volatility |
+| `/#/harvest` | `HarvestSessionComponent` | Guided harvest session stepper — select monster, roll DCs, record results |
 | `/#/crafting` | `CraftingComponent` | Browse magic item recipes by category/rarity; craft from inventory |
 | `/#/rules` | `RulesComponent` | Rules reference — effects by component/creature, quirks |
+| `/#/monsters/:id/edit` | `MonsterEditPageComponent` | Edit a custom monster's components, ingredients, and harvest selections |
+
+`/harvesting` and `/harvest-session` redirect to `/harvest`.
 
 ### Services
 
 **`CookingDataService`** (`src/app/services/cooking-data.service.ts`)
 
-- Central data access layer — all components inject this, none import data directly
+- Central read-only data layer — all components inject this, none import data directly
 - In API mode: fetches all 7 datasets via `toSignal(api.get(...))` — loads once, cached in signals
 - In static mode (`environment.staticData === true`): initialises signals directly from `src/app/data/*.data.ts`
 - All 7 private signals are typed as `Signal<T>` with a ternary on `environment.staticData`
 - `loading` computed returns `false` immediately in static mode
-- Merges custom user-created entities from `InventoryService` into every getter
+- `refreshMonsters()` / `refreshIngredients()` / `refreshRecipes()` re-fetch from the API and update the signal — called by `CookingCreateService` after mutations; no-ops in static builds
 - Exposes `harvestComponents()` and `magicItems()` getters alongside the original 5
+
+**`CookingCreateService`** (`src/app/services/cooking-create.service.ts`)
+
+- Owns all write operations — `createMonster`, `updateMonster`, `deleteMonster`, `createIngredient`, `deleteIngredient`, `createRecipe`
+- After each successful mutation, calls the relevant `CookingDataService.refresh*()` to keep read signals current
+- Holds three session signals (`newMonsters`, `newIngredients`, `newRecipes`) that surface freshly created entities before the next API refresh completes
+- All methods are no-ops / hidden in static builds (API unavailable)
 
 **`InventoryService`** (`src/app/services/inventory.service.ts`)
 
 - Manages per-session state with Angular signals persisted to `localStorage`
-- Tracks: ingredient quantities, essence stock (by rarity), custom monsters/recipes/ingredients, effect overrides (house rules)
+- Tracks: ingredient quantities, harvest-component stock, essence stock (by rarity)
 
 **`ApiService`** (`src/app/services/api.service.ts`)
 
@@ -233,13 +251,19 @@ Campaign/inventory tables (`campaigns`, `inventory_entries`, `essence_stock`) ex
 
 | Component | Role |
 | --- | --- |
-| `monster-card` | Monster summary card; opens `MonsterDetailDialogComponent` |
-| `ingredient-card` | Ingredient card with inventory controls |
-| `recipe-card` | Recipe card with tier badge; opens `RecipeDetailDialogComponent` |
+| `monster-card` | Monster summary card with harvest component chips; opens `MonsterDetailDialogComponent` |
 | `monster-detail-dialog` | Full monster sheet in a MatDialog |
+| `ingredient-card` | Ingredient card with inventory controls |
 | `ingredient-detail-dialog` | Ingredient detail with source monsters and related recipes |
+| `recipe-card` | Recipe card with tier badge; opens `RecipeDetailDialogComponent` |
 | `recipe-detail-dialog` | Recipe detail with component effects |
-| `edit-dialog` | Generic edit form for custom entities |
+| `component-card` | `HarvestComponent` card — DC, volatility, effect; opens `ComponentDetailDialogComponent` |
+| `component-detail-dialog` | `HarvestComponent` detail in a MatDialog |
+| `create-ingredient-dialog` | Create a standalone named ingredient linked to a source monster |
+| `create-ingredient-source-dialog` | Add a source monster to an existing ingredient |
+| `create-recipe-dialog` | Create a custom recipe with ingredient slots |
+| `rarity-label` | Unified rarity chip (common / uncommon / rare / very-rare / legendary) |
+| `skill-badge` | Skill name badge (Athletics, Perception, Survival, etc.) |
 
 ### Angular commands
 
@@ -252,6 +276,7 @@ ng build --configuration=electron          # Electron build
 ng test                                    # Unit tests via Vitest
 ng lint                                    # ESLint
 ng generate component components/<name>    # Scaffold a new component
+npm run docs                               # Generate TypeDoc (Angular + server)
 ```
 
 ## Data models (`src/app/models/`)
@@ -268,3 +293,5 @@ TypeScript interfaces matching the API response shapes exactly (camelCase). The 
 | `inventory.model.ts` | `InventoryEntry`, `EssenceStock` |
 | `harvest-component.model.ts` | `HarvestComponent` |
 | `magic-item.model.ts` | `MagicItem`, `MagicItemComponent`, `MagicItemCategory`, `MAGIC_ITEM_CATEGORY_LABELS` |
+| `cooking-session.model.ts` | `CookingQuirk`, `StockItem`, `SlotDetail`, `CookingCandidate`, `ResolvedSlot`, `ResultIngredient` — shared between `CookSessionComponent` and `RulesComponent` |
+| `create-payloads.model.ts` | `CreateMonsterPayload`, `UpdateMonsterPayload`, `CreateIngredientPayload`, `CreateRecipePayload` — request bodies for all mutation endpoints |
