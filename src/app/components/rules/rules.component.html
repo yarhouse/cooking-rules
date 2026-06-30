@@ -401,17 +401,21 @@
                   </ul>
 
                   <h3>Harvest Time by Size</h3>
-                  <table class="reference-table">
-                    <thead><tr><th>Creature Size</th><th>Time</th><th>Max Helpers</th></tr></thead>
-                    <tbody>
-                      @for (row of harvestSizeTable; track row.size) {
-                        <tr>
-                          <td>{{ row.size }}</td>
-                          <td>{{ row.time }}</td>
-                          <td>{{ row.helpers }}</td>
-                        </tr>
-                      }
-                    </tbody>
+                  <table mat-table [dataSource]="harvestSizeTable" class="reference-mat-table">
+                    <ng-container matColumnDef="size">
+                      <th mat-header-cell *matHeaderCellDef>Creature Size</th>
+                      <td mat-cell *matCellDef="let row">{{ row.size }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="time">
+                      <th mat-header-cell *matHeaderCellDef>Time</th>
+                      <td mat-cell *matCellDef="let row">{{ row.time }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="helpers">
+                      <th mat-header-cell *matHeaderCellDef>Max Helpers</th>
+                      <td mat-cell *matCellDef="let row">{{ row.helpers }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="harvestSizeColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: harvestSizeColumns;"></tr>
                   </table>
                 </div>
 
@@ -452,20 +456,25 @@
               <div class="ref-section">
                 <h3>Essence by Creature CR</h3>
                 <p class="section-hint">Higher-CR creatures yield rarer essence types.</p>
-                <table class="reference-table">
-                  <thead>
-                    <tr><th>Creature CR</th><th>Harvest DC</th><th>Essence</th><th>Item Rarity</th></tr>
-                  </thead>
-                  <tbody>
-                    @for (row of essenceTable; track row.cr) {
-                      <tr>
-                        <td>{{ row.cr }}</td>
-                        <td>{{ row.dc }}</td>
-                        <td>{{ row.essence }}</td>
-                        <td><app-rarity-label [rarity]="row.rarity" /></td>
-                      </tr>
-                    }
-                  </tbody>
+                <table mat-table [dataSource]="essenceTable" class="reference-mat-table">
+                  <ng-container matColumnDef="cr">
+                    <th mat-header-cell *matHeaderCellDef>Creature CR</th>
+                    <td mat-cell *matCellDef="let row">{{ row.cr }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="dc">
+                    <th mat-header-cell *matHeaderCellDef>Harvest DC</th>
+                    <td mat-cell *matCellDef="let row">{{ row.dc }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="essence">
+                    <th mat-header-cell *matHeaderCellDef>Essence</th>
+                    <td mat-cell *matCellDef="let row">{{ row.essence }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="rarity">
+                    <th mat-header-cell *matHeaderCellDef>Item Rarity</th>
+                    <td mat-cell *matCellDef="let row"><app-rarity-label [rarity]="row.rarity" /></td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="essenceColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: essenceColumns;"></tr>
                 </table>
               </div>
 
@@ -474,39 +483,49 @@
                 <p class="section-hint">
                   Values without harvesting supplies / with harvesting supplies.
                 </p>
-                <table class="reference-table">
-                  <thead>
-                    <tr><th>Comp. DC</th><th>Sell</th><th>Buy</th><th>Sell (supplied)</th><th>Buy (supplied)</th></tr>
-                  </thead>
-                  <tbody>
-                    @for (row of componentValueTable; track row.dc) {
-                      <tr>
-                        <td>{{ row.dc }}</td>
-                        <td>{{ row.sell }}</td>
-                        <td>{{ row.buy }}</td>
-                        <td>{{ row.sellSupplied }}</td>
-                        <td>{{ row.buySupplied }}</td>
-                      </tr>
-                    }
-                  </tbody>
+                <table mat-table [dataSource]="componentValueTable" class="reference-mat-table">
+                  <ng-container matColumnDef="dc">
+                    <th mat-header-cell *matHeaderCellDef>Comp. DC</th>
+                    <td mat-cell *matCellDef="let row">{{ row.dc }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="sell">
+                    <th mat-header-cell *matHeaderCellDef>Sell</th>
+                    <td mat-cell *matCellDef="let row">{{ row.sell }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="buy">
+                    <th mat-header-cell *matHeaderCellDef>Buy</th>
+                    <td mat-cell *matCellDef="let row">{{ row.buy }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="sellSupplied">
+                    <th mat-header-cell *matHeaderCellDef>Sell (supplied)</th>
+                    <td mat-cell *matCellDef="let row">{{ row.sellSupplied }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="buySupplied">
+                    <th mat-header-cell *matHeaderCellDef>Buy (supplied)</th>
+                    <td mat-cell *matCellDef="let row">{{ row.buySupplied }}</td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="componentValueColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: componentValueColumns;"></tr>
                 </table>
               </div>
 
               <div class="ref-section">
                 <h3>Essence Trading Values</h3>
-                <table class="reference-table">
-                  <thead>
-                    <tr><th>Essence</th><th>Sell</th><th>Buy</th></tr>
-                  </thead>
-                  <tbody>
-                    @for (row of essenceValueTable; track row.essence) {
-                      <tr>
-                        <td>{{ row.essence }}</td>
-                        <td>{{ row.sell }}</td>
-                        <td>{{ row.buy }}</td>
-                      </tr>
-                    }
-                  </tbody>
+                <table mat-table [dataSource]="essenceValueTable" class="reference-mat-table">
+                  <ng-container matColumnDef="essence">
+                    <th mat-header-cell *matHeaderCellDef>Essence</th>
+                    <td mat-cell *matCellDef="let row">{{ row.essence }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="sell">
+                    <th mat-header-cell *matHeaderCellDef>Sell</th>
+                    <td mat-cell *matCellDef="let row">{{ row.sell }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="buy">
+                    <th mat-header-cell *matHeaderCellDef>Buy</th>
+                    <td mat-cell *matCellDef="let row">{{ row.buy }}</td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="essenceValueColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: essenceValueColumns;"></tr>
                 </table>
               </div>
 
@@ -516,19 +535,21 @@
                   Make a check using the creature type's harvest skill + settlement modifier.
                   Roll a d20 + INT or CHA modifier + proficiency (if applicable).
                 </p>
-                <table class="reference-table">
-                  <thead>
-                    <tr><th>Check Total</th><th>Buyer's Offer</th><th>Seller's Offer</th></tr>
-                  </thead>
-                  <tbody>
-                    @for (row of tradingTable; track row.check) {
-                      <tr>
-                        <td>{{ row.check }}</td>
-                        <td>{{ row.buyer }}</td>
-                        <td>{{ row.seller }}</td>
-                      </tr>
-                    }
-                  </tbody>
+                <table mat-table [dataSource]="tradingTable" class="reference-mat-table">
+                  <ng-container matColumnDef="check">
+                    <th mat-header-cell *matHeaderCellDef>Check Total</th>
+                    <td mat-cell *matCellDef="let row">{{ row.check }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="buyer">
+                    <th mat-header-cell *matHeaderCellDef>Buyer's Offer</th>
+                    <td mat-cell *matCellDef="let row">{{ row.buyer }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="seller">
+                    <th mat-header-cell *matHeaderCellDef>Seller's Offer</th>
+                    <td mat-cell *matCellDef="let row">{{ row.seller }}</td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="tradingColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: tradingColumns;"></tr>
                 </table>
               </div>
 
@@ -573,16 +594,17 @@
                 </div>
                 <div>
                   <h3>Outcome</h3>
-                  <table class="reference-table">
-                    <thead>
-                      <tr><th>Check vs DC</th><th>Result</th></tr>
-                    </thead>
-                    <tbody>
-                      <tr><td>−5 or more below</td><td>Fail — half materials lost</td></tr>
-                      <tr><td>−4 to −1</td><td>Fail — time only wasted</td></tr>
-                      <tr><td>0 to +4</td><td>Success</td></tr>
-                      <tr><td>+5 or more</td><td>Success + one boon (roll on Mfg. Boons)</td></tr>
-                    </tbody>
+                  <table mat-table [dataSource]="manufacturingOutcomeTable" class="reference-mat-table">
+                    <ng-container matColumnDef="check">
+                      <th mat-header-cell *matHeaderCellDef>Check vs DC</th>
+                      <td mat-cell *matCellDef="let row">{{ row.check }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="result">
+                      <th mat-header-cell *matHeaderCellDef>Result</th>
+                      <td mat-cell *matCellDef="let row">{{ row.result }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="manufacturingOutcomeColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: manufacturingOutcomeColumns;"></tr>
                   </table>
                 </div>
               </div>
@@ -612,65 +634,71 @@
                 </div>
                 <div>
                   <h3>Essence &amp; Boon Limit</h3>
-                  <table class="reference-table">
-                    <thead>
-                      <tr><th>Essence</th><th>Rarity</th><th>Max Boons</th></tr>
-                    </thead>
-                    <tbody>
-                      <tr><td>—</td><td>Common</td><td>0</td></tr>
-                      <tr><td>Frail</td><td>Uncommon</td><td>1</td></tr>
-                      <tr><td>Robust</td><td>Rare</td><td>2</td></tr>
-                      <tr><td>Potent</td><td>Very Rare</td><td>3</td></tr>
-                      <tr><td>Mythic</td><td>Legendary</td><td>3</td></tr>
-                      <tr><td>Deific</td><td>Artifact</td><td>3</td></tr>
-                    </tbody>
+                  <table mat-table [dataSource]="essenceBoonLimitTable" class="reference-mat-table">
+                    <ng-container matColumnDef="essence">
+                      <th mat-header-cell *matHeaderCellDef>Essence</th>
+                      <td mat-cell *matCellDef="let row">{{ row.essence }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="rarity">
+                      <th mat-header-cell *matHeaderCellDef>Rarity</th>
+                      <td mat-cell *matCellDef="let row">{{ row.rarity }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="maxBoons">
+                      <th mat-header-cell *matHeaderCellDef>Max Boons</th>
+                      <td mat-cell *matCellDef="let row">{{ row.maxBoons }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="essenceBoonLimitColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: essenceBoonLimitColumns;"></tr>
                   </table>
                 </div>
               </div>
 
               <h3>Enchanting DC &amp; Time by Rarity</h3>
               <div class="table-scroll">
-                <table class="reference-table">
-                  <thead>
-                    <tr>
-                      <th>Rarity</th>
-                      <th>Essence</th>
-                      <th>DC</th>
-                      <th>Consumable</th>
-                      <th>Non-Attunement</th>
-                      <th>Attunement</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (row of enchantingTable; track row.rarity) {
-                      <tr>
-                        <td><app-rarity-label [rarity]="rarityClass(row.rarity)" /></td>
-                        <td>{{ row.essence }}</td>
-                        <td><strong>{{ row.dc }}</strong></td>
-                        <td>{{ row.consumable }}</td>
-                        <td>{{ row.nonAttunement }}</td>
-                        <td>{{ row.attunement }}</td>
-                      </tr>
-                    }
-                  </tbody>
+                <table mat-table [dataSource]="enchantingTable" class="reference-mat-table">
+                  <ng-container matColumnDef="rarity">
+                    <th mat-header-cell *matHeaderCellDef>Rarity</th>
+                    <td mat-cell *matCellDef="let row"><app-rarity-label [rarity]="rarityClass(row.rarity)" /></td>
+                  </ng-container>
+                  <ng-container matColumnDef="essence">
+                    <th mat-header-cell *matHeaderCellDef>Essence</th>
+                    <td mat-cell *matCellDef="let row">{{ row.essence }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="dc">
+                    <th mat-header-cell *matHeaderCellDef>DC</th>
+                    <td mat-cell *matCellDef="let row"><strong>{{ row.dc }}</strong></td>
+                  </ng-container>
+                  <ng-container matColumnDef="consumable">
+                    <th mat-header-cell *matHeaderCellDef>Consumable</th>
+                    <td mat-cell *matCellDef="let row">{{ row.consumable }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="nonAttunement">
+                    <th mat-header-cell *matHeaderCellDef>Non-Attunement</th>
+                    <td mat-cell *matCellDef="let row">{{ row.nonAttunement }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="attunement">
+                    <th mat-header-cell *matHeaderCellDef>Attunement</th>
+                    <td mat-cell *matCellDef="let row">{{ row.attunement }}</td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="enchantingColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: enchantingColumns;"></tr>
                 </table>
               </div>
 
               <div class="rules-two-col">
                 <div>
                   <h3>Creature Type → Enchanting Skill</h3>
-                  <table class="reference-table">
-                    <thead>
-                      <tr><th>Creature Type</th><th>Skill</th></tr>
-                    </thead>
-                    <tbody>
-                      @for (row of enchantingSkillTable; track row.type) {
-                        <tr>
-                          <td>{{ row.type }}</td>
-                          <td>{{ row.skill }}</td>
-                        </tr>
-                      }
-                    </tbody>
+                  <table mat-table [dataSource]="enchantingSkillTable" class="reference-mat-table">
+                    <ng-container matColumnDef="type">
+                      <th mat-header-cell *matHeaderCellDef>Creature Type</th>
+                      <td mat-cell *matCellDef="let row">{{ row.type }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="skill">
+                      <th mat-header-cell *matHeaderCellDef>Skill</th>
+                      <td mat-cell *matCellDef="let row">{{ row.skill }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="enchantingSkillColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: enchantingSkillColumns;"></tr>
                   </table>
                 </div>
                 <div>
@@ -679,18 +707,17 @@
                     The difference between your crafting check result and the crafting DC determines
                     whether the item gains quirks.
                   </p>
-                  <table class="reference-table">
-                    <thead>
-                      <tr><th>Check − DC</th><th>Quirks</th></tr>
-                    </thead>
-                    <tbody>
-                      @for (row of quirksGainedTable; track row.result) {
-                        <tr>
-                          <td>{{ row.result }}</td>
-                          <td>{{ row.outcome }}</td>
-                        </tr>
-                      }
-                    </tbody>
+                  <table mat-table [dataSource]="quirksGainedTable" class="reference-mat-table">
+                    <ng-container matColumnDef="result">
+                      <th mat-header-cell *matHeaderCellDef>Check − DC</th>
+                      <td mat-cell *matCellDef="let row">{{ row.result }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="outcome">
+                      <th mat-header-cell *matHeaderCellDef>Quirks</th>
+                      <td mat-cell *matCellDef="let row">{{ row.outcome }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="quirksGainedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: quirksGainedColumns;"></tr>
                   </table>
                 </div>
               </div>
@@ -710,26 +737,36 @@
               <div class="rules-two-col">
                 <div>
                   <h3>Hide / Pelt / Membrane Items</h3>
-                  <table class="reference-table">
-                    <thead><tr><th>Minimum Size</th><th>Items</th></tr></thead>
-                    <tbody>
-                      <tr><td>Small</td><td>Sling</td></tr>
-                      <tr><td>Medium</td><td>Net, Whip</td></tr>
-                      <tr><td>Large</td><td>Light and medium armour, shields</td></tr>
-                      <tr><td>Huge</td><td>Heavy armour</td></tr>
-                    </tbody>
+                  <table mat-table [dataSource]="hideItemsTable" class="reference-mat-table">
+                    <ng-container matColumnDef="minSize">
+                      <th mat-header-cell *matHeaderCellDef>Minimum Size</th>
+                      <td mat-cell *matCellDef="let row">{{ row.minSize }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="items">
+                      <th mat-header-cell *matHeaderCellDef>Items</th>
+                      <td mat-cell *matCellDef="let row">{{ row.items }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="hideItemsColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: hideItemsColumns;"></tr>
                   </table>
                 </div>
                 <div>
                   <h3>Bone / Antler / Claw / Tooth Items</h3>
-                  <table class="reference-table">
-                    <thead><tr><th>Component</th><th>Min. Size</th><th>Items</th></tr></thead>
-                    <tbody>
-                      <tr><td>Bone</td><td>Tiny</td><td>Arrow, bolt, dart</td></tr>
-                      <tr><td>Antler/Beak/Horn/Pincer/Talon/Tusk</td><td>Small</td><td>Arrow, bolt, dart</td></tr>
-                      <tr><td>Claw/Tooth</td><td>Medium</td><td>Arrow, bolt, dart, daggers</td></tr>
-                      <tr><td>Bone</td><td>Large</td><td>Spears, staffs, clubs, quarterstaffs</td></tr>
-                    </tbody>
+                  <table mat-table [dataSource]="boneItemsTable" class="reference-mat-table">
+                    <ng-container matColumnDef="component">
+                      <th mat-header-cell *matHeaderCellDef>Component</th>
+                      <td mat-cell *matCellDef="let row">{{ row.component }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="minSize">
+                      <th mat-header-cell *matHeaderCellDef>Min. Size</th>
+                      <td mat-cell *matCellDef="let row">{{ row.minSize }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="items">
+                      <th mat-header-cell *matHeaderCellDef>Items</th>
+                      <td mat-cell *matCellDef="let row">{{ row.items }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="boneItemsColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: boneItemsColumns;"></tr>
                   </table>
                 </div>
               </div>

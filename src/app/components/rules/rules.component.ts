@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTableModule } from '@angular/material/table';
 import { CookingDataService } from '../../services/cooking-data.service';
 import { RarityLabelComponent } from '../shared/rarity-label/rarity-label.component';
 import { InventoryService } from '../../services/inventory.service';
@@ -40,6 +41,7 @@ export interface EffectRow {
     MatFormFieldModule,
     MatDividerModule,
     MatTooltipModule,
+    MatTableModule,
     RarityLabelComponent,
   ],
   templateUrl: './rules.component.html',
@@ -167,6 +169,21 @@ export class RulesComponent {
   rarityClass(rarity: string): string {
     return rarity.toLowerCase().replace(/\s+/g, '-');
   }
+
+  // ── Table column definitions ──────────────────────────────────────────
+
+  readonly harvestSizeColumns        = ['size', 'time', 'helpers'];
+  readonly essenceColumns            = ['cr', 'dc', 'essence', 'rarity'];
+  readonly componentValueColumns     = ['dc', 'sell', 'buy', 'sellSupplied', 'buySupplied'];
+  readonly essenceValueColumns       = ['essence', 'sell', 'buy'];
+  readonly tradingColumns            = ['check', 'buyer', 'seller'];
+  readonly manufacturingOutcomeColumns = ['check', 'result'];
+  readonly essenceBoonLimitColumns   = ['essence', 'rarity', 'maxBoons'];
+  readonly enchantingColumns         = ['rarity', 'essence', 'dc', 'consumable', 'nonAttunement', 'attunement'];
+  readonly enchantingSkillColumns    = ['type', 'skill'];
+  readonly quirksGainedColumns       = ['result', 'outcome'];
+  readonly hideItemsColumns          = ['minSize', 'items'];
+  readonly boneItemsColumns          = ['component', 'minSize', 'items'];
 
   // ── Cooking: static data ──────────────────────────────────────────────
 
@@ -358,6 +375,36 @@ export class RulesComponent {
     { roll: '18',   name: 'Sidekick',                     effect: 'When you use the Help action for a check or attack, the creature adds 1d4 to its roll.' },
     { roll: '19',   name: 'Power',                        effect: '+1 bonus to attack rolls and spell/effect save DCs.' },
     { roll: '20',   name: 'Additional Attunement',        effect: 'The number of magic items you can attune to increases by one.' },
+  ];
+
+  readonly manufacturingOutcomeTable = [
+    { check: '−5 or more below', result: 'Fail — half materials lost' },
+    { check: '−4 to −1',         result: 'Fail — time only wasted' },
+    { check: '0 to +4',          result: 'Success' },
+    { check: '+5 or more',       result: 'Success + one boon (roll on Mfg. Boons)' },
+  ];
+
+  readonly essenceBoonLimitTable = [
+    { essence: '—',      rarity: 'Common',    maxBoons: 0 },
+    { essence: 'Frail',  rarity: 'Uncommon',  maxBoons: 1 },
+    { essence: 'Robust', rarity: 'Rare',       maxBoons: 2 },
+    { essence: 'Potent', rarity: 'Very Rare',  maxBoons: 3 },
+    { essence: 'Mythic', rarity: 'Legendary',  maxBoons: 3 },
+    { essence: 'Deific', rarity: 'Artifact',   maxBoons: 3 },
+  ];
+
+  readonly hideItemsTable = [
+    { minSize: 'Small',  items: 'Sling' },
+    { minSize: 'Medium', items: 'Net, Whip' },
+    { minSize: 'Large',  items: 'Light and medium armour, shields' },
+    { minSize: 'Huge',   items: 'Heavy armour' },
+  ];
+
+  readonly boneItemsTable = [
+    { component: 'Bone',                               minSize: 'Tiny',   items: 'Arrow, bolt, dart' },
+    { component: 'Antler/Beak/Horn/Pincer/Talon/Tusk', minSize: 'Small',  items: 'Arrow, bolt, dart' },
+    { component: 'Claw/Tooth',                         minSize: 'Medium', items: 'Arrow, bolt, dart, daggers' },
+    { component: 'Bone',                               minSize: 'Large',  items: 'Spears, staffs, clubs, quarterstaffs' },
   ];
 
   readonly craftingQuirkSectionOpts = [
