@@ -1,0 +1,130 @@
+<!--
+  EXAMPLE: Angular Material sidenav with collapsible rail + mobile overlay.
+
+  Copy this to src/app/app.html and update:
+    - "My App" / "My Subtitle" — your app name and subtitle
+    - navGroups / navItems — your routes and icons
+    - The theme-toggle section (remove or keep as-is)
+    - COLLAPSED_KEY constant in app.ts to match your app
+
+  Requirements:
+    - ViewEncapsulation.None on the host component
+    - isRail(), isSideOpen(), sidenavMode(), sidenavOpened() signals on the component
+    - toggleCollapsed(), onSidenavClosed(), onNavClick() methods
+    - navGroups property typed as NavGroup[]
+    - MatSidenavModule, MatListModule, MatToolbarModule, MatButtonModule,
+      MatIconModule, MatTooltipModule, MatDividerModule in component imports
+    - RouterLink, RouterLinkActive, RouterOutlet
+-->
+
+<mat-sidenav-container [class.rail-active]="isRail()" [class.side-open]="isSideOpen()">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────────────── -->
+  <mat-sidenav
+    [mode]="sidenavMode()"
+    [opened]="sidenavOpened()"
+    [class.rail]="isRail()"
+    (closed)="onSidenavClosed()">
+
+    <div class="sidebar-content" [class.rail]="isRail()">
+
+      <!-- Top: header + nav -->
+      <div class="sidebar-top">
+
+        <!-- Header row: collapse toggle + app title -->
+        <mat-toolbar class="sidebar-header">
+          <button
+            type="button"
+            mat-icon-button
+            (click)="toggleCollapsed()"
+            [attr.aria-label]="isRail() ? 'Expand navigation' : 'Collapse navigation'">
+            <mat-icon>menu</mat-icon>
+          </button>
+          <div class="sidebar-titles" [class.collapsed]="isRail()">
+            <div class="sidebar-title">My App</div>
+            <div class="sidebar-subtitle">My Subtitle</div>
+          </div>
+        </mat-toolbar>
+
+        <mat-divider [class.collapsed]="isRail()" />
+
+        <!-- Nav list — grouped with optional section headers -->
+        <mat-nav-list [class.collapsed]="isRail()">
+          @for (group of navGroups; track group.header; let first = $first) {
+
+            <!-- Divider between groups (not before the first) -->
+            @if (!first) {
+              <mat-divider class="nav-group-divider" />
+            }
+
+            <!-- Section header hidden in rail mode -->
+            @if (group.header && !isRail()) {
+              <div class="nav-group-header">{{ group.header }}</div>
+            }
+
+            @for (item of group.items; track item.route) {
+              <a
+                mat-list-item
+                [routerLink]="item.route"
+                routerLinkActive="active-nav-item"
+                [class.rail-item]="isRail()"
+                [matTooltip]="isRail() ? item.label : ''"
+                matTooltipPosition="right"
+                (click)="onNavClick()">
+                <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+                <span class="nav-label">{{ item.label }}</span>
+              </a>
+            }
+
+          }
+        </mat-nav-list>
+
+      </div><!-- /sidebar-top -->
+
+      <!-- Bottom: optional theme toggle or footer actions -->
+      <div class="sidebar-bottom">
+        <mat-divider />
+        <div class="theme-toggle">
+          <button
+            type="button"
+            mat-icon-button
+            (click)="toggleTheme()"
+            [attr.aria-label]="isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'"
+            [matTooltip]="isRail() ? (isDarkMode() ? 'Light mode' : 'Dark mode') : ''"
+            matTooltipPosition="right">
+            <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+          </button>
+          <span class="nav-label theme-label">{{ isDarkMode() ? 'Light mode' : 'Dark mode' }}</span>
+        </div>
+      </div>
+
+    </div><!-- /sidebar-content -->
+
+  </mat-sidenav>
+
+  <!-- ── Main content ────────────────────────────────────────────────────────── -->
+  <mat-sidenav-content>
+
+    <!--
+      Mobile-only top toolbar. Hidden on desktop via CSS (.mobile-toolbar { display: none }).
+      The hamburger here directly toggles sidenavOpened (not toggleCollapsed) so
+      tapping it always opens the drawer on mobile regardless of the desktop
+      collapsed state.
+    -->
+    <mat-toolbar class="mobile-toolbar">
+      <button
+        type="button"
+        mat-icon-button
+        (click)="sidenavOpened.set(!sidenavOpened())"
+        aria-label="Toggle navigation">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>My App</span>
+    </mat-toolbar>
+
+    <!-- Page content renders here -->
+    <router-outlet />
+
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

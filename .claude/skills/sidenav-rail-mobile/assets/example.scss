@@ -1,0 +1,281 @@
+// ── Variables ─────────────────────────────────────────────────────────────────
+//
+// Adjust these three values to match your project. Everything else derives from them.
+//
+$sidenav-expanded-width: 260px;
+$sidenav-rail-width: 80px;
+$nav-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+// The mobile breakpoint. Must match the value in app.ts BreakpointObserver.observe().
+$mobile-breakpoint: 768px;
+
+
+// ── Root wrapper ──────────────────────────────────────────────────────────────
+//
+// ViewEncapsulation.None means all styles in this file are global.
+// Wrapping everything in app-root {} prevents them from leaking out.
+//
+app-root {
+  display: block;
+  height: 100%;
+
+  // ── Sidenav container ──────────────────────────────────────────────────────
+  //
+  // We take full ownership of mat-sidenav-content's margin-left.
+  // Angular Material computes and sets it as an inline style when the drawer
+  // opens or closes. Because we animate the drawer's WIDTH rather than its
+  // open/close state, AM's inline value goes stale immediately after the CSS
+  // width transition completes. The !important here beats that inline style.
+  //
+  // Order matters: .rail-active must come AFTER .side-open so it wins
+  // when both classes are present simultaneously during the transition.
+  //
+  mat-sidenav-container {
+    height: 100%;
+
+    mat-sidenav-content {
+      transition: margin-left $nav-transition !important;
+    }
+
+    &.side-open mat-sidenav-content {
+      margin-left: $sidenav-expanded-width !important;
+    }
+
+    &.rail-active mat-sidenav-content {
+      margin-left: $sidenav-rail-width !important;
+    }
+  }
+
+  // ── Sidenav drawer ─────────────────────────────────────────────────────────
+  //
+  // !important on width and transition: AM's .mat-drawer class sets
+  //   width: var(--mat-sidenav-container-width, 360px)
+  // which has specificity (0,1,0). We need (0,0,2) to beat it normally, but AM
+  // also sets width as an inline style in some configurations — only !important
+  // can override an inline style.
+  //
+  // The transition must also be !important to override AM's own transition
+  // declaration (which uses !important internally) so the width animates.
+  //
+  mat-sidenav {
+    width: $sidenav-expanded-width !important;
+    transition: width $nav-transition, transform 400ms cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    overflow: hidden !important;
+    border-radius: 0 !important; // Material 3 defaults to a rounded drawer; remove it
+
+    &.rail {
+      width: $sidenav-rail-width !important;
+    }
+  }
+
+  // ── Sidebar inner container ─────────────────────────────────────────────────
+
+  .mat-drawer-inner-container {
+    border-right: 1px solid var(--mat-sys-outline-variant);
+    // Subtle surface tint to distinguish sidebar from page background
+    background: color-mix(in srgb, var(--mat-sys-surface-container-low) 70%, var(--mat-sys-surface));
+  }
+
+  .sidebar-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+  }
+
+  .sidebar-top {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  // ── Sidebar header ──────────────────────────────────────────────────────────
+
+  .sidebar-header {
+    --mat-toolbar-standard-height: auto;
+    padding: 8px;
+    gap: 4px;
+    transition: justify-content $nav-transition;
+  }
+
+  // NOTE: avoid ".rail & .sidebar-header" inside a nested block — SCSS would
+  // compile that to ".rail app-root .sidebar-header" which won't match.
+  // Write rail overrides as flat selectors at the app-root level instead.
+  .rail .sidebar-header {
+    justify-content: center;
+  }
+
+  .sidebar-titles {
+    // clip-path rather than overflow:hidden so tall ascenders (e.g. Cinzel) aren't clipped
+    clip-path: inset(0 -4px 0 0);
+    max-width: $sidenav-expanded-width - 64px; // leave room for the icon button
+    opacity: 1;
+    white-space: nowrap;
+    transition:
+      max-width $nav-transition,
+      opacity $nav-transition;
+
+    &.collapsed {
+      max-width: 0;
+      opacity: 0;
+    }
+  }
+
+  .sidebar-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--mat-sys-primary);
+  }
+
+  .sidebar-subtitle {
+    font-size: 0.72rem;
+    line-height: 1.2;
+    font-style: italic;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  // ── Dividers ────────────────────────────────────────────────────────────────
+
+  mat-divider {
+    transition: opacity $nav-transition;
+
+    &.collapsed {
+      opacity: 0;
+    }
+  }
+
+  .nav-group-divider {
+    margin: 4px 0;
+  }
+
+  // ── Nav list ────────────────────────────────────────────────────────────────
+
+  .nav-group-header {
+    padding: 12px 16px 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mat-sys-on-surface-variant);
+    opacity: 0.6;
+  }
+
+  // Align the icon to fill the rail-width column so icons sit in a
+  // consistent position whether the label is visible or not.
+  mat-nav-list .mdc-list-item__start {
+    width: $sidenav-rail-width;
+    min-width: $sidenav-rail-width;
+    flex-shrink: 0;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 !important;
+  }
+
+  // Remove default padding-inline so icons are positioned by the column above.
+  mat-nav-list a[mat-list-item] {
+    padding-inline: 0 !important;
+    transition: border-radius $nav-transition;
+  }
+
+  // ── Rail item (icon-only mode) ───────────────────────────────────────────────
+  //
+  // MDC list items use flex with explicit padding/margin — !important is required
+  // to override them. .mdc-list-item__content must shrink so the icon stays centred.
+  //
+  .rail-item {
+    padding-inline: 0 !important;
+    justify-content: center !important;
+
+    .mdc-list-item__start {
+      margin: 0 !important;
+    }
+
+    .mdc-list-item__content {
+      flex-grow: 0 !important;
+      flex-shrink: 1 !important;
+    }
+  }
+
+  // ── Nav label (animated hide) ────────────────────────────────────────────────
+  //
+  // Use max-width + opacity rather than display:none — you can't transition display.
+  // overflow:hidden clips the text as max-width collapses to 0.
+  //
+  .nav-label {
+    display: inline-flex;
+    max-width: 160px;
+    opacity: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    transition:
+      max-width $nav-transition,
+      opacity $nav-transition;
+  }
+
+  .rail .nav-label {
+    max-width: 0;
+    opacity: 0;
+  }
+
+  // ── Active nav item ──────────────────────────────────────────────────────────
+
+  .active-nav-item {
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+
+  // Pill shape for the active indicator in rail mode (Material 3 navigation rail style)
+  .rail .active-nav-item {
+    border-radius: 28px;
+  }
+
+  // ── Sidebar bottom ───────────────────────────────────────────────────────────
+  //
+  // Optional section for bottom-anchored actions (theme toggle, user avatar, etc.)
+  //
+
+  .sidebar-bottom {
+    flex-shrink: 0;
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+
+    .theme-label {
+      font-size: 0.875rem;
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+
+  .rail .theme-toggle {
+    justify-content: center;
+  }
+
+  // ── Mobile toolbar ────────────────────────────────────────────────────────────
+  //
+  // Always in the DOM but hidden on desktop. On mobile it becomes a sticky
+  // top bar with a hamburger to open the overlay drawer.
+  //
+  .mobile-toolbar {
+    display: none;
+    gap: 8px;
+    padding: 0 8px 0 4px;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    font-weight: 500;
+    font-size: 0.95rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  @media (max-width: $mobile-breakpoint) {
+    .mobile-toolbar {
+      display: flex;
+    }
+  }
+}
